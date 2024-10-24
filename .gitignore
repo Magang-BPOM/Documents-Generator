@@ -90,6 +90,9 @@ vendor/
 # IDE / Development Files
 #-------------------------
 
+# dependencies
+/node_modules 
+
 # Modules Testing
 _modules/*
 
