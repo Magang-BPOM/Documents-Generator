@@ -1785,6 +1785,7 @@ video {
   background-color: rgb(75 85 99 / var(--tw-bg-opacity));
 }
 
+<<<<<<< HEAD
 .dark\:bg-gray-800:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(31 41 55 / var(--tw-bg-opacity));
@@ -1803,6 +1804,11 @@ video {
 .dark\:text-gray-100:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(243 244 246 / var(--tw-text-opacity));
+=======
+.dark\:bg-gray-200:is(.dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity));
+>>>>>>> 88e97bbd68193a03b1184cd997819e8795ec3067
 }
 
 .dark\:text-neutral-200:is(.dark *) {
