@@ -22,7 +22,7 @@ Pembuatan Dokumen
                     <label for="judul" class="block font-medium">Nama Surat:</label>
                     <select id="judul" name="judul" class="w-full p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" required>
                         <option value=""> Jenis Surat </option>
-                        <option value="Surat Keputusan">Surat Tugas</option>
+                        <option value="Surat Tugas">Surat Tugas</option>
                     </select>
                 </div>
                 <div class="mb-4">
@@ -60,14 +60,14 @@ Pembuatan Dokumen
             <label class="block text-lg font-medium">Untuk </label>
             <label class="block text-lg font-medium">Deskripsi:</label>
             <textarea id="deskripsi" name="deskripsi" class="w-full p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" rows="4" required></textarea>
-            <label for="waktu" class="block mt-4 text-lg font-medium">Waktu  : <input type="date" id="nosurat" name="nosurat" class="w-60 p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" required></label>
+            <label for="waktu" class="block mt-4 text-lg font-medium">Tanggal  : <input type="date" id="nosurat" name="nosurat" class="w-60 p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" required></label>
             <label for="waktu" class="block mt-4 text-lg font-medium">Tujuan : <input type="text" id="nosurat" name="nosurat" class="w-60 p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" required></label>
+            <div class=" mt-6 mb-60 ">
+                <button id="printPdf" class="bg-green-500 text-white p-2 rounded">Print PDF</button>
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded">Buat Surat</button>
+            </div>
         </div>
 
-        <div class="mb-50 mt-6 content-center ">
-            <button id="printPdf" class="bg-green-500 text-white p-2 rounded">Print PDF</button>
-            <button type="submit" class="bg-blue-500 text-white p-2 rounded">Buat Surat</button>
-        </div>
 
     </div>
 </div>
@@ -76,43 +76,91 @@ Pembuatan Dokumen
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-    document.getElementById('printPdf').addEventListener('click', function() {
-        const {
-            jsPDF
-        } = window.jspdf;
-        const doc = new jsPDF();
+    document.getElementById("waktu").addEventListener("input", function() {
+        const inputDate = new Date(this.value);
+        const day = inputDate.getDay();
+        const holidays = [
+            '2024-01-01',  // Contoh Hari Libur: Tahun Baru
+            '2024-12-25',  // Contoh Hari Libur: Natal
+            // Tambahkan hari libur lainnya dalam format 'YYYY-MM-DD'
+        ];
 
-        // Ambil data dari form
-        const judul = document.getElementById('judul').value;
-        const menimbang = document.getElementById('menimbang').value;
-        const dasar = document.getElementById('dasar').value;
-        const kepada = document.getElementById('kepada').value;
-        const deskripsi = document.getElementById('deskripsi').value;
-
-        // Tulis ke dalam PDF
-        doc.setFontSize(16);
-        doc.text('Surat Menyurat', 10, 10);
-
-        doc.setFontSize(12);
-        doc.text('Judul Surat:', 10, 20);
-        doc.text(judul, 10, 30);
-
-        doc.text('Menimbang:', 10, 40);
-        doc.text(menimbang, 10, 50);
-
-        doc.text('Dasar:', 10, 60);
-        doc.text(dasar, 10, 70);
-
-        doc.text('Kepada:', 10, 80);
-        doc.text(kepada, 10, 90);
-
-        doc.text('Untuk:', 10, 100);
-        doc.text(deskripsi, 10, 110);
-
-        // Simpan sebagai PDF
-        doc.save('surat.pdf');
+        const formattedDate = inputDate.toISOString().split('T')[0];
+        
+        if (day === 0 || day === 6 || holidays.includes(formattedDate)) {
+            alert("Tanggal yang Anda pilih adalah hari libur atau akhir pekan. Silakan pilih hari kerja lain.");
+            this.value = "";
+        }
     });
 </script>
+
+<script>
+        document.getElementById('printPdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Ambil data dari form
+            const judul = document.getElementById('judul').value;
+            const nosurat = document.getElementById('nosurat').value;
+            const menimbang = document.getElementById('menimbang').value;
+            const dasar = document.getElementById('dasar').value;
+            const kepada = document.getElementById('kepada').value;
+            const deskripsi = document.getElementById('deskripsi').value;
+
+            // URL gambar
+            const header = '<?= base_url("assets/dokumen/header.png"); ?>';
+            const end = '<?= base_url("assets/dokumen/end.png"); ?>';
+
+            // Fungsi untuk mengonversi gambar ke base64
+            const toDataURL = (url, callback) => {
+                const xhr = new XMLHttpRequest();
+                xhr.onload = () => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => callback(reader.result);
+                    reader.readAsDataURL(xhr.response);
+                };
+                xhr.open('GET', url);
+                xhr.responseType = 'blob';
+                xhr.send();
+            };
+
+            // Konversi gambar dan tambahkan ke PDF
+            toDataURL(header, function(base64Img) {
+                doc.addImage(base64Img, 'PNG', 10, 10, 190, 30); // Tambah gambar di PDF
+                toDataURL(end, function(base64ImgEnd) {
+                    doc.setFontSize(14);
+                    doc.text("SURAT TUGAS", 87, 55); // Geser teks di bawah gambar 87 kiri kanan 
+    
+                    doc.setFontSize(12);
+                    doc.text('NOMOR: ' + judul, 65, 60);
+    
+                    doc.setFontSize(12);
+                    doc.text('Menimbang :', 33, 70);
+                    doc.text('menimbang', 64, 70);
+    
+                    doc.text('Dasar            :', 33, 100);
+                    doc.text("dasar", 64, 100);
+    
+                    doc.text('Kepada         :', 33, 150);
+                    doc.text('kepada', 64, 150);
+    
+                    doc.text('Untuk            :', 33, 190);
+                    doc.text('deskripsi', 64, 190);
+    
+                    doc.text('Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.', 30, 230);
+    
+                    doc.addImage(base64ImgEnd, 'PNG', 0, 230, 210, 70); 
+                    doc.text('Surabaya, 25 Oktober 2024', 135, 240);
+                    doc.text('Plt. Kepala Balai Besar POM di Surabaya,', 120, 245);
+                    doc.text('Surabaya, 25 Oktober 2024', 135, 270);
+                    doc.addImage(base64Img, 'PNG', 10, 10, 190, 30);
+    
+                    // Simpan sebagai PDF
+                    doc.save('surat.pdf');
+                });
+            });
+        });
+    </script>
 
 <script>
     function petugas() {
