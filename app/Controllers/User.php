@@ -14,41 +14,45 @@ class User extends BaseController
     }
 
     public function login()
-{
-    $session = session();
-    $validation = \Config\Services::validation();
+    {
+        $session = session();
+        $validation = \Config\Services::validation();
 
-    $identifier = $this->request->getVar('identifier');
-    $password = $this->request->getVar('password');
+        $identifier = $this->request->getVar('identifier');
+        $password = $this->request->getVar('password');
 
-    $validation->setRules([
-        'identifier' => 'required',
-        'password' => 'required',
-    ]);
-
-    if (!$validation->withRequest($this->request)->run()) {
-        return redirect()->back()->with('errors', $validation->getErrors())->withInput();
-    }
-
-    $userModel = new ModelsUser(); 
-    $user = $userModel->where('nip', $identifier)->first();
-
-    if ($user && password_verify($password, $user['password'])) {
-    
-        $session->set([
-            'user_id' => $user['id'],
-            'username' => $user['nama'], 
-            'is_logged_in' => true,
+        $validation->setRules([
+            'identifier' => 'required',
+            'password' => 'required',
         ]);
 
-        return redirect()->to('/dashboard');
-    } else {
-        $session->setFlashdata('status', 'NIP atau Password salah.');
-        return redirect()->back()->withInput();
-    }
-}
+        if (!$validation->withRequest($this->request)->run()) {
+            return redirect()->back()->with('errors', $validation->getErrors())->withInput();
+        }
 
-    
+        $userModel = new ModelsUser();
+        $user = $userModel->where('nip', $identifier)->first();
+
+        if ($user && password_verify($password, $user['password'])) {
+
+            $session->set([
+                'user_id' => $user['id'],
+                'username' => $user['nama'],
+                'foto_profil' => $user['foto_profil'],
+                'is_logged_in' => true,
+            ]);
+
+            return redirect()->to('/dashboard');
+            // $all_userdata = $session->get(); // Mengambil semua data session
+            // print_r($all_userdata); // Menampilkan semua data session
+
+        } else {
+            $session->setFlashdata('status', 'NIP atau Password salah.');
+            return redirect()->back()->withInput();
+        }
+    }
+
+
 
     public function logout()
     {

@@ -23,7 +23,7 @@
             </a>
         </li>
         <li>
-            <a href="<?= base_url('/dok') ?>" class="flex items-center py-2 px-2.5 text-gray-800 rounded-lg dark:hover:bg-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-white">
+            <a href="<?= base_url('/surat/create') ?>" class="flex items-center py-2 px-2.5 text-gray-800 rounded-lg dark:hover:bg-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-white">
                 <i class="fas fa-folder text-lg" style="width: 20px; height: 20px;"></i> 
                 <span class="ml-2">Dokumen</span>
             </a>

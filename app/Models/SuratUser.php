@@ -4,23 +4,16 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class User extends Model
+class SuratUser extends Model
 {
-    protected $table            = 'user';
+    protected $table            = 'surat_user';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields = [
-        'nama', 
-        'nip', 
-        'pangkat', 
-        'jabatan', 
-        'foto_profil', 
-        'password', 
-        'created_at', 
-        'updated_at'
+        'surat_id', 'user_id'
     ];
 
     protected bool $allowEmptyInserts = false;

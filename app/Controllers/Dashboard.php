@@ -8,4 +8,5 @@ class Dashboard extends BaseController
     {
         return view('pages/dashboard');
     }
+    
 }

@@ -8,31 +8,23 @@ class SuratsSeeder extends Seeder
 {
     public function run()
     {
-        // Insert data into surats table
         $data = [
             [
-                'nomor_surat'    => 'SK-001/2024',
-                'template_id'    => 1,  
-                'user_id'        => 1, 
-                'kepada'         => 'Kepala Bagian Keuangan',
-                'untuk'          => 'Pengajuan Laporan Tahunan',
-                'tanggal_surat'  => '2024-01-15',
+                'nomor_surat' => 'PW.01.05.11A.07.24.1234',
+                'menimbang' => 'Bahwa dalam rangka melaksanakan kebijakan pengawasan di bidang obat dan makanan.',
+                'dasar' => '1. Undang-Undang No. 8 Tahun 1999 tentang Perlindungan Konsumen; 2. Undang-Undang No. 17 Tahun 2023 tentang Kesehatan;',
+                'untuk' => '1. Melaksanakan Tugas Pengawasan dan pemeriksaan peredaran obat dan makanan dan/atau pengambilan sampel pada sarana produksi, sarana distribusi, dan/atau sarana pelayanan
+		                    2. Waktu : Senin, 8 Juli 2024
+		                    3. Tujuan : Kota Surabaya
+		                    4. Biaya	: DIPA Balai Besar POM di Surabaya Tahun 2024. 
+			                MAK : 3165.QIC.004.053.B.524113',
+                'ttd_tanggal' => '2024-10-24',
+                'penanda_tangan' => 'Dr. John Doe',
+                'jabatan_ttd' => 'Plt. Kepala Balai Besar POM di Surabaya',
                 'created_at'     => date('Y-m-d H:i:s'),
-                'updated_at'     => date('Y-m-d H:i:s')
             ],
-            [
-                'nomor_surat'    => 'SP-002/2024',
-                'template_id'    => 2, 
-                'user_id'        => 2, 
-                'kepada'         => 'Direktur Utama',
-                'untuk'          => 'Undangan Rapat Bulanan',
-                'tanggal_surat'  => '2024-02-10',
-                'created_at'     => date('Y-m-d H:i:s'),
-                'updated_at'     => date('Y-m-d H:i:s')
-            ]
         ];
 
-        // Using Query Builder to insert data
-        $this->db->table('surats')->insertBatch($data);
+        $this->db->table('surat')->insertBatch($data);
     }
 }

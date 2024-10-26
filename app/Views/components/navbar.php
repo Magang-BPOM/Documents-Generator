@@ -1,10 +1,10 @@
 <header class="sticky top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-[48] w-full bg-white border-b text-sm py-2.5 lg:ps-[260px] dark:bg-neutral-800 dark:border-neutral-700">
     <nav class="px-4 sm:px-6 flex basis-full items-center w-full mx-auto">
         <div class="me-5 lg:me-0 lg:hidden">
-        <a class="flex-none rounded-xl text-xl inline-block font-semibold focus:outline-none focus:opacity-80" href="#" aria-label="Preline">
-        <img class="w-40 h-10 dark:hidden" src="https://1.bp.blogspot.com/-YCWJVRc-y0M/Wg0U4GYmw2I/AAAAAAAAE80/Q0V4U7CE3_IsfFkLBRLlatIxMj_cmknXgCLcBGAs/s1600/Badan%2BPOM.png" alt="Dummy Logo Black">
-        <img class="w-40 h-10 hidden dark:block" src="https://1.bp.blogspot.com/-YCWJVRc-y0M/Wg0U4GYmw2I/AAAAAAAAE80/Q0V4U7CE3_IsfFkLBRLlatIxMj_cmknXgCLcBGAs/s1600/Badan%2BPOM.png" alt="Dummy Logo White">
-    </a>
+            <a class="flex-none rounded-xl text-xl inline-block font-semibold focus:outline-none focus:opacity-80" href="#" aria-label="Preline">
+                <img class="w-40 h-10 dark:hidden" src="https://1.bp.blogspot.com/-YCWJVRc-y0M/Wg0U4GYmw2I/AAAAAAAAE80/Q0V4U7CE3_IsfFkLBRLlatIxMj_cmknXgCLcBGAs/s1600/Badan%2BPOM.png" alt="Dummy Logo Black">
+                <img class="w-40 h-10 hidden dark:block" src="https://1.bp.blogspot.com/-YCWJVRc-y0M/Wg0U4GYmw2I/AAAAAAAAE80/Q0V4U7CE3_IsfFkLBRLlatIxMj_cmknXgCLcBGAs/s1600/Badan%2BPOM.png" alt="Dummy Logo White">
+            </a>
             <!-- End Logo -->
         </div>
 
@@ -93,8 +93,10 @@
                 <!-- Dropdown -->
                 <div class="hs-dropdown [--placement:bottom-right] relative inline-flex">
                     <button id="hs-dropdown-account" type="button" class="size-[38px] inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-transparent text-gray-800 focus:outline-none disabled:opacity-50 disabled:pointer-events-none dark:text-white" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
-                        <img class="shrink-0 rounded-full" src="https://ui-avatars.com/api/?name=John+Doe
-" alt="Avatar">
+                        <img class="shrink-0 rounded-full"
+                          src="<?= session()->get('foto_profil') ?>"
+                            alt="Avatar">
+
                     </button>
 
                     <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg mt-2 dark:bg-neutral-800 dark:border dark:border-neutral-700 dark:divide-neutral-700 after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full before:h-4 before:absolute before:-top-4 before:start-0 before:w-full" role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-account">
@@ -145,27 +147,27 @@
 </header>
 
 <script>
-const toggleTheme = (theme) => {
-    if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-        document.getElementById('dark-mode-toggle').classList.add('hidden');
-        document.getElementById('light-mode-toggle').classList.remove('hidden');
+    const toggleTheme = (theme) => {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            document.getElementById('dark-mode-toggle').classList.add('hidden');
+            document.getElementById('light-mode-toggle').classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            document.getElementById('light-mode-toggle').classList.add('hidden');
+            document.getElementById('dark-mode-toggle').classList.remove('hidden');
+        }
+    };
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        toggleTheme(savedTheme);
     } else {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-        document.getElementById('light-mode-toggle').classList.add('hidden');
-        document.getElementById('dark-mode-toggle').classList.remove('hidden');
+        toggleTheme('light');
     }
-};
 
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme) {
-    toggleTheme(savedTheme);
-} else {
-    toggleTheme('light');
-}
-
-document.getElementById('dark-mode-toggle').addEventListener('click', () => toggleTheme('dark'));
-document.getElementById('light-mode-toggle').addEventListener('click', () => toggleTheme('light'));
+    document.getElementById('dark-mode-toggle').addEventListener('click', () => toggleTheme('dark'));
+    document.getElementById('light-mode-toggle').addEventListener('click', () => toggleTheme('light'));
 </script>

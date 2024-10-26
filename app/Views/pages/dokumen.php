@@ -13,138 +13,229 @@ Pembuatan Dokumen
 <?= $this->endSection(); ?>
 
 <?= $this->section('content'); ?>
-<div class="m-11 bg-white dark:bg-neutral-800 rounded-xl">
-    <div class="m-7 ">
-        <h1 class="text-3xl text-center p-10 font-bold">Formulir Pembuatan Surat</h1>
-        <div class="flex p-10 gap-7">
-            <div class="flex-1 w-12 text-xl">
-                <div class="mb-4">
-                    <label for="judul" class="block font-medium">Nama Surat:</label>
-                    <select id="judul" name="judul" class="w-full p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" required>
-                        <option value=""> Jenis Surat </option>
-                        <option value="Surat Keputusan">Surat Tugas</option>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="nosurat" class="block text-lg font-medium">Nomor Surat:</label>
-                    <input type="text" id="nosurat" name="nosurat" class="w-full p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" required oninput="nomorsurat()">
-                    <div id="dropdown" class="bg-white dark:bg-gray-600 border border-gray-300 dark:border-black rounded mt-1 max-h-60 overflow-auto hidden">
-                        <!-- Options will be dynamically populated here -->
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label for="menimbang" class="block font-medium">Menimbang:</label>
-                    <textarea id="menimbang" name="menimbang" class="w-full p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" rows="4" required></textarea>
-                </div>
-            </div>
-            <div class="flex-1 w-46 ">
-                <form id="suratForm">
-                    <div class="mb-4">
-                        <label for="dasar" class="block text-lg font-medium">Dasar:</label>
-                        <textarea id="dasar" name="dasar" class="w-full p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" rows="4" required></textarea>
-                    </div>
+<div class="max-w-full mx-auto p-6 sm:px-6 lg:px-6">
+    <div class="bg-white dark:bg-neutral-900 shadow-lg rounded-xl p-6">
+        <div class="flex items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-neutral-100">Buat surat baru</h2>
+        </div>
 
-                    <div class="mb-4">
-                        <label for="kepada" class="block text-lg font-medium">Kepada:</label>
-                        <input type="text" id="kepada" name="kepada" class="w-full p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" required oninput="petugas()">
-                        <div id="dropdown" class="bg-white dark:bg-gray-600 border border-gray-300 dark:border-black rounded mt-1 max-h-60 overflow-auto hidden">
-                            <!-- Options will be dynamically populated here -->
+        <!-- Success Alert -->
+        <?php if (session()->getFlashdata('message')): ?>
+            <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline"><?= session()->getFlashdata('message') ?></span>
+            </div>
+        <?php endif; ?>
+
+        <!-- Error Alert -->
+        <?php if (session()->getFlashdata('errors')): ?>
+            <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <strong class="font-bold">Error!</strong>
+                <ul class="list-disc pl-5">
+                    <?php foreach (session()->getFlashdata('errors') as $error): ?>
+                        <li><?= esc($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <!-- Form -->
+        <form method="POST" action="<?= base_url('store') ?>" ">
+            <?= csrf_field(); ?>
+
+            <div class=" grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div class="col-span-1">
+                <label for="nomor_surat" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Nomor Surat</label>
+                <input type="text" name="nomor_surat" id="nomor_surat" placeholder="contoh:PW.01.05.11A.07.24.1816" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+            </div>
+
+
+            <div class="col-span-1">
+                <label for="menimbang" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Menimbang</label>
+                <input type="text" name="menimbang" id="menimbang" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+            </div>
+
+            <div class="col-span-1">
+                <label for="dasar" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Dasar</label>
+                <textarea name="dasar" id="dasar" rows="4" placeholder="Masukkan setiap poin dasar dengan akhiran ;" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3" required></textarea>
+
+            </div>
+
+            <div class="col-span-1">
+                <label for="untuk" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Untuk</label>
+                <textarea name="untuk" id="untuk" rows="4" placeholder="Masukkan setiap poin tugas dengan akhiran ;" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3" required></textarea>
+            </div>
+
+
+
+            <div class="col-span-2">
+                <label class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Kepada</label>
+                <div id="selected-users-container" class="mb-4">
+                </div>
+
+                <input type="hidden" name="selected_user" id="selected_users_input" value="<?= old('selected_user') ?>">
+
+                <div class="flex gap-2">
+                    <div class="flex-1 relative">
+                        <input type="text" id="selected_user"
+                            class="w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                            autocomplete="off"
+                            placeholder="Ketik nama user...">
+                        <div id="dropdown-list" class="hidden absolute w-full mt-1 max-h-60 overflow-auto bg-white dark:bg-neutral-800 border border-gray-300 rounded-md shadow-lg z-10">
                         </div>
                     </div>
-                </form>
+
+                </div>
+            </div>
+
+
+            <div class="col-span-1">
+                <label for="penanda_tangan" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Penanda Tangan</label>
+                <input type="text" name="penanda_tangan" id="penanda_tangan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+            </div>
+
+            <div class="col-span-1">
+                <label for="jabatan_ttd" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Jabatan Penanda Tangan</label>
+                <input type="text" name="jabatan_ttd" id="jabatan_ttd" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+            </div>
+
+            <!-- Tanggal TTD -->
+            <div class="col-span-1">
+                <label for="ttd_tanggal" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Tanggal TTD</label>
+                <input type="date" name="ttd_tanggal" id="ttd_tanggal" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <span id="error-message" class="text-red-500 text-sm mt-2 hidden"></span>
+            </div>
+
+
+            <!-- Button -->
+            <div class="col-span-2 flex justify-start space-x-2">
+                <a href="/surat" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
+                    Kembali
+                </a>
+
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
+                    Buat Surat
+                </button>
+            </div>
+    </div>
+    </form>
+
+</div>
+</div>
+<script>
+    const selectedUsers = new Set();
+    const dropdownList = document.getElementById('dropdown-list');
+    const userInput = document.getElementById('selected_user');
+    let users = <?= json_encode($users) ?>;
+
+
+    function renderDropdown(filteredUsers) {
+        dropdownList.innerHTML = filteredUsers.map(user => `
+        <div class="user-option p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 cursor-pointer"
+             data-id="${user.id}"
+             data-nama="${user.nama}"
+             data-nip="${user.nip}"
+             data-jabatan="${user.jabatan}"
+             data-pangkat="${user.pangkat}">
+            <div class="font-medium">${user.nama}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+                NIP: ${user.nip} | ${user.jabatan}
             </div>
         </div>
+    `).join('');
 
-        <!-- Tombol untuk mencetak menjadi PDF -->
-        <div class="">
-            <label class="block text-lg font-medium">Untuk </label>
-            <label class="block text-lg font-medium">Deskripsi:</label>
-            <textarea id="deskripsi" name="deskripsi" class="w-full p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" rows="4" required></textarea>
-            <label for="waktu" class="block mt-4 text-lg font-medium">Waktu  : <input type="date" id="nosurat" name="nosurat" class="w-60 p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" required></label>
-            <label for="waktu" class="block mt-4 text-lg font-medium">Tujuan : <input type="text" id="nosurat" name="nosurat" class="w-60 p-2 border border-gray-300 dark:border-black dark:bg-gray-600 dark:text-white rounded" required></label>
-        </div>
-
-        <div class="mb-50 mt-6 content-center ">
-            <button id="printPdf" class="bg-green-500 text-white p-2 rounded">Print PDF</button>
-            <button type="submit" class="bg-blue-500 text-white p-2 rounded">Buat Surat</button>
-        </div>
-
-    </div>
-</div>
-
-<!-- Tambahkan jsPDF CDN untuk konversi PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script>
-    document.getElementById('printPdf').addEventListener('click', function() {
-        const {
-            jsPDF
-        } = window.jspdf;
-        const doc = new jsPDF();
-
-        // Ambil data dari form
-        const judul = document.getElementById('judul').value;
-        const menimbang = document.getElementById('menimbang').value;
-        const dasar = document.getElementById('dasar').value;
-        const kepada = document.getElementById('kepada').value;
-        const deskripsi = document.getElementById('deskripsi').value;
-
-        // Tulis ke dalam PDF
-        doc.setFontSize(16);
-        doc.text('Surat Menyurat', 10, 10);
-
-        doc.setFontSize(12);
-        doc.text('Judul Surat:', 10, 20);
-        doc.text(judul, 10, 30);
-
-        doc.text('Menimbang:', 10, 40);
-        doc.text(menimbang, 10, 50);
-
-        doc.text('Dasar:', 10, 60);
-        doc.text(dasar, 10, 70);
-
-        doc.text('Kepada:', 10, 80);
-        doc.text(kepada, 10, 90);
-
-        doc.text('Untuk:', 10, 100);
-        doc.text(deskripsi, 10, 110);
-
-        // Simpan sebagai PDF
-        doc.save('surat.pdf');
-    });
-</script>
-
-<script>
-    function petugas() {
-        const input = document.getElementById("kepada").value;
-        const dropdown = document.getElementById("dropdown");
-
-        if (input.length > 1) {
-            // Send a request to the backend to fetch matching names
-            fetch(`/autocomplete/names?query=${input}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Clear the dropdown before adding new options
-                    dropdown.innerHTML = '';
-                    if (data.length > 0) {
-                        dropdown.classList.remove("hidden");
-                        data.forEach(name => {
-                            const option = document.createElement("div");
-                            option.className = "p-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700";
-                            option.textContent = name;
-                            option.onclick = () => {
-                                document.getElementById("kepada").value = name;
-                                dropdown.classList.add("hidden");
-                            };
-                            dropdown.appendChild(option);
-                        });
-                    } else {
-                        dropdown.classList.add("hidden");
-                    }
-                });
-        } else {
-            dropdown.classList.add("hidden");
-        }
+        // Add click handlers to options
+        document.querySelectorAll('.user-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const userId = this.dataset.id;
+                if (!selectedUsers.has(userId)) {
+                    addSelectedUser({
+                        id: userId,
+                        nama: this.dataset.nama,
+                        nip: this.dataset.nip,
+                        jabatan: this.dataset.jabatan,
+                        pangkat: this.dataset.pangkat
+                    });
+                }
+                userInput.value = '';
+                dropdownList.classList.add('hidden');
+            });
+        });
     }
+
+    // Setup input listener
+    userInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        if (searchTerm.length < 1) {
+            renderDropdown(users);
+            dropdownList.classList.remove('hidden');
+            return;
+        }
+
+        const filteredUsers = users.filter(user =>
+            user.nama.toLowerCase().includes(searchTerm)
+        );
+
+        renderDropdown(filteredUsers);
+        dropdownList.classList.remove('hidden');
+    });
+
+    // Show all users on input focus
+    userInput.addEventListener('focus', function() {
+        renderDropdown(users);
+        dropdownList.classList.remove('hidden');
+    });
+
+    function addSelectedUser(user) {
+        selectedUsers.add(user.id);
+
+        const userElement = document.createElement('div');
+        userElement.className = 'flex items-center justify-between p-3 mb-2 bg-gray-100 dark:bg-neutral-700 rounded-md';
+        userElement.innerHTML = `
+        <div>
+            <div class="font-medium">${user.nama}</div>
+            <div class="text-sm text-gray-600 dark:text-gray-300">
+                NIP: ${user.nip} | Jabatan: ${user.jabatan} | Pangkat: ${user.pangkat}
+            </div>
+        </div>
+        <button type="button" class="text-red-600 hover:text-red-800" onclick="removeUser('${user.id}', this)">
+            ✕
+        </button>
+    `;
+
+        document.getElementById('selected-users-container').appendChild(userElement);
+        updateSelectedUsersInput();
+    }
+
+    function removeUser(userId, button) {
+        selectedUsers.delete(userId);
+        button.closest('div').remove();
+        updateSelectedUsersInput();
+    }
+
+    function updateSelectedUsersInput() {
+        document.getElementById('selected_users_input').value = Array.from(selectedUsers).join(',');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!userInput.contains(e.target) && !dropdownList.contains(e.target)) {
+            dropdownList.classList.add('hidden');
+        }
+    });
+
+    // Handle Enter key
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const firstOption = dropdownList.querySelector('.user-option');
+            if (firstOption) {
+                firstOption.click();
+            }
+        }
+    });
+
+    
 </script>
 <?= $this->endSection(); ?>

@@ -9,6 +9,8 @@
 
     <link rel="shortcut icon" href="<?= base_url('assets/images/logo1-1.png') ?>">
     <link href="<?= base_url('css/output.css') ?>" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+
 </head>
 
 <body class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100 h-screen">
@@ -77,6 +79,9 @@
 
         document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
     </script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 </body>
 
 </html>
