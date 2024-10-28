@@ -15,21 +15,27 @@
         </div>
 
         <div class="h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-    <ul class="space-y-2 px-4">
-        <li>
-            <a href="<?= base_url('/dashboard') ?>" class="flex items-center py-2 px-2.5 text-gray-800 rounded-lg dark:hover:bg-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-white">
-                <i class="fas fa-tachometer-alt text-lg" style="width: 20px; height: 20px;"></i> 
-                <span class="ml-2">Dashboard</span>
-            </a>
-        </li>
-        <li>
-            <a href="<?= base_url('/surat/create') ?>" class="flex items-center py-2 px-2.5 text-gray-800 rounded-lg dark:hover:bg-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-white">
-                <i class="fas fa-folder text-lg" style="width: 20px; height: 20px;"></i> 
-                <span class="ml-2">Dokumen</span>
-            </a>
-        </li>
-    </ul>
-</div>
+            <ul class="space-y-2 px-4">
+                <li>
+                    <a href="<?= base_url('/dashboard') ?>" class="flex items-center py-2 px-2.5 text-gray-800 rounded-lg dark:hover:bg-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-white">
+                        <i class="fas fa-tachometer-alt text-lg" style="width: 20px; height: 20px;"></i>
+                        <span class="ml-2">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= base_url('/surat/create') ?>" class="flex items-center py-2 px-2.5 text-gray-800 rounded-lg dark:hover:bg-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-white">
+                        <i class="fas fa-folder text-lg" style="width: 20px; height: 20px;"></i>
+                        <span class="ml-2">Dokumen</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= base_url('/surat/') ?>" class="flex items-center py-2 px-2.5 text-gray-800 rounded-lg dark:hover:bg-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-white">
+                        <i class="fa fa-tasks" aria-hidden="true" style="width: 20px; height: 20px;"></i>
+                        <span class="ml-2"> Tersimpan</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
 
 
         <div class="px-4 py-2">

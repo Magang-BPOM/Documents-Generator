@@ -123,6 +123,8 @@ Pembuatan Dokumen
 
 </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 <script>
     const selectedUsers = new Set();
     const dropdownList = document.getElementById('dropdown-list');
@@ -238,4 +240,24 @@ Pembuatan Dokumen
 
     
 </script>
+<script>
+    // Atur Moment.js ke bahasa Indonesia
+    moment.locale('id');
+
+    // Ambil elemen input
+    const dateInput = document.getElementById('ttd_tanggal');
+
+    // Tambahkan event listener untuk mengolah input
+    dateInput.addEventListener('change', () => {
+        // Ambil nilai dari input type="date"
+        const dateValue = dateInput.value; // Format default: YYYY-MM-DD
+
+        // Ubah ke format bahasa Indonesia
+        const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY'); // Contoh format: Senin, 28 Oktober 2024
+
+        // Tampilkan hasilnya di console atau di elemen lain
+        console.log('Formatted Date in Indonesian:', formattedDate);
+    });
+</script>
+
 <?= $this->endSection(); ?>

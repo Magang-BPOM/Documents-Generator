@@ -1,30 +1,31 @@
 <?php
 
-function formatList($text) {
- 
+function formatList($text)
+{
+
     $text = str_replace(";", "\n", $text);
-    
+
 
     $items = explode("\n", $text);
-    
-    $items = array_map(function($item) {
+
+    $items = array_map(function ($item) {
         return trim($item);
     }, $items);
-    
-    $items = array_filter($items, function($item) {
+
+    $items = array_filter($items, function ($item) {
         return !empty($item);
     });
-    
+
 
     $formatted = [];
     foreach ($items as $item) {
-        $formatted[] = $item; 
+        $formatted[] = $item;
     }
-    
+
     for ($i = 0; $i < count($formatted); $i++) {
         $formatted[$i] = ($i + 1) . ". " . $formatted[$i];
     }
-    
+
     return $formatted;
 }
 
@@ -180,13 +181,31 @@ $untukArray = formatList($surat['untuk']);
 
         <p>Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.</p>
 
-        <div class="signature" style="margin-right :60px">
-            <p style="text-align:right">Surabaya, <?= esc($surat['ttd_tanggal']) ?></p>
+        <?php
 
+        use IntlDateFormatter;
+
+        // Fungsi untuk memformat tanggal dalam bahasa Indonesia
+        function formatTanggalIndonesia($tanggal)
+        {
+            $formatter = new IntlDateFormatter(
+                'id_ID', // Locale Indonesia
+                IntlDateFormatter::LONG,
+                IntlDateFormatter::NONE,
+                'Asia/Jakarta', // Waktu lokal
+                IntlDateFormatter::GREGORIAN
+            );
+            return $formatter->format(new DateTime($tanggal));
+        }
+        ?>
+
+        <div class="signature" style="margin-right :60px">
+            <p style="text-align:right">Surabaya, <?= esc(formatTanggalIndonesia($surat['ttd_tanggal'])) ?></p>
             <p style="text-align:right;"><?= esc($surat['jabatan_ttd']) ?>,</p>
             <br><br><br>
             <p style="text-align:right"><?= esc($surat['penanda_tangan']) ?></p>
         </div>
+
 
     </div>
 
