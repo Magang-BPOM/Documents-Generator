@@ -25,7 +25,9 @@ class DokumenController extends BaseController
     public function index()
     {
        
-        $data['users'] = $this->userModel->findAll();
+        $suratUser = new SuratUser();
+        $data['surat_user'] = $suratUser->surat();
+       
         return view('pages/dokumen/index', $data);
     }
 
@@ -35,29 +37,16 @@ class DokumenController extends BaseController
         $data['users'] = $this->userModel->findAll();
         return view('pages/dokumen/create', $data);
     }
-
-    public function surat()
-    {
-        $suratUser = new SuratUser();
-        $data['surat_user'] = $suratUser->surat();
-        // dd($data);
-        var_dump($data);
-        // die();
-        return view('pages/surat', $data);
-    }
-
     public function store()
     {
         $pembuatId = session()->get('user_id'); 
-        // print_r($pembuatId);
-        
 
         $validation = $this->validate([
             'nomor_surat' => 'required',
             'menimbang' => 'required',
             'dasar' => 'required',
             'untuk'=>'required',
-            'ttd_tanggal' => 'required',
+            'ttd_tanggal' => 'required|valid_date',
             'penanda_tangan' => 'required',
             'jabatan_ttd'=>'required',
             'selected_user' => 'required'
@@ -81,7 +70,7 @@ class DokumenController extends BaseController
             'menimbang' => $this->request->getPost('menimbang'),
             'dasar' => implode("; ", array_filter(array_map('trim', explode("\n", $this->request->getPost('dasar'))))), 
             'untuk' => implode("; ", array_filter(array_map('trim', explode("\n", $this->request->getPost('untuk'))))),
-           'ttd_tanggal' => $ttdTanggal,
+            'ttd_tanggal' => $ttdTanggal,
             'penanda_tangan' => $this->request->getPost('penanda_tangan'),
             'jabatan_ttd' => $this->request->getPost('jabatan_ttd'),
             'pembuat_id' =>$pembuatId

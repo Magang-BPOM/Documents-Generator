@@ -12,9 +12,7 @@ class SuratUser extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = [
-        'surat_id', 'user_id'
-    ];
+    protected $allowedFields    = ['surat_id','user_id'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -23,7 +21,7 @@ class SuratUser extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -46,11 +44,16 @@ class SuratUser extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
+
     public function surat()
     {
+        $userId = session()->get('user_id');
+        
         return $this->select('surat_user.*, surat.*, user.nama, user.nip')
                     ->join('user', 'surat_user.user_id = user.id')
-                    ->join('surat', 'surat_user.surat_id = surat.id')
+                    ->join('surat', 'surat_user.surat_id = surat.id') 
+                    ->where('surat.pembuat_id', $userId) 
                     ->findAll();
     }
+    
 }

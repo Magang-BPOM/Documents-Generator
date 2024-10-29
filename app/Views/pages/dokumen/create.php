@@ -40,7 +40,7 @@ Pembuatan Dokumen
         <?php endif; ?>
 
         <!-- Form -->
-        <form method="POST" action="<?= base_url('store') ?>" ">
+        <form method="POST" action="<?= base_url('dokumen/store') ?>" ">
             <?= csrf_field(); ?>
 
             <div class=" grid grid-cols-1 md:grid-cols-2 gap-6">
