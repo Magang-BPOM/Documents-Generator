@@ -35,6 +35,17 @@ class DokumenController extends BaseController
         $data['users'] = $this->userModel->findAll();
         return view('pages/dokumen/create', $data);
     }
+
+    public function surat()
+    {
+        $suratUser = new SuratUser();
+        $data['surat_user'] = $suratUser->surat();
+        // dd($data);
+        var_dump($data);
+        // die();
+        return view('pages/surat', $data);
+    }
+
     public function store()
     {
         $pembuatId = session()->get('user_id'); 
@@ -46,7 +57,7 @@ class DokumenController extends BaseController
             'menimbang' => 'required',
             'dasar' => 'required',
             'untuk'=>'required',
-            'ttd_tanggal' => 'required|valid_date',
+            'ttd_tanggal' => 'required',
             'penanda_tangan' => 'required',
             'jabatan_ttd'=>'required',
             'selected_user' => 'required'

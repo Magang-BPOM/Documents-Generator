@@ -82,6 +82,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+<script src="node_modules/moment/min/moment.min.js"></script>
+
 </body>
 
 </html>
