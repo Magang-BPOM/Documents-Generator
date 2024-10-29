@@ -23,7 +23,7 @@ class SuratUser extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -45,4 +45,12 @@ class SuratUser extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function surat()
+    {
+        return $this->select('surat_user.*, surat.*, user.nama, user.nip')
+                    ->join('user', 'surat_user.user_id = user.id')
+                    ->join('surat', 'surat_user.surat_id = surat.id')
+                    ->findAll();
+    }
 }

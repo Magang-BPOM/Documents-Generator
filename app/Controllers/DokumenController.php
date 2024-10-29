@@ -26,16 +26,17 @@ class DokumenController extends BaseController
     public function index()
     {
         helper('url');
-        $user['users'] = $this->userModel->findAll();
-        return view('pages/dokumen', $user);
+        $data['users'] = $this->userModel->findAll();
+        return view('pages/dokumen', $data);
     }
 
     public function surat()
     {
-        $suratModel = new Surat();
-        
-        // Mengambil semua data surat
-        $data['surat'] = $suratModel->findAll();
+        $suratUser = new SuratUser();
+        $data['surat_user'] = $suratUser->surat();
+        // dd($data);
+        var_dump($data);
+        // die();
         return view('pages/surat', $data);
     }
 
@@ -73,8 +74,7 @@ class DokumenController extends BaseController
             'untuk' => implode("; ", array_filter(array_map('trim', explode("\n", $this->request->getPost('untuk'))))),
            'ttd_tanggal' => $ttdTanggal,
             'penanda_tangan' => $this->request->getPost('penanda_tangan'),
-            'jabatan_ttd' => $this->request->getPost('jabatan_ttd'),
-
+            'jabatan_ttd' => $this->request->getPost('jabatan_ttd')
         ];
         
         $suratModel = new Surat();

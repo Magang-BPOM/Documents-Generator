@@ -160,10 +160,10 @@ $untukArray = formatList($surat['untuk']);
             <ul class="user-info">
                 <?php foreach ($users as $user): ?>
                     <li>
-                        Nama: <?= esc($user['nama']) ?><br>
-                        NIP: <?= esc($user['nip']) ?><br>
-                        Pangkat/Gol: <?= esc($user['pangkat']) ?><br>
-                        Jabatan: <?= esc($user['jabatan']) ?>
+                        1. Nama: <?= esc($user['nama']) ?><br>
+                        2. NIP: <?= esc($user['nip']) ?><br>
+                        3. Pangkat/Gol: <?= esc($user['pangkat']) ?><br>
+                        4. Jabatan: <?= esc($user['jabatan']) ?>
                     </li>
                 <?php endforeach; ?>
             </ul>

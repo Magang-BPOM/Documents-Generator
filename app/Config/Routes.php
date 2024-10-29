@@ -11,7 +11,9 @@ $routes->get('/dashboard', 'Dashboard::index');
 
 $routes->post('store', 'DokumenController::store'); 
 $routes->get('/surat/create', 'DokumenController::index');
+
 $routes->get('surat/', 'DokumenController::surat');
+$routes->get('surat/(:num)', 'DokumenController::generate/$1');
 
 $routes->get('/', 'User::index');
 $routes->post('login', 'User::login');
