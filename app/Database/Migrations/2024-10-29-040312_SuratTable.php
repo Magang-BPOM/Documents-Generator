@@ -40,6 +40,11 @@ class SuratTable extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ],
+            'pembuat_id'   => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -51,6 +56,7 @@ class SuratTable extends Migration
         ]);
 
         $this->forge->addKey('id', true);
+        $this->forge->addForeignKey('pembuat_id', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('surat');
     }
 

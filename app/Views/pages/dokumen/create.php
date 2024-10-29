@@ -16,7 +16,7 @@ Pembuatan Dokumen
 <div class="max-w-full mx-auto p-6 sm:px-6 lg:px-6">
     <div class="bg-white dark:bg-neutral-900 shadow-lg rounded-xl p-6">
         <div class="flex items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-neutral-100">Buat surat baru</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-neutral-100">Buat Dokumen Baru</h2>
         </div>
 
         <!-- Success Alert -->

@@ -1,5 +1,4 @@
 <?php
-
 function formatList($text) {
  
     $text = str_replace(";", "\n", $text);
@@ -30,6 +29,8 @@ function formatList($text) {
 
 $dasarArray = formatList($surat['dasar']);
 $untukArray = formatList($surat['untuk']);
+
+
 ?>
 
 <!DOCTYPE html>

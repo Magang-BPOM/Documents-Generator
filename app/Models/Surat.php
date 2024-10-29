@@ -19,7 +19,8 @@ class Surat extends Model
         'untuk',
         'ttd_tanggal',
         'penanda_tangan',
-        'jabatan_ttd'
+        'jabatan_ttd',
+        'pembuat_id'
     ];
 
     protected bool $allowEmptyInserts = false;
