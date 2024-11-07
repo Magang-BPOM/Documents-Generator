@@ -10,7 +10,7 @@
 
         <div class="w-full flex items-center justify-end ms-auto md:justify-between gap-x-1 md:gap-x-3">
 
-            <div class="hidden md:block">
+            <div class="hidden md:block border rounded-md">
                 <!-- Search Input -->
                 <div class="relative">
                     <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-3.5">

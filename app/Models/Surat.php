@@ -20,7 +20,8 @@ class Surat extends Model
         'ttd_tanggal',
         'penanda_tangan',
         'jabatan_ttd',
-        'pembuat_id'
+        'pembuat_id',
+        'status'
     ];
 
 

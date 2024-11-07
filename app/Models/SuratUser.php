@@ -49,11 +49,92 @@ class SuratUser extends Model
     {
         $userId = session()->get('user_id');
         
-        return $this->select('surat_user.*, surat.*, user.nama, user.nip')
-                    ->join('user', 'surat_user.user_id = user.id')
-                    ->join('surat', 'surat_user.surat_id = surat.id') 
-                    ->where('surat.pembuat_id', $userId) 
-                    ->findAll();
+    
+        $suratQuery = $this->select('
+                DISTINCT(surat.id) as surat_id,
+                surat.nomor_surat,
+                surat.ttd_tanggal,
+                surat.penanda_tangan,
+                surat.jabatan_ttd
+            ')
+            ->join('surat', 'surat_user.surat_id = surat.id')
+            ->where('surat.pembuat_id', $userId)
+            ->where('surat.status', 'aktif')
+            ->findAll();
+        
+    
+        $result = [];
+        foreach ($suratQuery as $surat) {
+  
+            $users = $this->select('user.nama, user.nip')
+                ->join('user', 'surat_user.user_id = user.id')
+                ->where('surat_user.surat_id', $surat['surat_id'])
+                ->findAll();
+            
+    
+            $kepada = [];
+            foreach ($users as $user) {
+                $kepada[] = $user['nama'] . ' | ' . $user['nip'];
+            }
+            
+            
+            $result[] = [
+                'id' => $surat['surat_id'],
+                'nomor_surat' => $surat['nomor_surat'],
+                'kepada' => implode(' ; ', $kepada),
+                'ttd_tanggal' => $surat['ttd_tanggal'],
+                'penanda_tangan' => $surat['penanda_tangan'],
+                'jabatan_ttd' => $surat['jabatan_ttd']
+            ];
+        }
+        
+        return $result;
+    }
+
+    public function suratArsip()
+    {
+        $userId = session()->get('user_id');
+        
+    
+        $suratQuery = $this->select('
+                DISTINCT(surat.id) as surat_id,
+                surat.nomor_surat,
+                surat.ttd_tanggal,
+                surat.penanda_tangan,
+                surat.jabatan_ttd
+            ')
+            ->join('surat', 'surat_user.surat_id = surat.id')
+            ->where('surat.pembuat_id', $userId)
+            ->where('surat.status', 'arsip')
+            ->findAll();
+        
+    
+        $result = [];
+        foreach ($suratQuery as $surat) {
+  
+            $users = $this->select('user.nama, user.nip')
+                ->join('user', 'surat_user.user_id = user.id')
+                ->where('surat_user.surat_id', $surat['surat_id'])
+                ->findAll();
+            
+    
+            $kepada = [];
+            foreach ($users as $user) {
+                $kepada[] = $user['nama'] . ' | ' . $user['nip'];
+            }
+            
+            
+            $result[] = [
+                'id' => $surat['surat_id'],
+                'nomor_surat' => $surat['nomor_surat'],
+                'kepada' => implode(' ; ', $kepada),
+                'ttd_tanggal' => $surat['ttd_tanggal'],
+                'penanda_tangan' => $surat['penanda_tangan'],
+                'jabatan_ttd' => $surat['jabatan_ttd']
+            ];
+        }
+        
+        return $result;
     }
     
 }

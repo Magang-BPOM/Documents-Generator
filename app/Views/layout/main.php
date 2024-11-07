@@ -10,6 +10,9 @@
     <link rel="shortcut icon" href="<?= base_url('assets/images/logo1-1.png') ?>">
     <link href="<?= base_url('css/output.css') ?>" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
 
 </head>
 
@@ -80,9 +83,9 @@
         document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
     </script>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
-<script src="node_modules/moment/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    <script src="node_modules/moment/min/moment.min.js"></script>
 
 </body>
 

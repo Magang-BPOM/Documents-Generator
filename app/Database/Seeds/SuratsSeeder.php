@@ -22,6 +22,7 @@ class SuratsSeeder extends Seeder
                 'penanda_tangan' => 'Dr. John Doe',
                 'jabatan_ttd' => 'Plt. Kepala Balai Besar POM di Surabaya',
                 'pembuat_id' => 1,
+                'status'        => 'aktif',
                 'created_at'     => date('Y-m-d H:i:s'),
             ],
         ];

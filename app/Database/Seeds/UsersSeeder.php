@@ -29,6 +29,16 @@ class UsersSeeder extends Seeder
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ],
+            [
+                'nama' => 'Agus Salim, S.Farm, Apt, M.Farm',
+                'nip' => '987654321',
+                'pangkat' => 'Penata Tk.I / Gol.II-d',
+                'jabatan' => 'Pengawas Farmasi dan Makanan Ahli Muda',
+                'foto_profil' => 'https://i.pravatar.cc/150?img=2', 
+                'password' => password_hash('987654321', PASSWORD_BCRYPT),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ],
         ];
 
         $this->db->table('user')->insertBatch($data);

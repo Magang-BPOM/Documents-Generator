@@ -15,9 +15,13 @@
                 class="h-20 w-auto">
         </div>
         <!-- Flash Message -->
-        <?php if (session()->getFlashdata('status')): ?>
+        <?php if (session()->getFlashdata('success')): ?>
             <div class="mb-4 p-3 text-green-700 bg-green-100 rounded-lg dark:bg-green-900 dark:text-green-200">
-                <?= session()->getFlashdata('status') ?>
+                <?= session()->getFlashdata('success') ?>
+            </div>
+        <?php elseif (session()->getFlashdata('error')): ?>
+            <div class="mb-4 p-3 text-red-700 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200">
+                <?= session()->getFlashdata('error') ?>
             </div>
         <?php endif; ?>
 

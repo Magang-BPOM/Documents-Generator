@@ -31,7 +31,17 @@ function formatList($text)
 $dasarArray = formatList($surat['dasar']);
 $untukArray = formatList($surat['untuk']);
 
-
+function formatTanggalIndonesia($tanggal)
+{
+    $fmt = new IntlDateFormatter(
+        'id_ID',
+        IntlDateFormatter::LONG, // Format tanggal panjang (24 Oktober 2024)
+        IntlDateFormatter::NONE, // Tidak menggunakan format waktu
+        'Asia/Jakarta', // Timezone
+        IntlDateFormatter::GREGORIAN // Kalender Gregorian
+    );
+    return $fmt->format(new DateTime($tanggal));
+}
 ?>
 
 <!DOCTYPE html>
@@ -121,17 +131,49 @@ $untukArray = formatList($surat['untuk']);
         .user-info li {
             margin-bottom: 10px;
         }
+
+        .page-break {
+            page-break-before: always;
+        }
+        .wrap {
+            margin: 80px;
+            font-size: 18px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 36px;
+        }
+
+        .table th,
+        .table td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            font-size : 18px
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+        }
+        .section-lampiran p {
+    margin-left: calc(58% - 100px);
+    width: 100%; 
+    text-align: left;
+}
+
     </style>
 </head>
 
 <body>
+    <!-- Halaman pertama -->
     <header>
         <img src="<?= esc($header_image) ?>" alt="Header" style="width: 100%; max-height: 100%; object-fit: fill;">
     </header>
 
     <div class="content">
         <div class="section-title">
-            <p style="text-align: center; ">SURAT TUGAS</p>
+            <p style="text-align: center;">SURAT TUGAS</p>
             <p style="text-align: center;">NOMOR: <?= esc($surat['nomor_surat']) ?></p>
         </div>
 
@@ -158,17 +200,22 @@ $untukArray = formatList($surat['untuk']);
         <div class="label-content">
             <p>Kepada</p>
             <span class="colon">:</span>
-            <ul class="user-info">
-                <?php foreach ($users as $user): ?>
-                    <li>
-                        1. Nama: <?= esc($user['nama']) ?><br>
-                        2. NIP: <?= esc($user['nip']) ?><br>
-                        3. Pangkat/Gol: <?= esc($user['pangkat']) ?><br>
-                        4. Jabatan: <?= esc($user['jabatan']) ?>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+            <?php if (count($users) > 2): ?>
+                <p>Nama-nama terlampir</p>
+            <?php else: ?>
+                <ul class="user-info">
+                    <?php foreach ($users as $user): ?>
+                        <li>
+                            Nama: <?= esc($user['nama']) ?><br>
+                            NIP: <?= esc($user['nip']) ?><br>
+                            Pangkat/Gol: <?= esc($user['pangkat']) ?><br>
+                            Jabatan: <?= esc($user['jabatan']) ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
         </div>
+
         <div class="label-content">
             <p>Untuk</p>
             <span class="colon">:</span>
@@ -179,22 +226,63 @@ $untukArray = formatList($surat['untuk']);
             </ul>
         </div>
 
-
         <p>Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.</p>
-
-        <div class="signature" style="margin-right :60px">
-        <p style="text-align:right;"><?= esc($surat['ttd_tanggal']) ?>,</p>
+        <div class="signature" style="margin-right: 60px;margin-top:20px;">
+            <p style="text-align:right;"><?= formatTanggalIndonesia($surat['ttd_tanggal']) ?>,</p>
             <p style="text-align:right;"><?= esc($surat['jabatan_ttd']) ?>,</p>
-            <br><br><br>
+            <br><br><br><br>
             <p style="text-align:right"><?= esc($surat['penanda_tangan']) ?></p>
         </div>
-
-
     </div>
 
     <footer>
         <img src="<?= esc($footer_image) ?>" alt="Footer">
     </footer>
+
+    <!-- Halaman kedua untuk lampiran -->
+    <?php if (count($users) > 2): ?>
+        <div class="page-break">
+    <div class="wrap">
+        <p class="text-md" style="text-align: center; font-size: 18px; margin-bottom: 8px;">LAMPIRAN</p>
+        <div class="section-lampiran mt-6" style="text-align: center;">
+            <p class="text-md" style="text-align: left;margin-bottom: 8px;">SURAT TUGAS KEPALA BBPOM DI SURABAYA</p>
+            <p class="text-md" style="text-align: left;margin-bottom: 8px;">NOMOR: <?= esc($surat['nomor_surat']) ?></p>
+            <p class="text-md" style="text-align: left;">TANGGAL: <?= formatTanggalIndonesia($surat['ttd_tanggal']) ?></p>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>NIP</th>
+                    <th>Pangkat/Gol</th>
+                    <th>Jabatan</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($users as $index => $user): ?>
+                    <tr>
+                        <td><?= $index + 1 ?></td>
+                        <td><?= esc($user['nama']) ?></td>
+                        <td><?= esc($user['nip']) ?></td>
+                        <td><?= esc($user['pangkat']) ?></td>
+                        <td><?= esc($user['jabatan']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <div class="end"  style="border:1px solid; padding:8px;margin-top : 300px">
+        <p>Petugas tidak diperkenankan menerima gratifikasi dalam bentuk apapun.</p>
+        </div>
+           
+    </div>
+</div>
+
+
+
+    <?php endif; ?>
 </body>
 
 </html>

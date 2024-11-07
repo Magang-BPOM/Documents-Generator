@@ -13,11 +13,10 @@ Semua Dokumen
 <?= $this->endSection(); ?>
 
 <?= $this->section('content'); ?>
-
 <div class="max-w-full mx-auto p-6 sm:px-6 lg:px-6">
     <div class="bg-white dark:bg-neutral-900 shadow-lg rounded-xl p-6">
         <!-- <div class="flex items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-neutral-100">Semua Surat</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-neutral-100">Arsip Surat</h2>
         </div> -->
 
         <div class=" py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 dark:border-neutral-700">
@@ -38,14 +37,7 @@ Semua Dokumen
 
                     <div class="sm:col-span-2 md:grow">
                         <div class="flex justify-end gap-x-2">
-                            <a href="/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                                Buat Surat
-                            </a>
-
-                            <button data-trashed="true" data-url="<?= base_url('dokumen/bulkArsip') ?>" type="button" class="bulkArsipBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                                Arsip
-                            </button>
-
+                       
                             <button data-trashed="false" data-url="<?= base_url('dokumen/delete') ?>" type="button" class="bulkDeleteBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Hapus
                             </button>
@@ -106,6 +98,7 @@ Semua Dokumen
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <input type="checkbox" id="selectAll" class="form-checkbox">
                         </th>
+
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Surat</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kepada</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal TTD</th>
@@ -115,48 +108,29 @@ Semua Dokumen
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200 dark:bg-neutral-900 dark:divide-neutral-800">
-                    <?php foreach ($surat_user as $item): ?>
+                    <?php
+
+                    foreach ($arsip_surat as $item): ?>
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="<?= $item['id'] ?>" class="rowCheckbox form-checkbox"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" name="selected[]" value="<?= $item['id'] ?>" class="rowCheckbox form-checkbox">
+                            </td>
+
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['nomor_surat']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['kepada']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['ttd_tanggal']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_ttd']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="<?= base_url('dokumen/generate/' . $item['id']) ?>" class="text-blue-600 hover:underline">Lihat PDF</a>
+                                <a href="<?= base_url('dokumen/generate/' . $item['id']) ?>"
+                                    class="text-blue-600 hover:underline">
+                                    Lihat PDF
+                                </a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-
             </table>
-        </div>
-
-        <div class="flex justify-between items-center">
-            <!-- Filter for items per page -->
-            <div class="flex items-center gap-2">
-                <label for="itemsPerPage" class="text-sm text-gray-600 dark:text-neutral-400">Show</label>
-                <select id="itemsPerPage" class="py-1 px-2 border border-gray-200 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="15">15</option>
-                    <option value="20">20</option>
-                </select>
-                <span class="text-sm text-gray-600 dark:text-neutral-400">items per page</span>
-            </div>
-
-            <div class="flex items-center gap-2">
-                <button id="prevPage" class="py-1 px-3 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700" disabled>
-                    Prev
-                </button>
-
-                <span id="currentPage" class="text-sm text-gray-600 dark:text-neutral-400">1</span>
-
-                <button id="nextPage" class="py-1 px-3 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700">
-                    Next
-                </button>
-            </div>
         </div>
 
     </div>
@@ -165,84 +139,6 @@ Semua Dokumen
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const itemsPerPageSelect = document.getElementById('itemsPerPage');
-        const prevPageBtn = document.getElementById('prevPage');
-        const nextPageBtn = document.getElementById('nextPage');
-        const currentPageDisplay = document.getElementById('currentPage');
-        const tableBody = document.querySelector('tbody');
-        let currentPage = 1;
-        let itemsPerPage = parseInt(itemsPerPageSelect.value);
-
-
-        const data = [
-            <?php foreach ($surat_user as $item): ?> {
-                    id: <?= $item['id'] ?>,
-                    nomor_surat: '<?= esc($item['nomor_surat']) ?>',
-                    kepada: '<?= esc($item['kepada']) ?>',
-                    ttd_tanggal: '<?= esc($item['ttd_tanggal']) ?>',
-                    penanda_tangan: '<?= esc($item['penanda_tangan']) ?>',
-                    jabatan_ttd: '<?= esc($item['jabatan_ttd']) ?>'
-                },
-            <?php endforeach; ?>
-        ];
-
-
-        function updateTable() {
-
-            const startIdx = (currentPage - 1) * itemsPerPage;
-            const endIdx = startIdx + itemsPerPage;
-            const paginatedData = data.slice(startIdx, endIdx);
-
-            tableBody.innerHTML = '';
-
-            paginatedData.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.kepada}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.ttd_tanggal}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_ttd}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <a href="dokumen/generate/${item.id}" class="text-blue-600 hover:underline">Lihat PDF</a>
-                </td>
-            `;
-                tableBody.appendChild(row);
-            });
-
-
-            currentPageDisplay.textContent = currentPage;
-            prevPageBtn.disabled = currentPage === 1;
-            nextPageBtn.disabled = currentPage * itemsPerPage >= data.length;
-        }
-
-        itemsPerPageSelect.addEventListener('change', (e) => {
-            itemsPerPage = parseInt(e.target.value);
-            currentPage = 1;
-            updateTable();
-        });
-
-
-        prevPageBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                updateTable();
-            }
-        });
-
-        nextPageBtn.addEventListener('click', () => {
-            if (currentPage * itemsPerPage < data.length) {
-                currentPage++;
-                updateTable();
-            }
-        });
-
-        updateTable();
-    });
-
-
     document.addEventListener('DOMContentLoaded', () => {
         moment.locale('id');
 
@@ -253,72 +149,9 @@ Semua Dokumen
                 td.textContent = formattedDate;
             }
         });
-    });
 
 
-    document.getElementById("search_table").addEventListener("keyup", function() {
-        const searchValue = this.value.toLowerCase();
-        const table = document.querySelector("tbody");
-        const rows = table.getElementsByTagName("tr");
-
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            const cells = row.getElementsByTagName("td");
-            let isMatch = false;
-
-            for (let j = 0; j < cells.length - 1; j++) {
-                if (cells[j].textContent.toLowerCase().includes(searchValue)) {
-                    isMatch = true;
-                    break;
-                }
-            }
-
-            row.style.display = isMatch ? "" : "none";
-        }
-    });
-    document.getElementById('selectAll').addEventListener('click', function() {
-        const checkboxes = document.querySelectorAll('.rowCheckbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-    });
-
-    document.querySelector('.bulkArsipBtn').addEventListener('click', function() {
-        const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
-
-        if (selectedIds.length === 0) {
-            swal("Peringatan", "Silakan pilih data yang ingin diarsipkan.", "warning");
-            return;
-        }
-
-        fetch(this.dataset.url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    selectedIds
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    swal("Sukses", "Data berhasil diarsipkan.", "success")
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000)
-                } else {
-                    swal("Gagal", "Gagal mengarsipkan data.", "error");
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                swal("Error", "Terjadi kesalahan saat mengarsipkan data.", "error");
-            });
-    });
-
-    document.querySelector('.bulkDeleteBtn').addEventListener('click', function() {
+        document.querySelector('.bulkDeleteBtn').addEventListener('click', function() {
         const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
 
         if (selectedIds.length === 0) {
@@ -352,6 +185,36 @@ Semua Dokumen
                 swal("Error", "Terjadi kesalahan saat menghapus data.", "error");
             });
     });
-</script>
+    });
 
-<?= $this->endSection(); ?>
+
+    document.getElementById("search_table").addEventListener("keyup", function() {
+        const searchValue = this.value.toLowerCase();
+        const table = document.querySelector("tbody");
+        const rows = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName("td");
+            let isMatch = false;
+
+            for (let j = 0; j < cells.length - 1; j++) {
+                if (cells[j].textContent.toLowerCase().includes(searchValue)) {
+                    isMatch = true;
+                    break;
+                }
+            }
+
+            row.style.display = isMatch ? "" : "none";
+        }
+    });
+    document.getElementById('selectAll').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.rowCheckbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+
+ 
+</script>
+    <?= $this->endSection(); ?>
