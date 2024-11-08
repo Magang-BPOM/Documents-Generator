@@ -20,4 +20,4 @@ $routes->post('dokumen/delete', 'DokumenController::delete');
 // Rute untuk User
 $routes->get('/', 'User::index'); 
 $routes->post('/login', 'User::login'); 
-$routes->get('/logout', 'User::logout'); 
+$routes->post('/logout', 'User::logout'); 

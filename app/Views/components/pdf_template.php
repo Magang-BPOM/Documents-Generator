@@ -228,7 +228,7 @@ function formatTanggalIndonesia($tanggal)
 
         <p>Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.</p>
         <div class="signature" style="margin-right: 60px;margin-top:20px;">
-            <p style="text-align:right;"><?= formatTanggalIndonesia($surat['ttd_tanggal']) ?>,</p>
+            <p style="text-align:right;">Surabaya, <?= formatTanggalIndonesia($surat['ttd_tanggal']) ?>,</p>
             <p style="text-align:right;"><?= esc($surat['jabatan_ttd']) ?>,</p>
             <br><br><br><br>
             <p style="text-align:right"><?= esc($surat['penanda_tangan']) ?></p>

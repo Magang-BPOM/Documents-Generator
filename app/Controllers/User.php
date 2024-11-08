@@ -10,6 +10,13 @@ class User extends BaseController
 {
     public function index()
     {
+        // Cek jika pengguna sudah login
+        if (session()->get('logged_in')) {
+            // Arahkan langsung ke dashboard jika session masih ada
+            return redirect()->to('/dashboard');
+        }
+
+        // Jika belum login, tampilkan halaman login
         return view('auth/login');
     }
 
@@ -17,34 +24,36 @@ class User extends BaseController
     {
         $session = session();
         $validation = \Config\Services::validation();
-    
+
+        // Mengambil data input
         $identifier = $this->request->getVar('identifier');
         $password = $this->request->getVar('password');
-    
-        // Set validasi input
+
+        // Atur aturan validasi input
         $validation->setRules([
             'identifier' => 'required',
             'password' => 'required',
         ]);
-    
+
         // Cek validasi
         if (!$validation->withRequest($this->request)->run()) {
             return redirect()->back()->with('errors', $validation->getErrors())->withInput();
         }
-    
+
+        // Cari user berdasarkan NIP
         $userModel = new ModelsUser();
         $user = $userModel->where('nip', $identifier)->first();
-    
+
         // Cek jika user ada dan password benar
         if ($user && password_verify($password, $user['password'])) {
-            // Set session data untuk pengguna yang login
+            // Set data session untuk pengguna yang login
             $session->set([
                 'user_id' => $user['id'],
-                'username' => $user['nama'],
-                'foto_profil' => $user['foto_profil'],
-                'is_logged_in' => true,
+                'nama' => $user['nama'],
+                'nip' => $user['nip'], // Menyimpan NIP di session
+                'logged_in' => true,
             ]);
-    
+
             // Set flash message untuk login berhasil
             $session->setFlashdata('success', 'Login berhasil! Selamat datang, ' . $user['nama']);
             return redirect()->to('/dashboard');
@@ -54,11 +63,11 @@ class User extends BaseController
             return redirect()->back()->withInput();
         }
     }
-    
 
     public function logout()
     {
+        // Hapus semua data session
         session()->destroy();
-        return redirect()->to('/login');
+        return redirect()->to('/');
     }
 }

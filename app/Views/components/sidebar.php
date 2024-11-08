@@ -16,16 +16,19 @@
 
             <div class="h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
                 <ul class="space-y-2 px-4" id="menu-container">
-                
+
                 </ul>
             </div>
 
             <div class="px-4 py-2">
-                <a href="/logout" class="flex items-center py-2.5 px-4 text-red-600 rounded-lg hover:bg-red-100 focus:outline-none">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span class="ml-2">Logout</span>
-                </a>
+                <form method="POST" action="<?= base_url('logout') ?>" class="flex items-center">
+                    <button type="submit" class="flex items-center py-2.5 px-4 text-red-600 rounded-lg hover:bg-red-100 focus:outline-none">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="ml-2">Logout</span>
+                    </button>
+                </form>
             </div>
+
         </div>
     </div>
 
