@@ -50,13 +50,20 @@ class User extends BaseController
             $session->set([
                 'user_id' => $user['id'],
                 'nama' => $user['nama'],
-                'nip' => $user['nip'], // Menyimpan NIP di session
+                'nip' => $user['nip'],
+                'role' => $user['role'],
                 'logged_in' => true,
             ]);
 
-            // Set flash message untuk login berhasil
-            $session->setFlashdata('success', 'Login berhasil! Selamat datang, ' . $user['nama']);
-            return redirect()->to('/dashboard');
+            // Arahkan berdasarkan role
+            if ($user['role'] == 'admin') {
+                $session->setFlashdata('success', 'Login berhasil! Selamat datang, ' . $user['nama']);
+                return redirect()->to('/admin/dashboard');
+            } else {
+                $session->setFlashdata('success', 'Login berhasil! Selamat datang, ' . $user['nama']);
+                return redirect()->to('/user/dashboard');
+            }
+
         } else {
             // Set flash message untuk login gagal
             $session->setFlashdata('error', 'NIP atau Password salah.');

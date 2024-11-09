@@ -42,6 +42,10 @@ class UserTable extends Migration
                 'constraint' => 255, 
                 'null' => false,
             ],
+            'role'        => [
+                'type'       => 'VARCHAR',
+                'constraint' => '100',
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
