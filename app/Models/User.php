@@ -12,16 +12,7 @@ class User extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = [
-        'nama', 
-        'nip', 
-        'pangkat', 
-        'jabatan', 
-        'foto_profil', 
-        'password', 
-        'created_at', 
-        'updated_at'
-    ];
+    protected $allowedFields = ['nip', 'nama', 'jabatan', 'pangkat', 'role'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -52,4 +43,9 @@ class User extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function surat()
+    {
+        return $this->findAll(); // Sesuaikan query jika perlu
+    }
 }

@@ -1,4 +1,4 @@
-<?= $this->extend('pages/admin/layout/main'); ?>
+<?= $this->extend('pages/user/layout/main'); ?>
 
 <?= $this->section('title'); ?>
 Dashboard

@@ -24,18 +24,30 @@ class DokumenController extends BaseController
 
     public function index()
     {
+        $role = session()->get('role');
 
         $suratUser = new SuratUser();
         $data['surat_user'] = $suratUser->surat();
 
-        return view('pages/dokumen/index', $data);
+        if ($role == 'admin') {
+            return view('pages/admin/dokumen/index', $data);
+        } else {
+            return view('pages/user/dokumen/index', $data);
+        }
     }
+
 
     public function create()
     {
+        $role = session()->get('role');
 
         $data['users'] = $this->userModel->findAll();
-        return view('pages/dokumen/create', $data);
+
+        if ($role == 'admin') {
+            return view('pages/admin/dokumen/create', $data);
+        } else {
+            return view('pages/user/dokumen/create', $data);
+        }
     }
 
     public function delete()
@@ -99,16 +111,22 @@ class DokumenController extends BaseController
         $userIds = explode(',', $this->request->getPost('selected_user'));
         log_message('debug', 'User IDs: ' . implode(',', $userIds));
 
-
         foreach ($userIds as $userId) {
             if (!empty($userId)) {
+                log_message('debug', 'Inserting SuratUser with surat_id: ' . $suratId . ' and user_id: ' . $userId);
+                
                 $suratUserModel = new SuratUser();
                 $suratUserModel->insert([
                     'surat_id' => $suratId,
                     'user_id' => $userId
                 ]);
+        
+                // Log if there is an error during the insert
+                if ($suratUserModel->errors()) {
+                    log_message('error', 'Error inserting SuratUser: ' . json_encode($suratUserModel->errors()));
+                }
             }
-        }
+        }        
 
         return $this->generate($suratId);
     }
@@ -195,7 +213,7 @@ class DokumenController extends BaseController
         $suratUser = new SuratUser();
         $data['arsip_surat'] = $suratUser->suratArsip();
 
-        return view('pages/dokumen/archive', $data);
+        return view('pages/admin/dokumen/archive', $data);
     }
 
 

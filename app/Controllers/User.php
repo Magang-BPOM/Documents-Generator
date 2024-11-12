@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\User as ModelsUser;
+use App\Models\SuratUser as SuratUser;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class User extends BaseController
@@ -19,6 +20,54 @@ class User extends BaseController
         // Jika belum login, tampilkan halaman login
         return view('auth/login');
     }
+
+    public function listuser()
+    {
+
+        $suratUser = new ModelsUser();
+        $data['user'] = $suratUser->surat();
+
+        return view('pages/admin/listuser/index', $data);
+    }
+
+    public function updateuser()
+    {
+        // Validasi input
+        $validation =  \Config\Services::validation();
+        $validation->setRules([
+            'nip' => 'required|is_unique[users.nip]',
+            'nama' => 'required',
+            'jabatan' => 'required',
+            'pangkat' => 'required',
+            'role' => 'required',
+        ]);
+
+        if (!$validation->withRequest($this->request)->run()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'errors' => $validation->getErrors()
+            ]);
+        }
+
+        // Ambil data dari form
+        $userData = [
+            'nip' => $this->request->getPost('nip'),
+            'nama' => $this->request->getPost('nama'),
+            'jabatan' => $this->request->getPost('jabatan'),
+            'pangkat' => $this->request->getPost('pangkat'),
+            'role' => $this->request->getPost('role'),
+        ];
+
+        // Update data user
+        $userModel = new ModelsUser();
+        $userModel->update($this->request->getPost('id'), $userData);
+
+        // Kembalikan response
+        return $this->response->setJSON([
+            'success' => true
+        ]);
+    }
+
 
     public function login()
     {
@@ -61,9 +110,8 @@ class User extends BaseController
                 return redirect()->to('/admin/dashboard');
             } else {
                 $session->setFlashdata('success', 'Login berhasil! Selamat datang, ' . $user['nama']);
-                return redirect()->to('/user/dashboard');
+                return redirect()->to('/dashboard');
             }
-
         } else {
             // Set flash message untuk login gagal
             $session->setFlashdata('error', 'NIP atau Password salah.');
