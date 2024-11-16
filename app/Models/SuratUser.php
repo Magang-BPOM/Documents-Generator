@@ -150,7 +150,6 @@ class SuratUser extends Model
                 surat.jabatan_ttd
             ')
             ->join('surat', 'surat_user.surat_id = surat.id')
-            ->where('surat.pembuat_id', $userId)
             ->where('surat.status', 'arsip')
             ->findAll();
 

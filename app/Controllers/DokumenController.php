@@ -221,6 +221,9 @@ class DokumenController extends BaseController
     {
         $request = $this->request->getJSON();
         $selectedIds = $request->selectedIds ?? [];
+        header('Content-Type: application/json');
+        echo json_encode($request);
+        exit;
 
         if (empty($selectedIds)) {
             return $this->response->setJSON(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
