@@ -28,7 +28,16 @@ class User extends Model
     protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [];
+    // Aturan validasi
+    protected $validationRules = [
+        'nama'        => 'required|min_length[3]|max_length[255]',
+        'nip'         => 'required|min_length[8]|max_length[100]|is_unique[user.nip]',
+        'jabatan'     => 'required|min_length[3]|max_length[100]',
+        'pangkat'     => 'permit_empty|max_length[100]',
+        'foto_profil' => 'permit_empty|valid_image[foto_profil]',
+        'password'    => 'required|min_length[6]|max_length[255]',
+        'role'        => 'required|in_list[admin,pegawai]',
+    ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
@@ -44,7 +53,7 @@ class User extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function surat()
+    public function user()
     {
         return $this->findAll(); // Sesuaikan query jika perlu
     }

@@ -6,7 +6,10 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 // $routes->get('/', 'Home::index');
+$routes->get('/', 'User::index');
 
+$routes->post('/login', 'User::login');
+$routes->post('/logout', 'User::logout');
 
 // Rute yang hanya bisa diakses jika login
 $routes->group('', ['filter' => 'auth'], function ($routes) {
@@ -23,8 +26,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
         //List user
         $routes->get('/admin/listuser', 'User::listuser');
-        $routes->post('/admin/updateuser', 'User::updateuser'); 
+        $routes->get('/user/create', 'User::create');
+        $routes->post('/user/store', 'User::store');
 
+        $routes->post('/admin/updateuser', 'User::updateuser');
     });
 
     // Rute untuk User
@@ -32,12 +37,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/dashboard', 'DashboardController::user');
         $routes->get('/dokumen', 'DokumenController::index');
         $routes->get('/dokumen/create', 'DokumenController::create');
+        $routes->post('/dokumen/store', 'DokumenController::store');
         // Tambahkan rute khusus user lainnya
     });
 });
-
-
-// Rute untuk User
-$routes->get('/', 'User::index');
-$routes->post('/login', 'User::login');
-$routes->post('/logout', 'User::logout');

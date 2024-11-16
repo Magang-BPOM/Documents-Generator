@@ -25,10 +25,63 @@ class User extends BaseController
     {
 
         $suratUser = new ModelsUser();
-        $data['user'] = $suratUser->surat();
+        $data['user'] = $suratUser->user();
 
         return view('pages/admin/listuser/index', $data);
     }
+
+    public function create()
+    {
+        return view('pages/admin/listuser/create');
+    }
+
+    // Menyimpan data user baru
+    public function store()
+    {
+        // Validasi input
+        $validation = \Config\Services::validation();
+
+        $validation->setRules([
+            'nama'        => 'required',
+            'nip'         => 'required|min_length[8]|max_length[100]|is_unique[user.nip]',
+            'jabatan'     => 'required',
+            'pangkat'     => 'permit_empty|max_length[100]',
+            'foto_profil' => 'permit_empty|valid_image[foto_profil]',
+            'password'    => 'required|min_length[6]|max_length[255]',
+            'role'        => 'required|in_list[admin,pegawai]',
+        ]);
+
+        if (!$validation->run($this->request->getPost())) {
+            // Jika validasi gagal, tampilkan kembali form input dengan error
+            return redirect()->to('/user/create')->withInput()->with('validation', $validation);
+        }
+
+        // Ambil data dari form
+        $data = [
+            'nama'        => $this->request->getPost('nama'),
+            'nip'         => $this->request->getPost('nip'),
+            'jabatan'     => $this->request->getPost('jabatan'),
+            'pangkat'     => $this->request->getPost('pangkat'),
+            'foto_profil' => 'https://i.pravatar.cc/150?img=1',
+            'password'    => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT), // Enkripsi password
+            'role'        => $this->request->getPost('role'),
+            'created_at'  => date('Y-m-d H:i:s'),
+        ];
+        header('Content-Type: application/json'); // Set header untuk output JSON
+        echo json_encode($data);
+        exit;
+
+        // Simpan data ke database
+        $userModel = new ModelsUser();
+        if ($userModel->insert($data)) {
+            return redirect()->to('/user/create')->with('success', 'User berhasil ditambahkan!');
+        } else {
+            return redirect()->to('/user/create')->with('error', 'Gagal menambahkan user');
+        }
+    }
+
+    // Fungsi untuk upload foto profil
+
 
     public function updateuser()
     {

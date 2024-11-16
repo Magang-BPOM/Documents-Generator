@@ -25,6 +25,11 @@ class CreateSuratUserTable extends Migration
                 'constraint' => 11,
                 'unsigned'   => true,
             ],
+            'id_created'   => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -34,7 +39,6 @@ class CreateSuratUserTable extends Migration
 
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('surat_id', 'surat', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('user_id', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('surat_user');
     }
 

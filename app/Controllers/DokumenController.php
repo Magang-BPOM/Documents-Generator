@@ -27,11 +27,14 @@ class DokumenController extends BaseController
         $role = session()->get('role');
 
         $suratUser = new SuratUser();
-        $data['surat_user'] = $suratUser->surat();
+        $dataAdmin['surat_user'] = $suratUser->surat();
+
+
 
         if ($role == 'admin') {
-            return view('pages/admin/dokumen/index', $data);
+            return view('pages/admin/dokumen/index', $dataAdmin);
         } else {
+            $data['surat_user'] = $suratUser->suratbyUser();
             return view('pages/user/dokumen/index', $data);
         }
     }
@@ -101,7 +104,6 @@ class DokumenController extends BaseController
             'ttd_tanggal' => $ttdTanggal,
             'penanda_tangan' => $this->request->getPost('penanda_tangan'),
             'jabatan_ttd' => $this->request->getPost('jabatan_ttd'),
-            'pembuat_id' => $pembuatId
         ];
 
         $suratModel = new Surat();
@@ -111,25 +113,23 @@ class DokumenController extends BaseController
         $userIds = explode(',', $this->request->getPost('selected_user'));
         log_message('debug', 'User IDs: ' . implode(',', $userIds));
 
+
         foreach ($userIds as $userId) {
             if (!empty($userId)) {
-                log_message('debug', 'Inserting SuratUser with surat_id: ' . $suratId . ' and user_id: ' . $userId);
-                
                 $suratUserModel = new SuratUser();
                 $suratUserModel->insert([
                     'surat_id' => $suratId,
-                    'user_id' => $userId
+                    'user_id' => $userId,
+                    'id_created' => $pembuatId
                 ]);
-        
-                // Log if there is an error during the insert
-                if ($suratUserModel->errors()) {
-                    log_message('error', 'Error inserting SuratUser: ' . json_encode($suratUserModel->errors()));
-                }
             }
-        }        
+        }
 
         return $this->generate($suratId);
     }
+
+
+
 
     public function generate($suratId)
     {
