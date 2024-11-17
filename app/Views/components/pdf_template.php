@@ -28,7 +28,6 @@ function formatList($text)
     return $formatted;
 }
 
-$dasarArray = formatList($surat['dasar']);
 $untukArray = formatList($surat['untuk']);
 
 function formatTanggalIndonesia($tanggal)
@@ -41,6 +40,18 @@ function formatTanggalIndonesia($tanggal)
         IntlDateFormatter::GREGORIAN // Kalender Gregorian
     );
     return $fmt->format(new DateTime($tanggal));
+}
+function formathari($waktu)
+{
+    $fmt = new IntlDateFormatter(
+        'id_ID', // Locale Indonesia
+        IntlDateFormatter::FULL, // Format lengkap, termasuk hari
+        IntlDateFormatter::NONE, // Tidak menggunakan format waktu
+        'Asia/Jakarta', // Timezone
+        IntlDateFormatter::GREGORIAN // Kalender Gregorian
+    );
+
+    return $fmt->format(new DateTime($waktu));
 }
 ?>
 
@@ -58,6 +69,35 @@ function formatTanggalIndonesia($tanggal)
             padding: 0;
             box-sizing: border-box;
             font-size: 16px;
+        }
+
+        .numbered-list {
+            padding-left: 10px;
+            /* Menghapus padding bawaan */
+        }
+
+        .numbered-list li {
+            display: flex;
+            /* Flexbox untuk mengatur nomor dan teks */
+            align-items: flex-start;
+        }
+
+        .numbered-list li::before {
+            counter-increment: item;
+            /* Menambah counter */
+            margin-right: 10px;
+            /* Spasi antara nomor dan teks */
+            text-align: right;
+            /* Menjaga nomor di kanan */
+            min-width: 20px;
+            /* Panjang minimum untuk nomor */
+        }
+
+        .numbered-list li .list-text {
+            /* Mengatur jarak teks */
+            text-indent: 1px;
+            /* Menyelaraskan teks */
+            padding-left: 10px;
         }
 
         body {
@@ -135,10 +175,12 @@ function formatTanggalIndonesia($tanggal)
         .page-break {
             page-break-before: always;
         }
+
         .wrap {
             margin: 80px;
             font-size: 18px;
         }
+
         .table {
             width: 100%;
             border-collapse: collapse;
@@ -150,18 +192,18 @@ function formatTanggalIndonesia($tanggal)
             border: 1px solid black;
             padding: 10px;
             text-align: left;
-            font-size : 18px
+            font-size: 18px
         }
 
         .table th {
             background-color: #f2f2f2;
         }
-        .section-lampiran p {
-    margin-left: calc(58% - 100px);
-    width: 100%; 
-    text-align: left;
-}
 
+        .section-lampiran p {
+            margin-left: calc(58% - 100px);
+            width: 100%;
+            text-align: left;
+        }
     </style>
 </head>
 
@@ -186,12 +228,19 @@ function formatTanggalIndonesia($tanggal)
         <div class="label-content">
             <p>Dasar</p>
             <span class="colon">:</span>
-            <ul>
-                <?php foreach ($dasarArray as $item): ?>
-                    <li><?= esc($item) ?></li>
-                <?php endforeach; ?>
-            </ul>
+            <?php if (count($dasar) > 2): ?>
+            <?php else: ?>
+                <ul class="numbered-list">
+                    <?php $no = 1; ?>
+                    <?php foreach ($dasar as $list): ?>
+                        <li>
+                            <?= $no++ ?>. <span class="list-text"><?= esc($list['undang']) ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
         </div>
+
 
         <div class="label-content">
             <p style="text-align:center">Memberi Tugas</p>
@@ -219,6 +268,9 @@ function formatTanggalIndonesia($tanggal)
         <div class="label-content">
             <p>Untuk</p>
             <span class="colon">:</span>
+            <p><?= esc($surat['sebagai']) ?></p>
+            <p><?= formathari($surat['waktu']) ?></p>
+            <p><?= esc($surat['tujuan']) ?></p>
             <ul>
                 <?php foreach ($untukArray as $item): ?>
                     <li><?= esc($item) ?></li>
@@ -228,7 +280,7 @@ function formatTanggalIndonesia($tanggal)
 
         <p>Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.</p>
         <div class="signature" style="margin-right: 60px;margin-top:20px;">
-            <p style="text-align:right;">Surabaya, <?= formatTanggalIndonesia($surat['ttd_tanggal']) ?>,</p>
+            <p style="text-align:right;">Surabaya, <?= formatTanggalIndonesia($surat['created_at']) ?>,</p>
             <p style="text-align:right;"><?= esc($surat['jabatan_ttd']) ?>,</p>
             <br><br><br><br>
             <p style="text-align:right"><?= esc($surat['penanda_tangan']) ?></p>
@@ -242,46 +294,43 @@ function formatTanggalIndonesia($tanggal)
     <!-- Halaman kedua untuk lampiran -->
     <?php if (count($users) > 2): ?>
         <div class="page-break">
-    <div class="wrap">
-        <p class="text-md" style="text-align: center; font-size: 18px; margin-bottom: 8px;">LAMPIRAN</p>
-        <div class="section-lampiran mt-6" style="text-align: center;">
-            <p class="text-md" style="text-align: left;margin-bottom: 8px;">SURAT TUGAS KEPALA BBPOM DI SURABAYA</p>
-            <p class="text-md" style="text-align: left;margin-bottom: 8px;">NOMOR: <?= esc($surat['nomor_surat']) ?></p>
-            <p class="text-md" style="text-align: left;">TANGGAL: <?= formatTanggalIndonesia($surat['ttd_tanggal']) ?></p>
+            <div class="wrap">
+                <p class="text-md" style="text-align: center; font-size: 18px; margin-bottom: 8px;">LAMPIRAN</p>
+                <div class="section-lampiran mt-6" style="text-align: center;">
+                    <p class="text-md" style="text-align: left;margin-bottom: 8px;">SURAT TUGAS KEPALA BBPOM DI SURABAYA</p>
+                    <p class="text-md" style="text-align: left;margin-bottom: 8px;">NOMOR: <?= esc($surat['nomor_surat']) ?></p>
+                    <p class="text-md" style="text-align: left;">TANGGAL: <?= formatTanggalIndonesia($surat['created-at']) ?></p>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>NIP</th>
+                            <th>Pangkat/Gol</th>
+                            <th>Jabatan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($users as $index => $user): ?>
+                            <tr>
+                                <td><?= $index + 1 ?></td>
+                                <td><?= esc($user['nama']) ?></td>
+                                <td><?= esc($user['nip']) ?></td>
+                                <td><?= esc($user['pangkat']) ?></td>
+                                <td><?= esc($user['jabatan']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+                <div class="end" style="border:1px solid; padding:8px;margin-top : 300px">
+                    <p>Petugas tidak diperkenankan menerima gratifikasi dalam bentuk apapun.</p>
+                </div>
+
+            </div>
         </div>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Nama</th>
-                    <th>NIP</th>
-                    <th>Pangkat/Gol</th>
-                    <th>Jabatan</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($users as $index => $user): ?>
-                    <tr>
-                        <td><?= $index + 1 ?></td>
-                        <td><?= esc($user['nama']) ?></td>
-                        <td><?= esc($user['nip']) ?></td>
-                        <td><?= esc($user['pangkat']) ?></td>
-                        <td><?= esc($user['jabatan']) ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-
-        <div class="end"  style="border:1px solid; padding:8px;margin-top : 300px">
-        <p>Petugas tidak diperkenankan menerima gratifikasi dalam bentuk apapun.</p>
-        </div>
-           
-    </div>
-</div>
-
-
-
     <?php endif; ?>
 </body>
 

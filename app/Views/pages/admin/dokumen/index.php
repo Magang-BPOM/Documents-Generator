@@ -109,7 +109,7 @@ Semua Dokumen
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Surat</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kepada</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal TTD</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Tugas </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penanda Tangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan TTD</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
@@ -123,7 +123,7 @@ Semua Dokumen
                             <td class="px-6 py-4 whitespace-nowrap"><?= $no++ ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['nomor_surat']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['kepada']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['ttd_tanggal']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_ttd']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -183,7 +183,7 @@ Semua Dokumen
                     id: <?= $item['id'] ?>,
                     nomor_surat: '<?= esc($item['nomor_surat']) ?>',
                     kepada: '<?= esc($item['kepada']) ?>',
-                    ttd_tanggal: '<?= esc($item['ttd_tanggal']) ?>',
+                    waktu: '<?= esc($item['waktu']) ?>',
                     penanda_tangan: '<?= esc($item['penanda_tangan']) ?>',
                     jabatan_ttd: '<?= esc($item['jabatan_ttd']) ?>'
                 },
@@ -192,34 +192,35 @@ Semua Dokumen
 
 
         function updateTable() {
-
             const startIdx = (currentPage - 1) * itemsPerPage;
             const endIdx = startIdx + itemsPerPage;
             const paginatedData = data.slice(startIdx, endIdx);
 
             tableBody.innerHTML = '';
 
-            paginatedData.forEach(item => {
+            paginatedData.forEach((item, index) => {
                 const row = document.createElement('tr');
+                const rowNumber = startIdx + index + 1; // Nomor baris
                 row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.kepada}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.ttd_tanggal}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_ttd}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <a href="dokumen/generate/${item.id}" class="text-blue-600 hover:underline">Lihat PDF</a>
-                </td>
-            `;
+            <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
+            <td class="px-6 py-4 whitespace-nowrap">${rowNumber}</td> <!-- Tambahkan nomor -->
+            <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${item.kepada}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${item.waktu}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_ttd}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <a href="dokumen/generate/${item.id}" class="text-blue-600 hover:underline">Lihat PDF</a>
+            </td>
+        `;
                 tableBody.appendChild(row);
             });
-
 
             currentPageDisplay.textContent = currentPage;
             prevPageBtn.disabled = currentPage === 1;
             nextPageBtn.disabled = currentPage * itemsPerPage >= data.length;
         }
+
 
         itemsPerPageSelect.addEventListener('change', (e) => {
             itemsPerPage = parseInt(e.target.value);

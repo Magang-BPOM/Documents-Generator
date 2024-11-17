@@ -1,4 +1,4 @@
-<?= $this->extend('layout/main'); ?>
+<?= $this->extend('pages/admin/layout/main'); ?>
 
 <?= $this->section('title'); ?>
 Semua Dokumen
@@ -98,10 +98,10 @@ Semua Dokumen
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <input type="checkbox" id="selectAll" class="form-checkbox">
                         </th>
-
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Surat</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kepada</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal TTD</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Tugas</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penanda Tangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan TTD</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
@@ -109,16 +109,16 @@ Semua Dokumen
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200 dark:bg-neutral-900 dark:divide-neutral-800">
                     <?php
-
+                    $no = 1; 
                     foreach ($arsip_surat as $item): ?>
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <input type="checkbox" name="selected[]" value="<?= $item['id'] ?>" class="rowCheckbox form-checkbox">
                             </td>
-
+                            <td class="px-6 py-4 whitespace-nowrap"><?= $no++ ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['nomor_surat']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['kepada']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['ttd_tanggal']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_ttd']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">

@@ -50,7 +50,7 @@ class SuratUser extends Model
         $suratQuery = $this->select('
             DISTINCT(surat.id) as surat_id,
             surat.nomor_surat,
-            surat.ttd_tanggal,
+            surat.waktu,
             surat.penanda_tangan,
             surat.jabatan_ttd
         ')
@@ -76,10 +76,13 @@ class SuratUser extends Model
                 'id' => $surat['surat_id'],
                 'nomor_surat' => $surat['nomor_surat'],
                 'kepada' => implode(' ; ', $kepada),
-                'ttd_tanggal' => $surat['ttd_tanggal'],
+                'waktu' => $surat['waktu'],
                 'penanda_tangan' => $surat['penanda_tangan'],
                 'jabatan_ttd' => $surat['jabatan_ttd']
             ];
+            // header('Content-Type: application/json');
+            // echo json_encode($result);
+            // exit;
         }
 
         return $result;
@@ -99,7 +102,7 @@ class SuratUser extends Model
         $suratQuery = $this->select('
             DISTINCT(surat.id) as surat_id,
             surat.nomor_surat,
-            surat.ttd_tanggal,
+            surat.waktu,
             surat.penanda_tangan,
             surat.jabatan_ttd
         ')
@@ -126,7 +129,7 @@ class SuratUser extends Model
                 'id' => $surat['surat_id'],
                 'nomor_surat' => $surat['nomor_surat'],
                 'kepada' => implode(' ; ', $kepada),
-                'ttd_tanggal' => $surat['ttd_tanggal'],
+                'waktu' => $surat['waktu'],
                 'penanda_tangan' => $surat['penanda_tangan'],
                 'jabatan_ttd' => $surat['jabatan_ttd']
             ];
@@ -145,7 +148,7 @@ class SuratUser extends Model
         $suratQuery = $this->select('
                 DISTINCT(surat.id) as surat_id,
                 surat.nomor_surat,
-                surat.ttd_tanggal,
+                surat.waktu,
                 surat.penanda_tangan,
                 surat.jabatan_ttd
             ')
@@ -173,7 +176,7 @@ class SuratUser extends Model
                 'id' => $surat['surat_id'],
                 'nomor_surat' => $surat['nomor_surat'],
                 'kepada' => implode(' ; ', $kepada),
-                'ttd_tanggal' => $surat['ttd_tanggal'],
+                'waktu' => $surat['waktu'],
                 'penanda_tangan' => $surat['penanda_tangan'],
                 'jabatan_ttd' => $surat['jabatan_ttd']
             ];

@@ -23,14 +23,17 @@ class SuratTable extends Migration
             'menimbang'     => [
                 'type'       => 'TEXT',
             ],
-            'dasar'         => [
+            'sebagai'         => [
+                'type'       => 'TEXT',
+            ],
+            'waktu'   => [
+                'type'       => 'DATE',
+            ],
+            'tujuan'         => [
                 'type'       => 'TEXT',
             ],
             'untuk'         => [
                 'type'       => 'TEXT',
-            ],
-            'ttd_tanggal'   => [
-                'type'       => 'DATE',
             ],
             'penanda_tangan' => [
                 'type'       => 'VARCHAR',
