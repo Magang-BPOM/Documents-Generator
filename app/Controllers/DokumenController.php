@@ -242,6 +242,7 @@ class DokumenController extends BaseController
 
     public function generateDocx($suratId)
     {
+
         helper('url');
         $suratModel = new Surat();
         $surat = $suratModel->find($suratId);
@@ -264,9 +265,22 @@ class DokumenController extends BaseController
             ->where('dasarsurat.id_surat', $suratId)
             ->findAll();
 
-        header('Content-Type: application/json');
-        echo json_encode($listdasar);
-        exit;
+        function formatTGL($tanggal, $format = 'tanggal')
+        {
+            // Tentukan format berdasarkan pilihan
+            $dateType = ($format === 'hari') ? \IntlDateFormatter::FULL : \IntlDateFormatter::LONG;
+
+            $fmt = new \IntlDateFormatter(
+                'id_ID', // Locale Indonesia
+                $dateType, // Pilihan format (FULL untuk hari, LONG untuk tanggal)
+                \IntlDateFormatter::NONE, // Tidak menggunakan format waktu
+                'Asia/Jakarta', // Timezone
+                \IntlDateFormatter::GREGORIAN // Kalender Gregorian
+            );
+
+            return $fmt->format(new \DateTime($tanggal));
+        }
+
         // Buat Dokumen Word
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
 
@@ -275,30 +289,102 @@ class DokumenController extends BaseController
 
         // Menambahkan Header
         $header = $section->addHeader();
-        $header->addImage(FCPATH . 'header.jpg', ['width' => 100, 'height' => 50]);
+        $header->addImage(FCPATH . 'header.jpg', [
+            'width' => 500,
+            'height' => 95,
+            'alignment' => 'left'
+        ]);
 
         // Tambahkan Konten Surat
-        $section->addText("Surat ID: $suratId", ['bold' => true, 'size' => 14]);
         $section->addTextBreak();
 
-        $section->addText("Isi Surat:");
-        $section->addText($surat['content'] ?? '', ['size' => 12]);
+        $section->addText("Isi Surat:", ['size' => 12]);
+        $section->addText($surat['nomor_surat'] ?? '', ['size' => 12]);
         $section->addTextBreak();
 
-        $section->addText("Daftar Pengguna:");
-        foreach ($users as $user) {
-            $section->addText("- " . $user['name'], ['size' => 12]);
-        }
-        $section->addTextBreak();
+        $section->addText("Menimbang:", ['size' => 12]);
+        $section->addText($surat['menimbang'] ?? '', ['size' => 12]);
 
-        $section->addText("Dasar Surat:");
+        $section->addText("Dasar :");
+        $no = 1;
         foreach ($listdasar as $dasar) {
-            $section->addText("- " . $dasar['nama'], ['size' => 12]);
+            $section->addText(
+                $no . ". " . $dasar['undang'],
+                ['size' => 12]
+            );
+            $no++;
         }
+        // header('Content-Type: application/json');
+        // echo json_encode($users);
+        // exit;
+        $section->addText("Memberi Tugas", ['size' => 12, 'bold' => true, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $section->addTextBreak();
+
+        $section->addText("Kepada :", ['size' => 12]);
+
+        if (count($users) > 2) {
+            $section->addText("Nama-nama terlampir", ['size' => 12]);
+        } else {
+            foreach ($users as $user) {
+                $section->addListItem("Nama: " . $user['nama'], 0, ['size' => 12]);
+                $section->addListItem("NIP: " . $user['nip'], 0, ['size' => 12]);
+                $section->addListItem("Pangkat/Gol: " . $user['pangkat'], 0, ['size' => 12]);
+                $section->addListItem("Jabatan: " . $user['jabatan'], 0, ['size' => 12]);
+                $section->addTextBreak();
+            }
+        }
+
+        $section->addText("Untuk :", ['size' => 12, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $section->addText($surat['sebagai'] ?? '', ['size' => 12]);
+        $section->addText('Waktu  : ' . formatTGL($surat['waktu'] ?? '', 'hari'), ['size' => 12]);
+        $section->addText('Tujuan : ' . ($surat['tujuan'] ?? ''), ['size' => 12]);
+        if (!empty($surat['untuk'])) {
+            $nod = 4;
+            foreach ($listdasar as $dasar) {
+                $section->addText(
+                    $nod . ". " . $surat['untuk'],
+                    ['size' => 12]
+                );
+                $nod++;
+            }
+        }
+
+        // Tambahkan teks instruksi tugas
+        $section->addText(
+            "Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.",
+            ['size' => 12],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]
+        );
+
+        // Tambahkan baris kosong untuk jarak
+        $section->addTextBreak(1);
+
+        // Tambahkan tanggal dan jabatan di sebelah kanan
+        $section->addText(
+            'Surabaya, ' . formatTGL($surat['created_at'], 'tanggal') . ',',
+            ['size' => 12],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::RIGHT]
+        );
+
+        $section->addText(
+            $surat['jabatan_ttd'] ?? '',
+            ['size' => 12],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::RIGHT]
+        );
+
+        // Tambahkan ruang kosong untuk tanda tangan
+        $section->addTextBreak(3);
+
+        // Tambahkan nama penanda tangan
+        $section->addText(
+            $surat['penanda_tangan'] ?? '',
+            ['size' => 12],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::RIGHT]
+        );
 
         // Menambahkan Footer
         $footer = $section->addFooter();
-        $footer->addImage(FCPATH . 'end.jpg', ['width' => 100, 'height' => 50]);
+        $footer->addImage(FCPATH . 'end.jpg', ['width' => 500, 'height' => 150, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::LEFT]);
 
         // Simpan File DOCX
         $fileName = "Surat-Tugas-$suratId.docx";

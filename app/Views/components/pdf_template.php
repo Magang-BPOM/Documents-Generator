@@ -30,29 +30,22 @@ function formatList($text)
 
 $untukArray = formatList($surat['untuk']);
 
-function formatTanggalIndonesia($tanggal)
+function formatTGL($tanggal, $format = 'tanggal')
 {
-    $fmt = new IntlDateFormatter(
-        'id_ID',
-        IntlDateFormatter::LONG, // Format tanggal panjang (24 Oktober 2024)
-        IntlDateFormatter::NONE, // Tidak menggunakan format waktu
-        'Asia/Jakarta', // Timezone
-        IntlDateFormatter::GREGORIAN // Kalender Gregorian
-    );
-    return $fmt->format(new DateTime($tanggal));
-}
-function formathari($waktu)
-{
+    // Tentukan format berdasarkan pilihan
+    $dateType = ($format === 'hari') ? IntlDateFormatter::FULL : IntlDateFormatter::LONG;
+
     $fmt = new IntlDateFormatter(
         'id_ID', // Locale Indonesia
-        IntlDateFormatter::FULL, // Format lengkap, termasuk hari
+        $dateType, // Pilihan format (FULL untuk hari, LONG untuk tanggal)
         IntlDateFormatter::NONE, // Tidak menggunakan format waktu
         'Asia/Jakarta', // Timezone
         IntlDateFormatter::GREGORIAN // Kalender Gregorian
     );
 
-    return $fmt->format(new DateTime($waktu));
+    return $fmt->format(new DateTime($tanggal));
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -269,7 +262,7 @@ function formathari($waktu)
             <p>Untuk</p>
             <span class="colon">:</span>
             <p><?= esc($surat['sebagai']) ?></p>
-            <p><?= formathari($surat['waktu']) ?></p>
+            <p><?= formatTGL($surat['waktu'], 'hari') ?></p>
             <p><?= esc($surat['tujuan']) ?></p>
             <ul>
                 <?php foreach ($untukArray as $item): ?>
@@ -280,7 +273,7 @@ function formathari($waktu)
 
         <p>Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.</p>
         <div class="signature" style="margin-right: 60px;margin-top:20px;">
-            <p style="text-align:right;">Surabaya, <?= formatTanggalIndonesia($surat['created_at']) ?>,</p>
+            <p style="text-align:right;">Surabaya, <?= formatTGL($surat['created_at'], 'tanggal') ?>,</p>
             <p style="text-align:right;"><?= esc($surat['jabatan_ttd']) ?>,</p>
             <br><br><br><br>
             <p style="text-align:right"><?= esc($surat['penanda_tangan']) ?></p>
@@ -299,7 +292,7 @@ function formathari($waktu)
                 <div class="section-lampiran mt-6" style="text-align: center;">
                     <p class="text-md" style="text-align: left;margin-bottom: 8px;">SURAT TUGAS KEPALA BBPOM DI SURABAYA</p>
                     <p class="text-md" style="text-align: left;margin-bottom: 8px;">NOMOR: <?= esc($surat['nomor_surat']) ?></p>
-                    <p class="text-md" style="text-align: left;">TANGGAL: <?= formatTanggalIndonesia($surat['created-at']) ?></p>
+                    <p class="text-md" style="text-align: left;">TANGGAL: <?= formatTGL($surat['created-at']) ?></p>
                 </div>
 
                 <table class="table">

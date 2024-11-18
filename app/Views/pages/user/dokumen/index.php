@@ -127,7 +127,8 @@ Semua Dokumen
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_ttd']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="<?= base_url('dokumen/generate/' . $item['id']) ?>" class="text-blue-600 hover:underline">Lihat PDF</a>
+                                <a href="<?= base_url('dokumen/pdf/' . $item['id']) ?>" class="text-blue-600 hover:underline">PDF</a>
+                                <a href="<?= base_url('dokumen/word/' . $item['id']) ?>" class="text-blue-600 hover:underline">Word</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -210,7 +211,8 @@ Semua Dokumen
             <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
             <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_ttd}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <a href="dokumen/generate/${item.id}" class="text-blue-600 hover:underline">Lihat PDF</a>
+                <a href="<?= base_url('dokumen/pdf/' . $item['id']) ?>" class="text-blue-600 hover:underline">PDF</a>
+                <a href="<?= base_url('dokumen/word/' . $item['id']) ?>" class="text-blue-600 hover:underline">Word</a>
             </td>
         `;
                 tableBody.appendChild(row);
