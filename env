@@ -67,3 +67,5 @@
 #--------------------------------------------------------------------
 
 # logger.threshold = 4
+
+CONVERT_API_SECRET=secret_O8ZWpkGWj365X5w1

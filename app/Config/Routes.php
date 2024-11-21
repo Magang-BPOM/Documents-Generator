@@ -19,8 +19,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/admin/dokumen', 'DokumenController::index');
         $routes->get('/admin/dokumen/create', 'DokumenController::create');
         $routes->post('/dokumen/store', 'DokumenController::store');
-        $routes->get('/admin/dokumen/word/(:num)', 'DokumenController::generateDocx/$1');
-        $routes->get('/admin/dokumen/pdf/(:num)', 'DokumenController::generate/$1');
+        $routes->get('/admin/dokumen/generate/(:num)', 'DokumenController::generate/$1');
+        $routes->get('/dokumen/generate-word/(:num)', 'DokumenController::generateWord/$1');
         $routes->get('/admin/dokumen/archive', 'DokumenController::arsip_index');
         $routes->post('/dokumen/bulkArsip', 'DokumenController::bulkArsip');
         $routes->post('/dokumen/delete', 'DokumenController::delete');
@@ -29,6 +29,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/admin/listuser', 'User::listuser');
         $routes->get('/user/create', 'User::create');
         $routes->post('/user/store', 'User::store');
+        $routes->post('/user/delete', 'User::delete');
 
         $routes->post('/admin/updateuser', 'User::updateuser');
     });
@@ -37,6 +38,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->group('', ['filter' => 'role:pegawai'], function ($routes) {
         $routes->get('/dashboard', 'DashboardController::user');
         $routes->get('/dokumen', 'DokumenController::index');
+        $routes->get('/dokumen/generate/(:num)', 'DokumenController::generate/$1');
         $routes->get('/dokumen/create', 'DokumenController::create');
         $routes->post('/dokumen/store', 'DokumenController::store');
         // Tambahkan rute khusus user lainnya

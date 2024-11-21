@@ -1,4 +1,4 @@
-<?= $this->extend('pages/user/layout/main'); ?>
+<?= $this->extend('pages/admin/layout/main'); ?>
 
 <?= $this->section('title'); ?>
 Tambah Pengguna

@@ -26,14 +26,18 @@ class SuratTable extends Migration
             'sebagai'         => [
                 'type'       => 'TEXT',
             ],
-            'waktu'   => [
+            'waktu_mulai'   => [
+                'type'       => 'DATE',
+            ],
+            'waktu_berakhir'   => [
                 'type'       => 'DATE',
             ],
             'tujuan'         => [
                 'type'       => 'TEXT',
             ],
-            'untuk'         => [
+            'biaya'         => [
                 'type'       => 'TEXT',
+                'null' => true,
             ],
             'penanda_tangan' => [
                 'type'       => 'VARCHAR',

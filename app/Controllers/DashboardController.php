@@ -9,6 +9,13 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class DashboardController extends BaseController
 {
+    protected $db;
+
+    public function __construct()
+    {
+        // Inisialisasi database
+        $this->db = \Config\Database::connect();
+    }
     public function index()
     {
         $suratModel = new Surat();
@@ -17,14 +24,12 @@ class DashboardController extends BaseController
         $suratAktif = $suratModel->where('status', 'aktif')->countAllResults();
         $suratArsip = $suratModel->where('status', 'arsip')->countAllResults();
 
-        // Menghitung surat baru untuk bulan ini tanpa filter 'pembuat_id'
         $currentMonth = date('m');
         $currentYear = date('Y');
         $suratBaruBulanIni = $suratModel->where('MONTH(created_at)', $currentMonth)
             ->where('YEAR(created_at)', $currentYear)
             ->countAllResults();
 
-        // Menghitung jumlah surat per bulan tanpa filter 'pembuat_id'
         $bulan = [];
         $jumlahSuratPerBulan = [];
         for ($i = 1; $i <= 12; $i++) {
@@ -50,14 +55,23 @@ class DashboardController extends BaseController
     public function user()
     {
         $userId = session()->get('user_id');
+        $userName = session()->get('nama');
         $suratModel = new Surat();
-        $suratUserModel = new SuratUser(); // Model untuk surat_user
+        $suratUserModel = new SuratUser();
+    
 
-        // Ambil semua surat_id dari surat_user berdasarkan user_id saat ini
-        $suratUserIds = $suratUserModel->where('id_created', $userId)->findColumn('surat_id');
-
-        if (!$suratUserIds) {
-            // Jika tidak ada surat yang terkait dengan user ini, set semua nilai ke 0 atau kosong
+        $suratUserIds = $this->db->table('surat_user')
+            ->select('surat.id')
+            ->join('surat', 'surat_user.surat_id = surat.id')
+            ->groupStart()
+                ->where('surat_user.user_id', $userId) 
+                ->orWhere('surat_user.id_created', $userId) 
+            ->groupEnd()
+            ->groupBy('surat.id')
+            ->get()
+            ->getResultArray();
+    
+        if (empty($suratUserIds)) {
             $data = [
                 'total_surat' => 0,
                 'surat_aktif' => 0,
@@ -68,39 +82,40 @@ class DashboardController extends BaseController
             ];
             return view('pages/user/dashboard', $data);
         }
-
-        // Total surat berdasarkan surat_id dari surat_user
-        $totalSurat = $suratModel->whereIn('id', $suratUserIds)->countAllResults();
-
-        // Surat aktif
-        $suratAktif = $suratModel->whereIn('id', $suratUserIds)
+    
+        $suratIds = array_column($suratUserIds, 'id');
+    
+        $totalSurat = count($suratIds);
+    
+        $suratAktif = $this->db->table('surat')
+            ->whereIn('id', $suratIds)
             ->where('status', 'aktif')
             ->countAllResults();
-
-        // Surat arsip
-        $suratArsip = $suratModel->whereIn('id', $suratUserIds)
+    
+        $suratArsip = $this->db->table('surat')
+            ->whereIn('id', $suratIds)
             ->where('status', 'arsip')
             ->countAllResults();
 
-        // Surat baru bulan ini
         $currentMonth = date('m');
         $currentYear = date('Y');
-        $suratBaruBulanIni = $suratModel->whereIn('id', $suratUserIds)
+        $suratBaruBulanIni = $this->db->table('surat')
+            ->whereIn('id', $suratIds)
             ->where('MONTH(created_at)', $currentMonth)
             ->where('YEAR(created_at)', $currentYear)
             ->countAllResults();
-
-        // Menghitung jumlah surat per bulan untuk tahun berjalan
+   
         $bulan = [];
         $jumlahSuratPerBulan = [];
         for ($i = 1; $i <= 12; $i++) {
             $bulan[] = date('F', mktime(0, 0, 0, $i, 1));
-            $jumlahSuratPerBulan[] = $suratModel->whereIn('id', $suratUserIds)
+            $jumlahSuratPerBulan[] = $this->db->table('surat')
+                ->whereIn('id', $suratIds)
                 ->where('MONTH(created_at)', $i)
                 ->where('YEAR(created_at)', $currentYear)
                 ->countAllResults();
         }
-
+    
         $data = [
             'total_surat' => $totalSurat,
             'surat_aktif' => $suratAktif,
@@ -109,7 +124,8 @@ class DashboardController extends BaseController
             'bulan' => $bulan,
             'jumlah_surat_per_bulan' => $jumlahSuratPerBulan,
         ];
-
+    
         return view('pages/user/dashboard', $data);
     }
+    
 }

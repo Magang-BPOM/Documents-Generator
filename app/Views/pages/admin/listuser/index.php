@@ -31,12 +31,23 @@ Semua Dokumen
                 </div>
             </div>
 
-            <!-- Button for adding new user -->
             <div class="sm:col-span-2 md:grow">
                 <div class="flex justify-end gap-x-2">
-                    <a href="/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                        Tambah User
-                    </a>
+
+                    <div class="sm:col-span-2 md:grow">
+                        <div class="flex justify-end gap-x-2">
+                            <button data-trashed="false" data-url="<?= base_url('user/delete') ?>" type="button" class="bulkDeleteBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                                Hapus
+                            </button>
+
+                            <a href="/admin/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                                Tambah User
+                            </a>
+
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
         </div>
@@ -127,5 +138,43 @@ Semua Dokumen
 
     </div>
 </div>
+
+<script>
+    
+    document.querySelector('.bulkDeleteBtn').addEventListener('click', function() {
+        const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
+
+        if (selectedIds.length === 0) {
+            alert('Silakan pilih data yang ingin hapus.');
+            return;
+        }
+
+        fetch(this.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    selectedIds
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    swal("Sukses", "Data berhasil dihapus.", "success")
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000)
+                } else {
+                    swal("Gagal", "Gagal menghapus data.", "error");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                swal("Error", "Terjadi kesalahan saat menghapus data.", "error");
+            });
+    });
+</script>
 
 <?= $this->endSection(); ?>

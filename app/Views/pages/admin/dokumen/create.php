@@ -73,50 +73,7 @@ Pembuatan Dokumen
                 </div>
             </div>
 
-            <!-- untuk -->
-            <div class="col-span-1 font-normal text-lg">
-                <label for="untuk" class="required block text-gray-700 dark:text-neutral-300">Untuk :</label>
-                <div class="px-6">
-                    <div class="mb-4">
-                        <label for="sebagai" class="required block mt-2 text-gray-700 dark:text-neutral-300">Sebagai</label>
-                        <input type="text" name="sebagai" id="sebagai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="waktu" class="required mt-7 block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan</label>
-                        <input type="date" name="waktu" id="waktu" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                        <span id="error-message" class="text-red-500 mt-2 hidden"></span>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Tujuan</label>
-                        <input type="text" name="tujuan" id="tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                    </div>
-
-                    <!-- Radio untuk mengontrol opsi tambahan -->
-                    <div class="mb-4 flex flex-col items-center">
-                        <label class="block mb-2 text-gray-700 dark:text-neutral-300">Opsi Tambahan</label>
-                        <div class="flex items-center justify-center gap-3">
-                            <label class="flex items-center">
-                                <input type="radio" name="opsi_tambahan" value="show" class="mr-2" onclick="toggleOpsiTambahan(true)">
-                                Tambah
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="opsi_tambahan" value="hide" class="mr-2" onclick="toggleOpsiTambahan(false)" checked>
-                                Tidak
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Textarea Opsi Tambahan -->
-                    <div class="mb-4 hidden" id="opsi-tambahan-container">
-                        <textarea name="untuk" id="untuk" rows="4" placeholder="Contoh input 'Biaya : DIPA Balai Besar POM di Surabaya Tahun 2024.;' akhiran ';'" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3"></textarea>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="col-span-1 pt-4">
+            <div class="col-span-2">
                 <label class="required block font-medium text-gray-700 dark:text-neutral-300">Kepada</label>
                 <div id="selected-users-container" class="mb-4">
                 </div>
@@ -135,17 +92,78 @@ Pembuatan Dokumen
                 </div>
             </div>
 
+            <!-- untuk -->
+
+            <label for="untuk" class="required block font-medium text-gray-700 dark:text-neutral-300">Isian section Untuk</label>
+
+            <div class="col-span-2">
+                <label for="sebagai" class="required block text-gray-700 dark:text-neutral-300">Sebagai</label>
+                <input type="text" name="sebagai" id="sebagai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+            </div>
 
             <div class="col-span-1">
-                <div class="mb-4">
+                <label for="waktu" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan dimulai</label>
+                <input type="date" name="waktu_mulai" id="waktu_mulai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <span id="error-message" class="text-red-500 mt-2 hidden"></span>
+            </div>
+
+            <div class="col-span-1">
+                <label for="waktu" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan berakhir</label>
+                <input type="date" name="waktu_berakhir" id="waktu_berakhir" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <span id="error-message" class="text-red-500 mt-2 hidden"></span>
+            </div>
+
+
+            <div class="col-span-2">
+                <label for="tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Tujuan</label>
+                <input type="text" name="tujuan" id="tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+            </div>
+
+            <!-- Opsi Tambahan -->
+            <div class="col-span-2">
+                <label class="block text-lg font-medium text-gray-700 dark:text-neutral-300 mb-4">
+                    Opsi Tambahan
+                </label>
+                <div class="flex flex-col space-y-4">
+                    <!-- Radio Button Group -->
+                    <div class="flex items-center space-x-6">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opsi_tambahan" value="show"
+                                class="form-radio text-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700"
+                                onclick="toggleOpsiTambahan(true)">
+                            <span class="text-gray-700 dark:text-neutral-300">Tambah</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opsi_tambahan" value="hide" checked
+                                class="form-radio text-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700"
+                                onclick="toggleOpsiTambahan(false)">
+                            <span class="text-gray-700 dark:text-neutral-300">Tidak</span>
+                        </label>
+                    </div>
+
+                    <!-- Textarea for Opsi Tambahan -->
+                    <div id="opsi-tambahan-container" class="hidden transition-all duration-300">
+                        <textarea name="untuk" id="untuk" rows="4"
+                            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3"
+                            placeholder="Contoh input: 'Biaya : DIPA Balai Besar POM di Surabaya Tahun 2024.' (akhiran ';')">
+                        </textarea>
+                        <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
+                            Masukkan informasi tambahan dengan format yang sesuai.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+           
+                <div class="col-span-1">
                     <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">Penanda Tangan</label>
                     <input type="text" name="penanda_tangan" id="penanda_tangan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
                 </div>
-                <div>
+                <div class="col-">
                     <label for="jabatan_ttd" class="required block font-medium text-gray-700 dark:text-neutral-300">Jabatan Penanda Tangan</label>
                     <input type="text" name="jabatan_ttd" id="jabatan_ttd" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
                 </div>
-            </div>
+      
 
             <!-- Button -->
             <div class="col-span-2 flex justify-start space-x-2">
@@ -175,9 +193,6 @@ Pembuatan Dokumen
         }
     }
 
-
-
-    // Script Dasar
     (function() {
         const selectedDasar = new Set();
         const dropdownDasar = document.getElementById('list-dasar');
@@ -186,6 +201,8 @@ Pembuatan Dokumen
         const dasarHiddenInput = document.getElementById('selected_dasar_input');
 
         let dasar = <?= json_encode($dasar); ?>;
+
+        console.log(dasar);
 
         function renderDropdown(showDasar) {
             dropdownDasar.innerHTML = showDasar.map(list => `
@@ -369,11 +386,11 @@ Pembuatan Dokumen
 
     // Tambahkan event listener untuk mengolah input
     dateInput.addEventListener('change', () => {
-        // Ambil nilai dari input type="date"
-        const dateValue = dateInput.value; // Format default: YYYY-MM-DD
+
+        const dateValue = dateInput.value; 
 
         // Ubah ke format bahasa Indonesia
-        const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY'); // Contoh format: Senin, 28 Oktober 2024
+        const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY'); 
 
         // Tampilkan hasilnya di console atau di elemen lain
         console.log('Formatted Date in Indonesian:', formattedDate);

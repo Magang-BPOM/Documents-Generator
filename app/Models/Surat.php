@@ -16,9 +16,10 @@ class Surat extends Model
         'nomor_surat',
         'menimbang',
         'sebagai',
-        'waktu',
+        'waktu_mulai',
+        'waktu_berakhir',
         'tujuan',
-        'untuk',
+        'biaya',
         'penanda_tangan',
         'jabatan_ttd',
         'status'

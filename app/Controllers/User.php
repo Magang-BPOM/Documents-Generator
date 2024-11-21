@@ -11,13 +11,11 @@ class User extends BaseController
 {
     public function index()
     {
-        // Cek jika pengguna sudah login
+
         if (session()->get('logged_in')) {
-            // Arahkan langsung ke dashboard jika session masih ada
             return redirect()->to('/dashboard');
         }
 
-        // Jika belum login, tampilkan halaman login
         return view('auth/login');
     }
 
@@ -35,57 +33,91 @@ class User extends BaseController
         return view('pages/admin/listuser/create');
     }
 
-    // Menyimpan data user baru
+
     public function store()
     {
-        // Validasi input
+        // Inisialisasi validasi
         $validation = \Config\Services::validation();
-
+    
+        // Atur aturan validasi
         $validation->setRules([
             'nama'        => 'required',
             'nip'         => 'required|min_length[8]|max_length[100]|is_unique[user.nip]',
             'jabatan'     => 'required',
             'pangkat'     => 'permit_empty|max_length[100]',
-            'foto_profil' => 'permit_empty|valid_image[foto_profil]',
+            'foto_profil' => 'uploaded[foto_profil]|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]', // Validasi file
             'password'    => 'required|min_length[6]|max_length[255]',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);
-
+    
+        // Log input untuk debugging
+        log_message('debug', 'Input data: ' . json_encode($this->request->getPost()));
+    
+        // Validasi input
         if (!$validation->run($this->request->getPost())) {
-            // Jika validasi gagal, tampilkan kembali form input dengan error
+            log_message('error', 'Validation errors: ' . json_encode($validation->getErrors()));
             return redirect()->to('/user/create')->withInput()->with('validation', $validation);
         }
-
-        // Ambil data dari form
+    
+        // Default foto profil
+        $fotoProfilPath = 'https://i.pravatar.cc/150?img=1';
+    
+        // Proses upload file
+        $file = $this->request->getFile('foto_profil');
+        if ($file->isValid() && !$file->hasMoved()) {
+            $uploadDir = WRITEPATH . 'uploads';
+    
+            // Buat folder jika tidak ada
+            if (!is_dir($uploadDir)) {
+                if (!mkdir($uploadDir, 0777, true)) {
+                    log_message('error', 'Failed to create upload directory: ' . $uploadDir);
+                } else {
+                    log_message('info', 'Upload directory created: ' . $uploadDir);
+                }
+            }
+    
+            $newName = $file->getRandomName();
+            try {
+                $file->move($uploadDir, $newName);
+                $fotoProfilPath = base_url('uploads/' . $newName);
+                log_message('debug', 'File uploaded successfully: ' . $fotoProfilPath);
+            } catch (\Exception $e) {
+                log_message('error', 'File upload error: ' . $e->getMessage());
+                return redirect()->to('/user/create')->with('error', 'Failed to upload file.');
+            }
+        } else {
+            log_message('error', 'File upload invalid or already moved.');
+        }
+    
+        // Siapkan data untuk disimpan
         $data = [
             'nama'        => $this->request->getPost('nama'),
             'nip'         => $this->request->getPost('nip'),
             'jabatan'     => $this->request->getPost('jabatan'),
             'pangkat'     => $this->request->getPost('pangkat'),
-            'foto_profil' => 'https://i.pravatar.cc/150?img=1',
-            'password'    => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT), // Enkripsi password
+            'foto_profil' => $fotoProfilPath,
+            'password'    => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
             'role'        => $this->request->getPost('role'),
             'created_at'  => date('Y-m-d H:i:s'),
         ];
-        header('Content-Type: application/json'); // Set header untuk output JSON
-        echo json_encode($data);
-        exit;
-
-        // Simpan data ke database
-        $userModel = new ModelsUser();
+    
+        // Log data yang akan disimpan
+        log_message('debug', 'User data to be inserted: ' . json_encode($data));
+    
+        // Simpan ke database
+        $userModel = new \App\Models\User();
         if ($userModel->insert($data)) {
-            return redirect()->to('/user/create')->with('success', 'User berhasil ditambahkan!');
+            log_message('info', 'User successfully added: ' . json_encode($data));
+            return redirect()->to('/admin/listuser')->with('success', 'User berhasil ditambahkan!');
         } else {
+            log_message('error', 'Failed to add user: ' . json_encode($userModel->errors()));
             return redirect()->to('/user/create')->with('error', 'Gagal menambahkan user');
         }
     }
-
-    // Fungsi untuk upload foto profil
-
-
+    
+    
     public function updateuser()
     {
-        // Validasi input
         $validation =  \Config\Services::validation();
         $validation->setRules([
             'nip' => 'required|is_unique[users.nip]',
@@ -101,8 +133,6 @@ class User extends BaseController
                 'errors' => $validation->getErrors()
             ]);
         }
-
-        // Ambil data dari form
         $userData = [
             'nip' => $this->request->getPost('nip'),
             'nama' => $this->request->getPost('nama'),
@@ -111,15 +141,31 @@ class User extends BaseController
             'role' => $this->request->getPost('role'),
         ];
 
-        // Update data user
         $userModel = new ModelsUser();
         $userModel->update($this->request->getPost('id'), $userData);
 
-        // Kembalikan response
         return $this->response->setJSON([
             'success' => true
         ]);
     }
+
+    
+    public function delete()
+    {
+        $userModel = new ModelsUser();
+
+        $request = $this->request->getJSON();
+        $selectedIds = $request->selectedIds ?? [];
+
+        if (empty($selectedIds)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
+        }
+
+        $userModel->whereIn('id', $selectedIds)->delete();
+
+        return $this->response->setJSON(['success' => true, 'message' => 'Data berhasil diarsipkan']);
+    }
+
 
 
     public function login()
@@ -127,7 +173,6 @@ class User extends BaseController
         $session = session();
         $validation = \Config\Services::validation();
 
-        // Mengambil data input
         $identifier = $this->request->getVar('identifier');
         $password = $this->request->getVar('password');
 
@@ -146,9 +191,7 @@ class User extends BaseController
         $userModel = new ModelsUser();
         $user = $userModel->where('nip', $identifier)->first();
 
-        // Cek jika user ada dan password benar
         if ($user && password_verify($password, $user['password'])) {
-            // Set data session untuk pengguna yang login
             $session->set([
                 'user_id' => $user['id'],
                 'nama' => $user['nama'],

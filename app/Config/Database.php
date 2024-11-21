@@ -28,7 +28,7 @@ class Database extends Config
         'DSN'          => '',
         'hostname'     => '127.0.0.1',
         'username'     => 'root',
-        'password'     => '1212',
+        'password'     => '',
         'database'     => 'documents_generator',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',

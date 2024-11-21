@@ -28,22 +28,45 @@ function formatList($text)
     return $formatted;
 }
 
-$untukArray = formatList($surat['untuk']);
-
 function formatTGL($tanggal, $format = 'tanggal')
 {
-    // Tentukan format berdasarkan pilihan
+
     $dateType = ($format === 'hari') ? IntlDateFormatter::FULL : IntlDateFormatter::LONG;
 
     $fmt = new IntlDateFormatter(
-        'id_ID', // Locale Indonesia
-        $dateType, // Pilihan format (FULL untuk hari, LONG untuk tanggal)
-        IntlDateFormatter::NONE, // Tidak menggunakan format waktu
-        'Asia/Jakarta', // Timezone
-        IntlDateFormatter::GREGORIAN // Kalender Gregorian
+        'id_ID',
+        $dateType, 
+        IntlDateFormatter::NONE,
+        'Asia/Jakarta',
+        IntlDateFormatter::GREGORIAN 
     );
 
     return $fmt->format(new DateTime($tanggal));
+}
+
+function formatTanggalRentang($mulai, $berakhir)
+{
+    $hariMulai = date('l', strtotime($mulai));
+    $hariBerakhir = date('l', strtotime($berakhir));
+
+    $tanggalMulai = date('d', strtotime($mulai));
+    $tanggalBerakhir = date('d', strtotime($berakhir));
+
+    $bulanMulai = date('F', strtotime($mulai));
+    $bulanBerakhir = date('F', strtotime($berakhir));
+
+    $tahunMulai = date('Y', strtotime($mulai));
+    $tahunBerakhir = date('Y', strtotime($berakhir));
+
+    if ($bulanMulai === $bulanBerakhir && $tahunMulai === $tahunBerakhir) {
+        return "{$hariMulai}-{$hariBerakhir}, {$tanggalMulai}-{$tanggalBerakhir} {$bulanMulai} {$tahunMulai}";
+    }
+
+    if ($tahunMulai === $tahunBerakhir) {
+        return "{$hariMulai}-{$hariBerakhir}, {$tanggalMulai} {$bulanMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunMulai}";
+    }
+
+    return "{$hariMulai}-{$hariBerakhir}, {$tanggalMulai} {$bulanMulai} {$tahunMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunBerakhir}";
 }
 
 ?>
@@ -56,8 +79,12 @@ function formatTGL($tanggal, $format = 'tanggal')
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Tugas</title>
     <style>
+        @page {
+            size: 210mm 330mm;
+        }
+        
         * {
-            max-width: 100vw;
+            min-width: 100vw;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -66,38 +93,29 @@ function formatTGL($tanggal, $format = 'tanggal')
 
         .numbered-list {
             padding-left: 10px;
-            /* Menghapus padding bawaan */
         }
 
         .numbered-list li {
             display: flex;
-            /* Flexbox untuk mengatur nomor dan teks */
             align-items: flex-start;
         }
 
         .numbered-list li::before {
             counter-increment: item;
-            /* Menambah counter */
             margin-right: 10px;
-            /* Spasi antara nomor dan teks */
             text-align: right;
-            /* Menjaga nomor di kanan */
             min-width: 20px;
-            /* Panjang minimum untuk nomor */
         }
 
         .numbered-list li .list-text {
-            /* Mengatur jarak teks */
             text-indent: 1px;
-            /* Menyelaraskan teks */
             padding-left: 10px;
         }
 
         body {
             font-family: "Times New Roman", Times, serif;
-            margin: 0;
-            padding: 0;
             min-height: 100vh;
+            min-width: 100vw;
         }
 
         header {
@@ -125,8 +143,8 @@ function formatTGL($tanggal, $format = 'tanggal')
             bottom: 0;
             left: 0;
             right: 0;
-            width: 100%;
-            max-height: 50%;
+            min-width: 100vw;
+            min-height: 100%;
             text-align: center;
 
         }
@@ -261,14 +279,9 @@ function formatTGL($tanggal, $format = 'tanggal')
         <div class="label-content">
             <p>Untuk</p>
             <span class="colon">:</span>
-            <p><?= esc($surat['sebagai']) ?></p>
-            <p><?= formatTGL($surat['waktu'], 'hari') ?></p>
-            <p><?= esc($surat['tujuan']) ?></p>
-            <ul>
-                <?php foreach ($untukArray as $item): ?>
-                    <li><?= esc($item) ?></li>
-                <?php endforeach; ?>
-            </ul>
+            <p>Sebagai : <?= esc($surat['sebagai']) ?></p>
+            <p>Waktu : <?= formatTanggalRentang($surat['waktu_mulai'], $surat['waktu_berakhir']); ?></p>
+            <p>Tujuan : <?= esc($surat['tujuan']) ?></p>
         </div>
 
         <p>Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.</p>
