@@ -19,6 +19,36 @@ class DokumenController extends BaseController
     protected $dasarSurat;
     protected $SuratUserModel;
 
+    private function convertPdfToWord($pdfPath, $wordPath)
+    {
+        // Pastikan file PDF ada
+        if (!file_exists($pdfPath)) {
+            throw new \RuntimeException("PDF file not found: $pdfPath");
+        }
+
+        // Buat direktori tujuan jika belum ada
+        $outputDir = dirname($wordPath);
+        if (!is_dir($outputDir)) {
+            mkdir($outputDir, 0777, true);
+        }
+
+        // Jalankan perintah LibreOffice untuk konversi
+        $command = "libreoffice --headless --convert-to docx --outdir " . escapeshellarg($outputDir) . " " . escapeshellarg($pdfPath);
+        exec($command, $output, $resultCode);
+
+        if ($resultCode !== 0) {
+            throw new \RuntimeException("LibreOffice conversion failed: " . implode("\n", $output));
+        }
+
+        // Pastikan file hasil ada
+        if (!file_exists($wordPath)) {
+            throw new \RuntimeException("Word file not created: $wordPath");
+        }
+
+        return $wordPath;
+    }
+
+
     public function __construct()
     {
         $this->suratModel = new Surat();
@@ -308,172 +338,20 @@ class DokumenController extends BaseController
     public function generateWord($suratId)
     {
         $pdfPath = WRITEPATH . "pdfs/Surat-Tugas-$suratId.pdf";
+        $wordPath = WRITEPATH . "docs/Surat-Tugas-$suratId.docx";
 
         if (!file_exists($pdfPath)) {
             throw new \RuntimeException("PDF file not found: $pdfPath");
         }
 
-        return $this->convertPdfToWordWithConvertApi($pdfPath);
+        try {
+            $convertedWord = $this->convertPdfToWord($pdfPath, $wordPath);
+            return $this->response->download($convertedWord, null)->setFileName("Surat-Tugas-$suratId.docx");
+        } catch (\Exception $e) {
+            log_message('error', $e->getMessage());
+            return $this->response->setJSON(['success' => false, 'message' => 'Konversi gagal.']);
+        }
     }
-
-
-    // public function generateDocx($suratId)
-    // {
-
-    //     helper('url');
-    //     $suratModel = new Surat();
-    //     $surat = $suratModel->find($suratId);
-    //     if (!$surat) {
-    //         log_message('error', "Surat with ID $suratId not found.");
-    //         throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
-    //     }
-
-    //     $suratUserModel = new SuratUser();
-    //     $users = $suratUserModel
-    //         ->select('user.*')
-    //         ->join('user', 'user.id = surat_user.user_id')
-    //         ->where('surat_user.surat_id', $suratId)
-    //         ->findAll();
-
-    //     $DasarSuratModel = new DasarSurat();
-    //     $listdasar = $DasarSuratModel
-    //         ->select('dasar.*')
-    //         ->join('dasar', 'dasar.id = dasarsurat.id_dasar')
-    //         ->where('dasarsurat.id_surat', $suratId)
-    //         ->findAll();
-
-    //     function formatTGL($tanggal, $format = 'tanggal')
-    //     {
-    //         // Tentukan format berdasarkan pilihan
-    //         $dateType = ($format === 'hari') ? \IntlDateFormatter::FULL : \IntlDateFormatter::LONG;
-
-    //         $fmt = new \IntlDateFormatter(
-    //             'id_ID', // Locale Indonesia
-    //             $dateType, // Pilihan format (FULL untuk hari, LONG untuk tanggal)
-    //             \IntlDateFormatter::NONE, // Tidak menggunakan format waktu
-    //             'Asia/Jakarta', // Timezone
-    //             \IntlDateFormatter::GREGORIAN // Kalender Gregorian
-    //         );
-
-    //         return $fmt->format(new \DateTime($tanggal));
-    //     }
-
-    //     // Buat Dokumen Word
-    //     $phpWord = new \PhpOffice\PhpWord\PhpWord();
-
-    //     // Menambahkan Halaman
-    //     $section = $phpWord->addSection();
-
-    //     // Menambahkan Header
-    //     $header = $section->addHeader();
-    //     $header->addImage(FCPATH . 'header.jpg', [
-    //         'width' => 500,
-    //         'height' => 95,
-    //         'alignment' => 'left'
-    //     ]);
-
-    //     // Tambahkan Konten Surat
-    //     $section->addTextBreak();
-
-    //     $section->addText("Isi Surat:", ['size' => 12]);
-    //     $section->addText($surat['nomor_surat'] ?? '', ['size' => 12]);
-    //     $section->addTextBreak();
-
-    //     $section->addText("Menimbang:", ['size' => 12]);
-    //     $section->addText($surat['menimbang'] ?? '', ['size' => 12]);
-
-    //     $section->addText("Dasar :");
-    //     $no = 1;
-    //     foreach ($listdasar as $dasar) {
-    //         $section->addText(
-    //             $no . ". " . $dasar['undang'],
-    //             ['size' => 12]
-    //         );
-    //         $no++;
-    //     }
-    //     // header('Content-Type: application/json');
-    //     // echo json_encode($users);
-    //     // exit;
-    //     $section->addText("Memberi Tugas", ['size' => 12, 'bold' => true, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-    //     $section->addTextBreak();
-
-    //     $section->addText("Kepada :", ['size' => 12]);
-
-    //     if (count($users) > 2) {
-    //         $section->addText("Nama-nama terlampir", ['size' => 12]);
-    //     } else {
-    //         foreach ($users as $user) {
-    //             $section->addListItem("Nama: " . $user['nama'], 0, ['size' => 12]);
-    //             $section->addListItem("NIP: " . $user['nip'], 0, ['size' => 12]);
-    //             $section->addListItem("Pangkat/Gol: " . $user['pangkat'], 0, ['size' => 12]);
-    //             $section->addListItem("Jabatan: " . $user['jabatan'], 0, ['size' => 12]);
-    //             $section->addTextBreak();
-    //         }
-    //     }
-
-    //     $section->addText("Untuk :", ['size' => 12, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-    //     $section->addText($surat['sebagai'] ?? '', ['size' => 12]);
-    //     $section->addText('Waktu  : ' . formatTGL($surat['waktu'] ?? '', 'hari'), ['size' => 12]);
-    //     $section->addText('Tujuan : ' . ($surat['tujuan'] ?? ''), ['size' => 12]);
-    //     if (!empty($surat['untuk'])) {
-    //         $nod = 4;
-    //         foreach ($listdasar as $dasar) {
-    //             $section->addText(
-    //                 $nod . ". " . $surat['untuk'],
-    //                 ['size' => 12]
-    //             );
-    //             $nod++;
-    //         }
-    //     }
-
-    //     // Tambahkan teks instruksi tugas
-    //     $section->addText(
-    //         "Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.",
-    //         ['size' => 12],
-    //         ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]
-    //     );
-
-    //     // Tambahkan baris kosong untuk jarak
-    //     $section->addTextBreak(1);
-
-    //     // Tambahkan tanggal dan jabatan di sebelah kanan
-    //     $section->addText(
-    //         'Surabaya, ' . formatTGL($surat['created_at'], 'tanggal') . ',',
-    //         ['size' => 12],
-    //         ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::RIGHT]
-    //     );
-
-    //     $section->addText(
-    //         $surat['jabatan_ttd'] ?? '',
-    //         ['size' => 12],
-    //         ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::RIGHT]
-    //     );
-
-    //     // Tambahkan ruang kosong untuk tanda tangan
-    //     $section->addTextBreak(3);
-
-    //     // Tambahkan nama penanda tangan
-    //     $section->addText(
-    //         $surat['penanda_tangan'] ?? '',
-    //         ['size' => 12],
-    //         ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::RIGHT]
-    //     );
-
-    //     // Menambahkan Footer
-    //     $footer = $section->addFooter();
-    //     $footer->addImage(FCPATH . 'end.jpg', ['width' => 500, 'height' => 150, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::LEFT]);
-
-    //     // Simpan File DOCX
-    //     $fileName = "Surat-Tugas-$suratId.docx";
-    //     $tempFile = WRITEPATH . $fileName;
-
-    //     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-    //     $objWriter->save($tempFile);
-
-    //     // Berikan File ke User
-    //     return $this->response->download($tempFile, null)->setFileName($fileName);
-    // }
-
 
     private function convertImageToBase64($imagePath)
     {
