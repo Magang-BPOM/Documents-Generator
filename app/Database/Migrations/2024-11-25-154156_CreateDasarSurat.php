@@ -46,3 +46,5 @@ class CreateDasarSurat extends Migration
         $this->forge->dropTable('dasarsurat');
     }
 }
+
+

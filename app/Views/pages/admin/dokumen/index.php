@@ -38,7 +38,7 @@ Semua Dokumen
 
                     <div class="sm:col-span-2 md:grow">
                         <div class="flex justify-end gap-x-2">
-                            <a href="/admin/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                            <a href="/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Buat Surat
                             </a>
 
@@ -46,7 +46,7 @@ Semua Dokumen
                                 Arsip
                             </button>
 
-                            <button data-trashed="false" data-url="<?= base_url('dokumen/delete') ?>" type="button" class="bulkDeleteBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                            <button data-trashed="false" data-url="<?= base_url('admin/dokumen/delete') ?>" type="button" class="bulkDeleteBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Hapus
                             </button>
 
@@ -124,11 +124,7 @@ Semua Dokumen
 
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu_mulai']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_ttd']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="<?= base_url('/admin/dokumen/pdf/' . $item['id']) ?>" class="text-blue-600 hover:underline">PDF</a>
-                                <a href="<?= base_url('dokumen/word/' . $item['id']) ?>" class="text-blue-600 hover:underline">Word</a>
-                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_penanda_tangan']) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -232,7 +228,7 @@ function closeModal() {
                     kepada: <?= json_encode($item['kepada']) ?>,
                     waktu_mulai: '<?= esc($item['waktu_mulai']) ?>',
                     penanda_tangan: '<?= esc($item['penanda_tangan']) ?>',
-                    jabatan_ttd: '<?= esc($item['jabatan_ttd']) ?>'
+                    jabatan_penanda_tangan: '<?= esc($item['jabatan_penanda_tangan']) ?>'
                 },
             <?php endforeach; ?>
         ];
@@ -258,9 +254,9 @@ function closeModal() {
             </td>
             <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
             <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
-            <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_ttd}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_penanda_tangan}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-                 <a href="dokumen/generate/${item.id}" class="text-blue-600 hover:underline">Lihat PDF</a>
+                <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
             </td>
         `;
                 tableBody.appendChild(row);
@@ -436,7 +432,7 @@ function closeModal() {
             alert('Silakan pilih data yang ingin di export');
             return;
         }
-        window.location.href = `/dokumen/generate-word/${selectedIds}`;
+        window.location.href = `/aadmin/dokumen/generate-word/${selectedIds}`;
     }
 
     function exportPDF() {

@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\PembabananAnggaranModel;
 use App\Models\Surat as Surat;
 use App\Models\User as User;
 use App\Models\Dasar as Dasar;
@@ -19,6 +20,8 @@ class DokumenController extends BaseController
     protected $dasarSurat;
     protected $SuratUserModel;
 
+    protected $pembebanan_anggaran;
+
     public function __construct()
     {
         $this->suratModel = new Surat();
@@ -26,6 +29,7 @@ class DokumenController extends BaseController
         $this->SuratUserModel = new SuratUser();
         $this->dasarModel = new Dasar();
         $this->dasarSurat = new DasarSurat();
+        $this->pembebanan_anggaran = new PembabananAnggaranModel();
         $secretKey = 'secret_O8ZWpkGWj365X5w1';
         ConvertApi::setApiCredentials($secretKey);
     }
@@ -36,11 +40,11 @@ class DokumenController extends BaseController
 
         $suratUser = new SuratUser();
         $dataAdmin['surat_user'] = $suratUser->surat();
+        $data['surat_user'] = $suratUser->suratbyUser();
 
         if ($role == 'admin') {
             return view('pages/admin/dokumen/index', $dataAdmin);
         } else {
-            $data['surat_user'] = $suratUser->suratbyUser();
             return view('pages/user/dokumen/index', $data);
         }
     }
@@ -49,10 +53,20 @@ class DokumenController extends BaseController
     public function create()
     {
         $role = session()->get('role');
+        $penandaTangan = $this->userModel
+            ->where('is_penanda_tangan', 1)
+            ->where('role !=', 'admin')
+            ->findAll();
+
 
         $data = [
-            'users' => $this->userModel->findAll(),
+            'users' => $this->userModel
+                ->where('role !=', 'admin') 
+                ->findAll(),
+
             'dasar' => $this->dasarModel->findAll(),
+            'pembebanan_anggaran' => $this->pembebanan_anggaran->findAll(),
+            'penanda_tangan' => $penandaTangan,
         ];
 
         if ($role == 'admin') {
@@ -88,76 +102,88 @@ class DokumenController extends BaseController
             'waktu_mulai' => 'required|valid_date',
             'waktu_berakhir' => 'required|valid_date',
             'tujuan' => 'required',
+            'kota_tujuan' => 'required',
             'biaya' => 'permit_empty|string',
+            'kategori_biaya' => 'required',
+            'id_pembebanan_anggaran' => 'required|integer',
             'penanda_tangan' => 'required',
-            'jabatan_ttd' => 'required',
             'selected_user' => 'required',
         ];
-
+    
         if ($this->request->getPost('opsi_tambahan') === 'show') {
             $validationRules['untuk'] = 'required';
         }
-
+    
         if (!$this->validate($validationRules)) {
+            session()->setFlashdata('error', 'Validasi gagal. Mohon periksa input Anda.');
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
-
+    
         $ttdTanggal = $this->request->getPost('waktu_mulai');
-
+    
         if ($this->isHoliday($ttdTanggal)) {
-            return redirect()->back()->withInput()->with('errors', [
-                'waktu' => 'Tanggal tidak dapat dipilih karena merupakan hari libur.',
-            ]);
+            session()->setFlashdata('error', 'Tanggal tidak dapat dipilih karena merupakan hari libur.');
+            return redirect()->back()->withInput();
         }
-
-        $dataSurat = [
-            'nomor_surat' => $this->request->getPost('nomor_surat'),
-            'menimbang' => $this->request->getPost('menimbang'),
-            'sebagai' => $this->request->getPost('sebagai'),
-            'waktu_mulai' => $this->request->getPost('waktu_mulai'),
-            'waktu_berakhir' => $this->request->getPost('waktu_berakhir'),
-            'tujuan' => $this->request->getPost('tujuan'),
-            'biaya' => $this->request->getPost('biaya'),
-            'penanda_tangan' => $this->request->getPost('penanda_tangan'),
-            'jabatan_ttd' => $this->request->getPost('jabatan_ttd'),
-        ];
-
-        $suratModel = new Surat();
-        $suratModel->insert($dataSurat);
-        $suratId = $suratModel->getInsertID();
-
-        $suratUserModel = new SuratUser();
-        $userIds = explode(',', $this->request->getPost('selected_user'));
-        foreach ($userIds as $userId) {
-            if (!empty($userId)) {
-                $suratUserModel->insert([
-                    'surat_id' => $suratId,
-                    'user_id' => $userId,
-                    'id_created' => $pembuatId,
-                ]);
+    
+        try {
+            $dataSurat = [
+                'nomor_surat' => $this->request->getPost('nomor_surat'),
+                'menimbang' => $this->request->getPost('menimbang'),
+                'sebagai' => $this->request->getPost('sebagai'),
+                'waktu_mulai' => $this->request->getPost('waktu_mulai'),
+                'waktu_berakhir' => $this->request->getPost('waktu_berakhir'),
+                'tujuan' => $this->request->getPost('tujuan'),
+                'kota_tujuan' => $this->request->getPost('kota_tujuan'),
+                'biaya' => $this->request->getPost('biaya'),
+                'kategori_biaya' => $this->request->getPost('kategori_biaya'),
+                'id_pembebanan_anggaran' => $this->request->getPost('id_pembebanan_anggaran'),
+                'id_penanda_tangan' => $this->request->getPost('penanda_tangan'),
+            ];
+    
+            $suratModel = new Surat();
+            $suratModel->insert($dataSurat);
+            $suratId = $suratModel->getInsertID();
+    
+            $suratUserModel = new SuratUser();
+            $userIds = explode(',', $this->request->getPost('selected_user'));
+            foreach ($userIds as $userId) {
+                if (!empty($userId)) {
+                    $suratUserModel->insert([
+                        'surat_id' => $suratId,
+                        'user_id' => $userId,
+                        'id_created' => $pembuatId,
+                    ]);
+                }
             }
-        }
-
-        $dasarSuratModel = new DasarSurat();
-        $selectDasar = explode(',', $this->request->getPost('selected_dasar'));
-        foreach ($selectDasar as $dasar) {
-            if (!empty($dasar)) {
-                $dasarSuratModel->insert([
-                    'id_surat' => $suratId,
-                    'id_dasar' => $dasar,
-                ]);
+    
+            $dasarSuratModel = new DasarSurat();
+            $selectDasar = explode(',', $this->request->getPost('selected_dasar'));
+            foreach ($selectDasar as $dasar) {
+                if (!empty($dasar)) {
+                    $dasarSuratModel->insert([
+                        'id_surat' => $suratId,
+                        'id_dasar' => $dasar,
+                    ]);
+                }
             }
+    
+            session()->setFlashdata('success', 'Surat berhasil disimpan.');
+            return redirect()->to('/dokumen');
+        } catch (\Exception $e) {
+            session()->setFlashdata('error', 'Terjadi kesalahan saat menyimpan surat: ' . $e->getMessage());
+            return redirect()->back()->withInput();
         }
-
-        return $this->generate($suratId);
     }
-
+    
 
     public function generate($suratId)
     {
         helper('url');
         $suratModel = new Surat();
         $surat = $suratModel->find($suratId);
+        $userModel = new User();
+
         if (!$surat) {
             log_message('error', "Surat with ID $suratId not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
@@ -184,10 +210,17 @@ class DokumenController extends BaseController
             ->where('dasarsurat.id_surat', $suratId)
             ->findAll();
 
+
+        $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
+        if (!$penandaTangan) {
+            log_message('error', "Penanda tangan for ID {$surat['id_penanda_tangan']} not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Penanda tangan not found.");
+        }
         $data = [
             'surat' => $surat,
             'users' => $users,
             'dasar' => $listdasar,
+            'penanda_tangan' => $penandaTangan,
             'header_image' => $this->convertImageToBase64('header.jpg'),
             'footer_image' => $this->convertImageToBase64('end.jpg'),
         ];
@@ -204,7 +237,7 @@ class DokumenController extends BaseController
 
 
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('F4', 'portrait');
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
         $outputDir = WRITEPATH . "pdfs";
@@ -219,16 +252,20 @@ class DokumenController extends BaseController
     }
 
 
-
     public function generateSPD($suratId)
     {
         helper('url');
+
         $suratModel = new Surat();
+        $pembebananAnggaranModel = new PembabananAnggaranModel();
+        $userModel = new User();
+
         $surat = $suratModel->find($suratId);
         if (!$surat) {
             log_message('error', "Surat with ID $suratId not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
         }
+
 
         $suratUserModel = new SuratUser();
         $users = $suratUserModel
@@ -238,37 +275,38 @@ class DokumenController extends BaseController
             ->findAll();
 
         log_message('debug', 'Users count: ' . count($users));
-        if (!empty($users)) {
-            log_message('debug', 'First user data: ' . print_r($users[0], true));
-        } else {
+        if (empty($users)) {
             log_message('error', "No users found for surat ID $suratId.");
         }
 
-        $DasarSuratModel = new DasarSurat();
-        $listdasar = $DasarSuratModel
-            ->select('dasar.*')
-            ->join('dasar', 'dasar.id = dasarsurat.id_dasar')
-            ->where('dasarsurat.id_surat', $suratId)
-            ->findAll();
+        $pembebananAnggaran = $pembebananAnggaranModel->getById($surat['id_pembebanan_anggaran']);
+        if (!$pembebananAnggaran) {
+            log_message('error', "Pembebanan anggaran for ID {$surat['id_pembebanan_anggaran']} not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Pembebanan anggaran not found.");
+        }
+        $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
+        if (!$penandaTangan) {
+            log_message('error', "Penanda tangan for ID {$surat['id_penanda_tangan']} not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Penanda tangan not found.");
+        }
 
         $data = [
             'surat' => $surat,
             'users' => $users,
+            'pembebanan_anggaran' => $pembebananAnggaran,
+            'penanda_tangan' => $penandaTangan,
         ];
 
-
+        // Render PDF
         $html = view('components/template_SPD', $data);
-
 
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
 
         $dompdf = new Dompdf($options);
-
-
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('F4', 'portrait');
+        $dompdf->setPaper('F4', 'landscape');
         $dompdf->render();
 
         $outputDir = WRITEPATH . "pdfs";
@@ -279,8 +317,9 @@ class DokumenController extends BaseController
         $outputPath = $outputDir . "/Surat-Perjalanan-Tugas-$suratId.pdf";
         file_put_contents($outputPath, $dompdf->output());
 
-        $dompdf->stream("Surat-Tugas-$suratId.pdf", ["Attachment" => false]);
+        $dompdf->stream("Surat-Perjalanan-Tugas-$suratId.pdf", ["Attachment" => false]);
     }
+
 
     public function convertPdfToWordWithConvertApi($pdfPath)
     {
@@ -502,11 +541,18 @@ class DokumenController extends BaseController
 
     public function arsip_index()
     {
-
+        $role = session()->get('role');
         $suratUser = new SuratUser();
+
         $data['arsip_surat'] = $suratUser->suratArsip();
 
-        return view('pages/admin/dokumen/archive', $data);
+        if ($role === 'admin') {
+            return view('pages/admin/dokumen/archive', $data);
+        } else if ($role === 'pegawai') {
+            return view('pages/user/dokumen/archive', $data);
+        } else {
+            return redirect()->to('/login')->with('error', 'Unauthorized access');
+        }
     }
 
 
@@ -522,5 +568,19 @@ class DokumenController extends BaseController
         $this->suratModel->whereIn('id', $selectedIds)->set(['status' => 'arsip'])->update();
 
         return $this->response->setJSON(['success' => true, 'message' => 'Data berhasil diarsipkan']);
+    }
+
+    public function unarchive()
+    {
+        $request = $this->request->getJSON();
+        $selectedIds = $request->selectedIds ?? [];
+
+        if (empty($selectedIds)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
+        }
+
+        $this->suratModel->whereIn('id', $selectedIds)->set(['status' => 'aaktif'])->update();
+
+        return $this->response->setJSON(['success' => true, 'message' => 'Data berhasil dipulihkan']);
     }
 }

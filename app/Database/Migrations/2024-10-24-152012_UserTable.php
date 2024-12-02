@@ -22,6 +22,7 @@ class UserTable extends Migration
             'nip'         => [
                 'type'       => 'VARCHAR',
                 'constraint' => '100',
+                'unique'     => true,
             ],
             'jabatan'     => [
                 'type'       => 'VARCHAR',
@@ -45,6 +46,11 @@ class UserTable extends Migration
             'role'        => [
                 'type'       => 'VARCHAR',
                 'constraint' => '100',
+            ],
+            'is_penanda_tangan' => [
+                'type'       => 'TINYINT',
+                'constraint' => 1,
+                'default'    => 0, 
             ],
             'created_at' => [
                 'type' => 'DATETIME',

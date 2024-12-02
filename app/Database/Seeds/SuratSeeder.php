@@ -6,11 +6,11 @@ use CodeIgniter\Database\Seeder;
 use App\Models\Surat;
 use App\Models\SuratUser;
 
-class SuratsSeeder extends Seeder
+class SuratSeeder extends Seeder
 {
     public function run()
     {
-
+        
         $requestData = [
             'nomor_surat' => 'PW.01.05.11A.07.24.1234',
             'menimbang' => 'Bahwa dalam rangka melaksanakan kebijakan pengawasan di bidang obat dan makanan.',
@@ -19,10 +19,12 @@ class SuratsSeeder extends Seeder
             'waktu_mulai' => '2024-10-22', 
             'waktu_berakhir' => '2024-10-24', 
             'tujuan'=>"Kantor UPT Pelatihan Pertanian, Dinas Pertanian dan Ketahanan Pangan Provinsi Jawa Timur Jl.Raya Dr. Cipto No. 123, Bedali Lawang Malang",
+            'kota_tujuan'=>"Malang",
             'biaya'=>"DIPA Balai Besar POM di Surabaya Tahun 2024.MAK : 3165.QIC.004.053.B.524113",
+            'kategori_biaya'=>'A',
+            'id_pembebanan_anggaran'=>'1',
             'ttd_tanggal' => '2024-10-24',
-            'penanda_tangan' => 'Budi Sulistyowati, S.Farm, Apt',
-            'jabatan_ttd' => 'Plt. Kepala Balai Besar POM di Surabaya',
+            'id_penanda_tangan' => '2',
             'selected_user' => '2,3', 
         ];
 
@@ -34,24 +36,24 @@ class SuratsSeeder extends Seeder
             'waktu_mulai' => $requestData['waktu_mulai'],
             'waktu_berakhir' => $requestData['waktu_berakhir'],
             'tujuan'=>$requestData['tujuan'],
+            'kota_tujuan'=>$requestData['kota_tujuan'],
             'biaya'=> $requestData['biaya'],
+            'kategori_biaya'=> $requestData['kategori_biaya'],
+            'id_pembebanan_anggaran'=> $requestData['id_pembebanan_anggaran'],
             'ttd_tanggal' => $requestData['ttd_tanggal'],
-            'penanda_tangan' => $requestData['penanda_tangan'],
-            'jabatan_ttd' => $requestData['jabatan_ttd'],
+            'id_penanda_tangan' => $requestData['id_penanda_tangan'],
             'status' => 'aktif',
             'created_at' => date('Y-m-d H:i:s'),
         ];
 
-        // Insert the surat data into 'surat' table
         $suratModel = new Surat();
         $suratModel->insert($dataSurat);
         $suratId = $suratModel->getInsertID();
 
-        // Handle user relations (surat_user)
         $userIds = explode(',', $requestData['selected_user']);
         log_message('debug', 'User IDs: ' . implode(',', $userIds));
 
-        $pembuatId = 1; // Set the creator ID for the record, adjust accordingly if needed
+        $pembuatId = 1; 
         
         foreach ($userIds as $userId) {
             if (!empty($userId)) {

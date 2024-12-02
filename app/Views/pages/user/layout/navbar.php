@@ -90,18 +90,23 @@
                 </button>
 
 
-                <!-- Dropdown -->
-                <div class="hs-dropdown [--placement:bottom-right] relative inline-flex">
-                    <button id="hs-dropdown-account" type="button" class="size-[38px] inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-transparent text-gray-800 focus:outline-none disabled:opacity-50 disabled:pointer-events-none dark:text-white" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
-                        <img class="shrink-0 rounded-full"
-                            src="<?= session()->get('foto_profil') ?>"
-                            alt="Avatar">
-                    </button>
-                    <!-- Menampilkan NIP pengguna -->
-                    <span><?= session()->get('nama') ?></span>
+                <div class="inline-flex items-center dark:bg-neutral-800 rounded-xl px-4 py-2 shadow-sm border border-gray-300 dark:border-neutral-700">
+                    <img class="w-8 h-8 rounded-full object-cover mr-3"
+                        src="<?= session()->get('foto_profil') ?>"
+                        alt="Avatar">
+    
 
+                    <div class="flex flex-col">
+                        <span class="text-sm font-medium text-gray-800 dark:text-white">
+                            <?= session()->get('nama') ?>
+                        </span>
+                        <span class="text-xs text-gray-600 dark:text-neutral-400">
+                            NIP: <?= session()->get('nip') ?>
+                        </span>
+                    </div>
                 </div>
-                <!-- End Dropdown -->
+
+
             </div>
         </div>
     </nav>

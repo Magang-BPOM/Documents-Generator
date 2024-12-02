@@ -35,10 +35,10 @@ function formatTGL($tanggal, $format = 'tanggal')
 
     $fmt = new IntlDateFormatter(
         'id_ID',
-        $dateType, 
+        $dateType,
         IntlDateFormatter::NONE,
         'Asia/Jakarta',
-        IntlDateFormatter::GREGORIAN 
+        IntlDateFormatter::GREGORIAN
     );
 
     return $fmt->format(new DateTime($tanggal));
@@ -46,28 +46,33 @@ function formatTGL($tanggal, $format = 'tanggal')
 
 function formatTanggalRentang($mulai, $berakhir)
 {
-    $hariMulai = date('l', strtotime($mulai));
-    $hariBerakhir = date('l', strtotime($berakhir));
+    $formatterHari = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN, 'EEEE');
+    $formatterBulan = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN, 'MMMM');
+    
+    $hariMulai = ucfirst($formatterHari->format(strtotime($mulai)));
+    $hariBerakhir = ucfirst($formatterHari->format(strtotime($berakhir)));
 
     $tanggalMulai = date('d', strtotime($mulai));
     $tanggalBerakhir = date('d', strtotime($berakhir));
 
-    $bulanMulai = date('F', strtotime($mulai));
-    $bulanBerakhir = date('F', strtotime($berakhir));
+    $bulanMulai = ucfirst($formatterBulan->format(strtotime($mulai)));
+    $bulanBerakhir = ucfirst($formatterBulan->format(strtotime($berakhir)));
 
     $tahunMulai = date('Y', strtotime($mulai));
     $tahunBerakhir = date('Y', strtotime($berakhir));
 
     if ($bulanMulai === $bulanBerakhir && $tahunMulai === $tahunBerakhir) {
-        return "{$hariMulai}-{$hariBerakhir}, {$tanggalMulai}-{$tanggalBerakhir} {$bulanMulai} {$tahunMulai}";
+        return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} - {$tanggalBerakhir} {$bulanMulai} {$tahunMulai}";
     }
 
     if ($tahunMulai === $tahunBerakhir) {
-        return "{$hariMulai}-{$hariBerakhir}, {$tanggalMulai} {$bulanMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunMulai}";
+        return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} {$bulanMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunMulai}";
     }
 
-    return "{$hariMulai}-{$hariBerakhir}, {$tanggalMulai} {$bulanMulai} {$tahunMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunBerakhir}";
+    return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} {$bulanMulai} {$tahunMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunBerakhir}";
 }
+
+
 
 ?>
 
@@ -82,7 +87,7 @@ function formatTanggalRentang($mulai, $berakhir)
         @page {
             size: 210mm 330mm;
         }
-        
+
         * {
             min-width: 100vw;
             margin: 0;
@@ -92,16 +97,19 @@ function formatTanggalRentang($mulai, $berakhir)
         }
 
         .numbered-list {
-            padding-left: 10px;
-        }
+    list-style: none; /* Hilangkan numbering default */
+    padding: 0;
+    margin: 0;
+}
 
-        .numbered-list li {
-            display: flex;
-            align-items: flex-start;
-        }
+.numbered-list li {
+    display: flex; /* Gunakan flex untuk menyelaraskan elemen */
+    align-items: center; /* Selaraskan elemen secara vertikal */
+    margin-bottom: 8px; /* Jarak antar item */
+}
+
 
         .numbered-list li::before {
-            counter-increment: item;
             margin-right: 10px;
             text-align: right;
             min-width: 20px;
@@ -109,7 +117,18 @@ function formatTanggalRentang($mulai, $berakhir)
 
         .numbered-list li .list-text {
             text-indent: 1px;
-            padding-left: 10px;
+            padding-left: 20px;
+            margin-top: -19px;
+        }
+        .list-number {
+            min-width: 20px; 
+            text-align: right; 
+            margin-right: 10px; 
+        }
+
+        .list-text {
+            flex-grow: 1; 
+            text-indent: 0;
         }
 
         body {
@@ -124,7 +143,7 @@ function formatTanggalRentang($mulai, $berakhir)
         }
 
         .content {
-            padding: 0 80px;
+            padding: 0 70px;
         }
 
         .section-title {
@@ -179,13 +198,42 @@ function formatTanggalRentang($mulai, $berakhir)
             vertical-align: top;
         }
 
+        .user-info {
+            list-style: none; 
+            padding: 0;
+            margin: 0;
+        }
+
         .user-info li {
+            display: flex; 
+            align-items: flex-start; 
             margin-bottom: 10px;
+        }
+        .list-user {
+            min-width: 20px;
+            text-align: right; 
+            margin-right: 10px; 
+        }
+        .list-details {
+            flex-grow: 1; 
+            padding-left: 19px;
+            margin-top: -19px;
+        }
+
+        .list-untuk {
+            list-style-type: decimal; 
+            padding-left: 20px; 
+            margin: 0;
+        }
+
+        .list-untuk li {
+            margin-bottom: 4px; 
         }
 
         .page-break {
             page-break-before: always;
         }
+        
 
         .wrap {
             margin: 80px;
@@ -239,24 +287,28 @@ function formatTanggalRentang($mulai, $berakhir)
         <div class="label-content">
             <p>Dasar</p>
             <span class="colon">:</span>
-            <?php if (count($dasar) > 2): ?>
-            <?php else: ?>
+            <?php if (!empty($dasar)): ?>
                 <ul class="numbered-list">
                     <?php $no = 1; ?>
                     <?php foreach ($dasar as $list): ?>
                         <li>
-                            <?= $no++ ?>. <span class="list-text"><?= esc($list['undang']) ?></span>
+                            <span class="list-number"><?= $no++ ?>.</span>
+                            <div class="list-text">
+                                <?= esc($list['undang']) ?>
+                            </div>
                         </li>
-                    <?php endforeach; ?>
+                     <?php endforeach; ?>
                 </ul>
+            <?php else: ?>
+                <p>Tidak ada dasar yang ditemukan.</p>
             <?php endif; ?>
         </div>
+
 
 
         <div class="label-content">
             <p style="text-align:center">Memberi Tugas</p>
         </div>
-
         <div class="label-content">
             <p>Kepada</p>
             <span class="colon">:</span>
@@ -264,40 +316,59 @@ function formatTanggalRentang($mulai, $berakhir)
                 <p>Nama-nama terlampir</p>
             <?php else: ?>
                 <ul class="user-info">
+                    <?php $no = 1; ?>
                     <?php foreach ($users as $user): ?>
                         <li>
-                            Nama: <?= esc($user['nama']) ?><br>
-                            NIP: <?= esc($user['nip']) ?><br>
-                            Pangkat/Gol: <?= esc($user['pangkat']) ?><br>
-                            Jabatan: <?= esc($user['jabatan']) ?>
+                            <span class="list-user"><?= $no++ ?>.</span>
+                            <div class="list-details">
+                                Nama: <?= esc($user['nama']) ?><br>
+                                NIP: <?= esc($user['nip']) ?><br>
+                                Pangkat/Gol: <?= esc($user['pangkat']) ?><br>
+                                Jabatan: <?= esc($user['jabatan']) ?>
+                            </div>
                         </li>
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>
         </div>
 
+
         <div class="label-content">
             <p>Untuk</p>
             <span class="colon">:</span>
-            <p>Sebagai : <?= esc($surat['sebagai']) ?></p>
-            <p>Waktu : <?= formatTanggalRentang($surat['waktu_mulai'], $surat['waktu_berakhir']); ?></p>
-            <p>Tujuan : <?= esc($surat['tujuan']) ?></p>
+            <ol class="list-untuk">
+                <li>
+                    Sebagai: <?= esc($surat['sebagai']) ?>
+                </li>
+                <li>
+                    Waktu: <?= formatTanggalRentang($surat['waktu_mulai'], $surat['waktu_berakhir']); ?>
+                </li>
+                <li>
+                    Tujuan: <?= esc($surat['tujuan']) ?>
+                </li>
+            </ol>
         </div>
+
 
         <p>Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.</p>
         <div class="signature" style="margin-right: 60px;margin-top:20px;">
-            <p style="text-align:right;">Surabaya, <?= formatTGL($surat['created_at'], 'tanggal') ?>,</p>
-            <p style="text-align:right;"><?= esc($surat['jabatan_ttd']) ?>,</p>
+            <p style="text-align:right;margin-right:40px">Surabaya, <?= formatTGL($surat['created_at'], 'tanggal') ?>,</p>
+            <p style="text-align:right;"><?= esc($penanda_tangan['jabatan']) ?>,</p>
             <br><br><br><br>
-            <p style="text-align:right"><?= esc($surat['penanda_tangan']) ?></p>
+            <p style="text-align:right;margin-right:25px"><?= esc($penanda_tangan['nama']) ?></p>
         </div>
+
+
+    </div>
+
+    <div style="position:absolute;top:1125px;margin-left:125px;justify-content:center;text-align:center;border:1px solid black;align-items:center;max-width:530px">
+        <p style="font-size:18px;text-align:center;align-items:center;justify-content:center">Petugas tidak diperkenankan menerima gratifikasi dalam bentuk apapun.</p>
     </div>
 
     <footer>
         <img src="<?= esc($footer_image) ?>" alt="Footer">
     </footer>
 
-    <!-- Halaman kedua untuk lampiran -->
     <?php if (count($users) > 2): ?>
         <div class="page-break">
             <div class="wrap">
@@ -334,7 +405,6 @@ function formatTanggalRentang($mulai, $berakhir)
                 <div class="end" style="border:1px solid; padding:8px;margin-top : 300px">
                     <p>Petugas tidak diperkenankan menerima gratifikasi dalam bentuk apapun.</p>
                 </div>
-
             </div>
         </div>
     <?php endif; ?>

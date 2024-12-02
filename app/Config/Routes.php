@@ -11,27 +11,26 @@ $routes->get('/', 'User::index');
 $routes->post('/login', 'User::login');
 $routes->post('/logout', 'User::logout');
 
-// Rute yang hanya bisa diakses jika login
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     $routes->group('', ['filter' => 'role:admin'], function ($routes) {
         $routes->get('/admin/dashboard', 'DashboardController::index');
         $routes->get('/admin/dokumen', 'DokumenController::index');
         $routes->get('/admin/dokumen/create', 'DokumenController::create');
-        $routes->post('/dokumen/store', 'DokumenController::store');
+        $routes->post('/admin/dokumen/store', 'DokumenController::store');
         $routes->get('/admin/dokumen/generate/(:num)', 'DokumenController::generate/$1');
-        $routes->get('/dokumen/generate-word/(:num)', 'DokumenController::generateWord/$1');
+        $routes->get('/admin/dokumen/generateSPD/(:num)', 'DokumenController::generateSPD/$1');
+        $routes->get('/admin/dokumen/generate-word/(:num)', 'DokumenController::generateWord/$1');
         $routes->get('/admin/dokumen/archive', 'DokumenController::arsip_index');
-        $routes->post('/dokumen/bulkArsip', 'DokumenController::bulkArsip');
-        $routes->post('/dokumen/delete', 'DokumenController::delete');
+        $routes->post('/admin/dokumen/bulkArsip', 'DokumenController::bulkArsip');
+        $routes->post('/admin/dokumen/delete', 'DokumenController::delete');
 
-        //List user
         $routes->get('/admin/listuser', 'User::listuser');
         $routes->get('/user/create', 'User::create');
         $routes->post('/user/store', 'User::store');
         $routes->post('/user/delete', 'User::delete');
-
-        $routes->post('/admin/updateuser', 'User::updateuser');
+        $routes->get('user/edit/(:segment)', 'UserController::edit/$1');
+        $routes->post('user/update/(:segment)', 'UserController::update/$1');
     });
 
     // Rute untuk User
@@ -39,8 +38,12 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/dashboard', 'DashboardController::user');
         $routes->get('/dokumen', 'DokumenController::index');
         $routes->get('/dokumen/generate/(:num)', 'DokumenController::generate/$1');
+        $routes->get('/dokumen/generateSPD/(:num)', 'DokumenController::generateSPD/$1');
         $routes->get('/dokumen/create', 'DokumenController::create');
         $routes->post('/dokumen/store', 'DokumenController::store');
-        // Tambahkan rute khusus user lainnya
+        $routes->get('/dokumen/archive', 'DokumenController::arsip_index');
+        $routes->post('/dokumen/delete', 'DokumenController::delete');
+        $routes->post('/dokumen/bulkArsip', 'DokumenController::bulkArsip');
+        $routes->post('/dokumen/unarchive', 'DokumenController::unarchive');
     });
 });

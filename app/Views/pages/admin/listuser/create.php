@@ -18,7 +18,6 @@ Tambah Pengguna Baru
         <div class="flex items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-neutral-100">Tambah Pengguna Baru</h2>
         </div>
-
         <!-- Success Alert -->
         <?php if (session()->getFlashdata('message')): ?>
             <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
@@ -57,12 +56,12 @@ Tambah Pengguna Baru
 
                 <div class="col-span-1">
                     <label for="jabatan" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Jabatan</label>
-                    <input type="text" name="jabatan" id="jabatan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" value="<?= old('jabatan') ?>" required>
+                    <input type="text" name="jabatan" placeholder="Pengawas Farmasi dan Makanan Ahli Madya" id="jabatan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" value="<?= old('jabatan') ?>" required>
                 </div>
 
                 <div class="col-span-1">
-                    <label for="pangkat" class="block text-sm font-medium text-gray-700 dark:text-neutral-300">Pangkat</label>
-                    <input type="text" name="pangkat" id="pangkat" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" value="<?= old('pangkat') ?>">
+                    <label for="pangkat" class="block text-sm font-medium text-gray-700 dark:text-neutral-300">Pangkat/Gol</label>
+                    <input type="text" placeholder="Pembina/Gol.IV-a" name="pangkat" id="pangkat" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" value="<?= old('pangkat') ?>">
                 </div>
 
                 <div class="col-span-1">
@@ -98,5 +97,33 @@ Tambah Pengguna Baru
         </form>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      
+        <?php if (session()->getFlashdata('success')): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '<?= session()->getFlashdata('success') ?>',
+                timer: 3000, // 3 seconds
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = "<?= base_url('admin/listuser') ?>";
+            });
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('error')): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '<?= session()->getFlashdata('error') ?>',
+                confirmButtonText: 'OK'
+            });
+        <?php endif; ?>
+    });
+</script>
+
+
 
 <?= $this->endSection(); ?>

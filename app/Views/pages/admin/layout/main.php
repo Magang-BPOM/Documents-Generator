@@ -81,6 +81,22 @@
         }
 
         document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+        <?php if (session()->getFlashdata('sweetalert_success')): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '<?= session()->getFlashdata('sweetalert_success') ?>',
+            });
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('sweetalert_error')): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '<?= session()->getFlashdata('sweetalert_error') ?>',
+            });
+        <?php endif; ?>
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>

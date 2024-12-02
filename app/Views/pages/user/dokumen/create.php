@@ -40,148 +40,174 @@ Pembuatan Dokumen
         <?php endif; ?>
 
         <!-- Form -->
-        <form method="POST" action="<?= base_url('dokumen/store') ?>" ">
+        <form method="POST" action="<?= base_url('dokumen/store') ?>" id="storeForm">
             <?= csrf_field(); ?>
 
             <div class=" grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <div class="col-span-1">
-                <label for="nomor_surat" class="required block font-medium text-gray-700 dark:text-neutral-300">Nomor Surat</label>
-                <input type="text" name="nomor_surat" id="nomor_surat" placeholder="contoh:PW.01.05.11A.07.24.1816" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
-            </div>
+                <div class="col-span-1">
+                    <label for="nomor_surat" value="<?= old('nomor_surat') ?>" class="required block font-medium text-gray-700 dark:text-neutral-300">Nomor Surat</label>
+                    <input type="text" name="nomor_surat" id="nomor_surat" placeholder="contoh:PW.01.05.11A.07.24.1816" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                </div>
 
-            <div class="col-span-1">
-                <label for="menimbang" class="required block font-medium text-gray-700 dark:text-neutral-300">Menimbang</label>
-                <input type="text" name="menimbang" id="menimbang" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
-            </div>
+                <div class="col-span-1">
+                    <label for="menimbang" value="<?= old('menimbang') ?>" class="required block font-medium text-gray-700 dark:text-neutral-300">Menimbang</label>
+                    <input type="text" name="menimbang" id="menimbang" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                </div>
 
-            <div class="col-span-2 text-lg">
-                <label class="required block font-medium text-gray-700 dark:text-neutral-300">Dasar</label>
-                <div id="selected-dasar-container" class="mb-4"></div>
+                <div class="col-span-2 text-lg">
+                    <label class="required block font-medium text-gray-700 dark:text-neutral-300">Dasar</label>
+                    <div id="selected-dasar-container" class="mb-4"></div>
 
-                <input type="hidden" name="selected_dasar" id="selected_dasar_input" value="<?= old('selected_dasar') ?>">
+                    <input type="hidden" name="selected_dasar" id="selected_dasar_input" value="<?= old('selected_dasar') ?>">
 
-                <div class="flex gap-2">
-                    <div class="flex-1 relative">
-                        <input type="text" id="selected_dasar"
-                            class="w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
-                            autocomplete="off"
-                            placeholder="Ketik nama dasar...">
-                        <div id="list-dasar" class="hidden absolute w-full mt-1 max-h-60 overflow-auto bg-white dark:bg-neutral-800 border border-gray-300 rounded-md shadow-lg z-10">
+                    <div class="flex gap-2">
+                        <div class="flex-1 relative">
+                            <input type="text" id="selected_dasar"
+                                class="w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                                autocomplete="off"
+                                placeholder="Ketik nama dasar...">
+                            <div id="list-dasar" class="hidden absolute w-full mt-1 max-h-60 overflow-auto bg-white dark:bg-neutral-800 border border-gray-300 rounded-md shadow-lg z-10">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-span-2">
-                <label class="required block font-medium text-gray-700 dark:text-neutral-300">Kepada</label>
-                <div id="selected-users-container" class="mb-4">
-                </div>
+                <div class="col-span-2">
+                    <label class="required block font-medium text-gray-700 dark:text-neutral-300">Kepada</label>
+                    <div id="selected-users-container" class="mb-4">
+                    </div>
 
-                <input type="hidden" name="selected_user" id="selected_users_input" value="<?= old('selected_user') ?>">
+                    <input type="hidden" name="selected_user" id="selected_users_input" value="<?= old('selected_user') ?>">
 
-                <div class="flex gap-2">
-                    <div class="flex-1 relative">
-                        <input type="text" id="selected_user"
-                            class="w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
-                            autocomplete="off"
-                            placeholder="Ketik nama user...">
-                        <div id="dropdown-list" class="hidden absolute w-full mt-1 max-h-60 overflow-auto bg-white dark:bg-neutral-800 border border-gray-300 rounded-md shadow-lg z-10">
+                    <div class="flex gap-2">
+                        <div class="flex-1 relative">
+                            <input type="text" id="selected_user"
+                                class="w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                                autocomplete="off"
+                                placeholder="Ketik nama user...">
+                            <div id="dropdown-list" class="hidden absolute w-full mt-1 max-h-60 overflow-auto bg-white dark:bg-neutral-800 border border-gray-300 rounded-md shadow-lg z-10">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- untuk -->
+                <!-- untuk -->
 
-            <label for="untuk" class="required block font-medium text-gray-700 dark:text-neutral-300">Isian section Untuk</label>
+                <label for="untuk" class="required block font-medium text-gray-700 dark:text-neutral-300">Isian section Untuk</label>
 
-            <div class="col-span-2">
-                <label for="sebagai" class="required block text-gray-700 dark:text-neutral-300">Sebagai</label>
-                <input type="text" name="sebagai" id="sebagai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-            </div>
+                <div class="col-span-2">
+                    <label for="sebagai" value="<?= old('sebagai') ?>" class="required block text-gray-700 dark:text-neutral-300">Sebagai</label>
+                    <input type="text" name="sebagai" id="sebagai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                </div>
 
-            <div class="col-span-1">
-                <label for="waktu" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan dimulai</label>
-                <input type="date" name="waktu_mulai" id="waktu_mulai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                <span id="error-message" class="text-red-500 mt-2 hidden"></span>
-            </div>
+                <div class="col-span-1">
+                    <label for="waktu" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan dimulai</label>
+                    <input type="date" name="waktu_mulai" id="waktu_mulai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                    <span id="error-message" class="text-red-500 mt-2 hidden"></span>
+                </div>
 
-            <div class="col-span-1">
-                <label for="waktu" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan berakhir</label>
-                <input type="date" name="waktu_berakhir" id="waktu_berakhir" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                <span id="error-message" class="text-red-500 mt-2 hidden"></span>
-            </div>
+                <div class="col-span-1">
+                    <label for="waktu" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan berakhir</label>
+                    <input type="date" name="waktu_berakhir" id="waktu_berakhir" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                    <span id="error-message" class="text-red-500 mt-2 hidden"></span>
+                </div>
 
 
-            <div class="col-span-2">
-                <label for="tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Tujuan</label>
-                <input type="text" name="tujuan" id="tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-            </div>
+                <div class="col-span-1">
+                    <label for="tujuan" value="<?= old('tujuan') ?>" class="required block mt-2 text-gray-700 dark:text-neutral-300">Detail Tujuan</label>
+                    <input type="text" name="tujuan" id="tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                </div>
 
-            <!-- Opsi Tambahan -->
-            <div class="col-span-2">
-                <label class="block text-lg font-medium text-gray-700 dark:text-neutral-300 mb-4">
-                    Opsi Tambahan
-                </label>
-                <div class="flex flex-col space-y-4">
-                    <!-- Radio Button Group -->
-                    <div class="flex items-center space-x-6">
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="opsi_tambahan" value="show"
-                                class="form-radio text-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700"
-                                onclick="toggleOpsiTambahan(true)">
-                            <span class="text-gray-700 dark:text-neutral-300">Tambah</span>
-                        </label>
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="opsi_tambahan" value="hide" checked
-                                class="form-radio text-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700"
-                                onclick="toggleOpsiTambahan(false)">
-                            <span class="text-gray-700 dark:text-neutral-300">Tidak</span>
-                        </label>
-                    </div>
+                <div class="col-span-1">
+                    <label for="kota_tujuan" value="<?= old('kota_tujuan') ?>" class="required block mt-2 text-gray-700 dark:text-neutral-300">Kota tujuan</label>
+                    <input type="text" name="kota_tujuan" id="kota_tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                </div>
 
-                    <!-- Textarea for Opsi Tambahan -->
-                    <div id="opsi-tambahan-container" class="hidden transition-all duration-300">
-                        <textarea name="untuk" id="untuk" rows="4"
-                            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3"
-                            placeholder="Contoh input: 'Biaya : DIPA Balai Besar POM di Surabaya Tahun 2024.' (akhiran ';')">
+                <!-- Opsi Tambahan -->
+                <div class="col-span-2">
+                    <label class="block text-lg font-medium text-gray-700 dark:text-neutral-300 mb-4">
+                        Opsi Tambahan
+                    </label>
+                    <div class="flex flex-col space-y-4">
+                        <!-- Radio Button Group -->
+                        <div class="flex items-center space-x-6">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="opsi_tambahan" value="show"
+                                    class="form-radio text-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700"
+                                    onclick="toggleOpsiTambahan(true)">
+                                <span class="text-gray-700 dark:text-neutral-300">Tambah</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="opsi_tambahan" value="hide" checked
+                                    class="form-radio text-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700"
+                                    onclick="toggleOpsiTambahan(false)">
+                                <span class="text-gray-700 dark:text-neutral-300">Tidak</span>
+                            </label>
+                        </div>
+
+                        <!-- Textarea for Opsi Tambahan -->
+                        <div id="opsi-tambahan-container" class="hidden transition-all duration-300">
+                            <textarea name="untuk" id="untuk" rows="4"
+                                class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3"
+                                placeholder="Contoh input: 'Biaya : DIPA Balai Besar POM di Surabaya Tahun 2024.' (akhiran ';')">
                         </textarea>
-                        <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
-                            Masukkan informasi tambahan dengan format yang sesuai.
-                        </p>
+                            <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
+                                Masukkan informasi tambahan dengan format yang sesuai.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-           
+                <div class="col-span-1">
+                    <label for="kategori_biaya" class="required block font-medium text-gray-700 dark:text-neutral-300">Kategori Biaya</label>
+                    <select name="kategori_biaya" id="kategori_biaya"
+                        class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                        <option value="A">Kategori A</option>
+                        <option value="B">Kategori B</option>
+                        <option value="C">Kategori C</option>
+                        <option value="D">Kategori D</option>
+                    </select>
+                </div>
+
+                <div class="col-span-1">
+                    <label for="id_pembebanan_anggaran" class="required block font-medium text-gray-700 dark:text-neutral-300">Pembebanan Anggaran</label>
+                    <select name="id_pembebanan_anggaran" id="id_pembebanan_anggaran"
+                        class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                        <?php foreach ($pembebanan_anggaran as $item): ?>
+                            <option value="<?= $item['id'] ?>"><?= $item['akun'] ?> - <?= $item['instansi'] ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+
                 <div class="col-span-1">
                     <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">Penanda Tangan</label>
-                    <input type="text" name="penanda_tangan" id="penanda_tangan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                    <select name="penanda_tangan" id="penanda_tangan"
+                        class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                        <?php foreach ($penanda_tangan as $user): ?>
+                            <option value="<?= $user['id'] ?>"><?= $user['nama'] ?> - NIP: <?= $user['nip'] ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
-                <div class="col-">
-                    <label for="jabatan_ttd" class="required block font-medium text-gray-700 dark:text-neutral-300">Jabatan Penanda Tangan</label>
-                    <input type="text" name="jabatan_ttd" id="jabatan_ttd" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+
+                <div class="col-span-2 flex justify-start space-x-2">
+                    <a href="/surat" class="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
+                        Kembali
+                    </a>
+
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
+                        Buat Surat
+                    </button>
                 </div>
-      
-
-            <!-- Button -->
-            <div class="col-span-2 flex justify-start space-x-2">
-                <a href="/surat" class="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
-                    Kembali
-                </a>
-
-                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
-                    Buat Surat
-                </button>
             </div>
+        </form>
     </div>
-    </form>
 </div>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+    
     function toggleOpsiTambahan(show) {
         const opsiTambahanContainer = document.getElementById('opsi-tambahan-container');
         const opsiTambahanInput = document.getElementById('opsi_tambahan_input');
@@ -202,7 +228,7 @@ Pembuatan Dokumen
 
         let dasar = <?= json_encode($dasar); ?>;
 
-        console.log(dasar);
+
 
         function renderDropdown(showDasar) {
             dropdownDasar.innerHTML = showDasar.map(list => `
@@ -280,7 +306,6 @@ Pembuatan Dokumen
     })();
 
 
-    // Script Users
     (function() {
         const selectedUsers = new Set();
         const dropdownList = document.getElementById('dropdown-list');
@@ -376,26 +401,43 @@ Pembuatan Dokumen
             }
         });
     })();
-</script>
-<script>
-    // Atur Moment.js ke bahasa Indonesia
-    moment.locale('id');
 
-    // Ambil elemen input
+
+    moment.locale('id');
     const dateInput = document.getElementById('waktu');
 
-    // Tambahkan event listener untuk mengolah input
     dateInput.addEventListener('change', () => {
 
-        const dateValue = dateInput.value; 
-
-        // Ubah ke format bahasa Indonesia
-        const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY'); 
-
-        // Tampilkan hasilnya di console atau di elemen lain
+        const dateValue = dateInput.value;
+        const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY');
         console.log('Formatted Date in Indonesian:', formattedDate);
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        <?php if (session()->getFlashdata('success')): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '<?= session()->getFlashdata('success') ?>',
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('error')): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '<?= session()->getFlashdata('error') ?>',
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        <?php endif; ?>
+    });
 </script>
+
 
 
 

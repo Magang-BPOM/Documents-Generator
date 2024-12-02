@@ -118,7 +118,7 @@ Semua Dokumen
                             <td class="px-6 py-4 whitespace-nowrap"><?= $no++ ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['nomor_surat']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['kepada']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu_mulai']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_ttd']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">

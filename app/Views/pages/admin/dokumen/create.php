@@ -40,7 +40,7 @@ Pembuatan Dokumen
         <?php endif; ?>
 
         <!-- Form -->
-        <form method="POST" action="<?= base_url('dokumen/store') ?>" ">
+        <form method="POST" action="<?= base_url('admin/dokumen/store') ?>" ">
             <?= csrf_field(); ?>
 
             <div class=" grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -152,6 +152,28 @@ Pembuatan Dokumen
                         </p>
                     </div>
                 </div>
+            </div>
+
+            <div class="col-span-1">
+                <label for="kategori_biaya" class="required block font-medium text-gray-700 dark:text-neutral-300">Kategori Biaya</label>
+                <select name="kategori_biaya" id="kategori_biaya"
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                    <option value="A">Kategori A</option>
+                    <option value="B">Kategori B</option>
+                    <option value="C">Kategori C</option>
+                    <option value="D">Kategori D</option>
+                </select>
+            </div>
+
+            <!-- Pembebanan Anggaran Dropdown -->
+            <div class="col-span-1">
+                <label for="id_pembebanan_anggaran" class="required block font-medium text-gray-700 dark:text-neutral-300">Pembebanan Anggaran</label>
+                <select name="id_pembebanan_anggaran" id="id_pembebanan_anggaran"
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                    <?php foreach ($pembebanan_anggaran as $item): ?>
+                        <option value="<?= $item['id'] ?>"><?= $item['akun'] ?> - <?= $item['instansi'] ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
            
@@ -376,26 +398,43 @@ Pembuatan Dokumen
             }
         });
     })();
-</script>
-<script>
-    // Atur Moment.js ke bahasa Indonesia
-    moment.locale('id');
 
-    // Ambil elemen input
+    
+    moment.locale('id');
     const dateInput = document.getElementById('waktu');
 
-    // Tambahkan event listener untuk mengolah input
     dateInput.addEventListener('change', () => {
 
         const dateValue = dateInput.value; 
-
-        // Ubah ke format bahasa Indonesia
         const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY'); 
-
-        // Tampilkan hasilnya di console atau di elemen lain
         console.log('Formatted Date in Indonesian:', formattedDate);
     });
+
+
+
+    <?php if (session()->getFlashdata('generate_success')): ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Surat berhasil dibuat. Proses generate akan dimulai.',
+            timer: 3000, 
+            timerProgressBar: true,
+            showConfirmButton: false,
+            willClose: () => {
+                window.location.href = "<?= base_url('admin/dokumen/generate') ?>/" + <?= session()->getFlashdata('surat_id') ?>;
+            }
+        });
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('generate_error')): ?>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '<?= session()->getFlashdata('generate_error') ?>',
+        });
+    <?php endif; ?>
 </script>
+
 
 
 

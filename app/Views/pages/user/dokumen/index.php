@@ -14,7 +14,7 @@ Semua Dokumen
 
 <?= $this->section('content'); ?>
 
-<div class="relative min-h-screen max-w-full mx-auto p-6 sm:px-6 lg:px-6">
+<div class="relative max-w-full min-h-screen mx-auto p-6 sm:px-6 lg:px-6">
     <div class="bg-white dark:bg-neutral-900 shadow-lg rounded-xl p-6">
         <!-- <div class="flex items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-neutral-100">Semua Surat</h2>
@@ -38,16 +38,12 @@ Semua Dokumen
 
                     <div class="sm:col-span-2 md:grow">
                         <div class="flex justify-end gap-x-2">
-                            <a href="/admin/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                            <a href="/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Buat Surat
                             </a>
 
                             <button data-trashed="true" data-url="<?= base_url('dokumen/bulkArsip') ?>" type="button" class="bulkArsipBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Arsip
-                            </button>
-
-                            <button data-trashed="false" data-url="<?= base_url('dokumen/delete') ?>" type="button" class="bulkDeleteBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                                Hapus
                             </button>
 
                             <div class="relative inline-block text-left">
@@ -79,7 +75,6 @@ Semua Dokumen
 
                             </div>
 
-
                         </div>
                     </div>
 
@@ -87,7 +82,6 @@ Semua Dokumen
                 </div>
             </div>
         </div>
-
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-neutral-800">
@@ -98,17 +92,20 @@ Semua Dokumen
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Surat</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kepada</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Tugas </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Tugas</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penanda Tangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan TTD</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tambahan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200 dark:bg-neutral-900 dark:divide-neutral-800">
                     <?php $no = 1; ?>
                     <?php foreach ($surat_user as $item): ?>
+
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="<?= $item['id'] ?>" class="rowCheckbox form-checkbox"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" name="selected[]" value="<?= $item['id'] ?>" class="rowCheckbox form-checkbox">
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= $no++ ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['nomor_surat']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -119,37 +116,37 @@ Semua Dokumen
                                         class="text-blue-600 hover:underline ml-2">Selengkapnya</button>
                                 <?php endif; ?>
                             </td>
+
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu_mulai']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_ttd']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="<?= base_url('dokumen/generate/' . $item['id']) ?>" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
-                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_penanda_tangan']) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
 
+
             </table>
         </div>
 
-
         <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-100">Daftar petugas</h2>
-                <button onclick="closeModal()" class="text-gray-600 dark:text-neutral-400 hover:text-gray-800 dark:hover:text-neutral-200">
-                    ✕
-                </button>
-            </div>
-            <div id="modal-content" class="mt-4 text-gray-700 dark:text-neutral-300">
-            </div>
-            <div class="mt-6 flex justify-end">
-                <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    Tutup
-                </button>
+            <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-100">Daftar petugas</h2>
+                    <button onclick="closeModal()" class="text-gray-600 dark:text-neutral-400 hover:text-gray-800 dark:hover:text-neutral-200">
+                        ✕
+                    </button>
+                </div>
+                <div id="modal-content" class="mt-4 text-gray-700 dark:text-neutral-300">
+                    <!-- isi konten modal -->
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+
 
         <div class="flex justify-between items-center">
             <!-- Filter for items per page -->
@@ -191,7 +188,7 @@ function showUsersModal(users) {
     modalContent.innerHTML = `
         <ul class="space-y-2">
             ${users.map(user => {
-                const [nama, nip] = user.split(' | ');
+                const [nama, nip] = user.split(' | '); 
                 return `
                     <li class="flex justify-between items-center bg-gray-50 dark:bg-neutral-700 p-3 rounded-md shadow-sm">
                         <span class="text-sm font-medium">${nama}</span>
@@ -209,6 +206,7 @@ function closeModal() {
 }
 
 
+
     document.addEventListener('DOMContentLoaded', function() {
         const itemsPerPageSelect = document.getElementById('itemsPerPage');
         const prevPageBtn = document.getElementById('prevPage');
@@ -218,7 +216,6 @@ function closeModal() {
         let currentPage = 1;
         let itemsPerPage = parseInt(itemsPerPageSelect.value);
 
-
         const data = [
             <?php foreach ($surat_user as $item): ?> {
                     id: <?= $item['id'] ?>,
@@ -226,7 +223,7 @@ function closeModal() {
                     kepada: <?= json_encode($item['kepada']) ?>,
                     waktu_mulai: '<?= esc($item['waktu_mulai']) ?>',
                     penanda_tangan: '<?= esc($item['penanda_tangan']) ?>',
-                    jabatan_ttd: '<?= esc($item['jabatan_ttd']) ?>'
+                    jabatan_penanda_tangan: '<?= esc($item['jabatan_penanda_tangan']) ?>'
                 },
             <?php endforeach; ?>
         ];
@@ -241,7 +238,7 @@ function closeModal() {
 
             paginatedData.forEach((item, index) => {
                 const row = document.createElement('tr');
-                const rowNumber = startIdx + index + 1; 
+                const rowNumber = startIdx + index + 1;
                 row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
             <td class="px-6 py-4 whitespace-nowrap">${rowNumber}</td> <!-- Tambahkan nomor -->
@@ -252,9 +249,9 @@ function closeModal() {
             </td>
             <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
             <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
-            <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_ttd}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_penanda_tangan}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <a href="<?= base_url('dokumen/generate/' . $item['id']) ?>" class="text-blue-600 hover:underline">Surat Perjanalan Dinas</a>
+                 <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
             </td>
         `;
                 tableBody.appendChild(row);
@@ -401,7 +398,6 @@ function closeModal() {
             });
     });
 
-
     document.addEventListener('DOMContentLoaded', function() {
         const dropdownButton = document.getElementById('export_drobdown_table');
         const dropdownMenu = document.getElementById('dropdownMenu');
@@ -440,7 +436,7 @@ function closeModal() {
             alert('Silakan pilih data yang ingin di export');
             return;
         }
-        window.location.href = `/admin/dokumen/generate/${selectedIds}`;
+        window.location.href = `/dokumen/generate/${selectedIds}`;
     }
 </script>
 

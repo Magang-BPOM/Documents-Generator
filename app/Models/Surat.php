@@ -19,9 +19,11 @@ class Surat extends Model
         'waktu_mulai',
         'waktu_berakhir',
         'tujuan',
+        'kota_tujuan',
         'biaya',
-        'penanda_tangan',
-        'jabatan_ttd',
+        'kategori_biaya',
+        'id_pembebanan_anggaran',
+        'id_penanda_tangan',
         'status'
     ];
 

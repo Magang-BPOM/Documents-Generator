@@ -1,8 +1,35 @@
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+
+        #menu-container a {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #menu-container a:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateX(5px); 
+        }
+
+        #menu-container ul a {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #menu-container ul a:hover {
+            background-color: rgba(59, 130, 246, 0.2);
+            transform: translateX(5px);
+        }
+
+        .rotate-180 {
+            transform: rotate(180deg);
+            transition: transform 0.3s ease;
+        }
+    </style>
 </head>
 
+
 <body>
+
     <div id="hs-application-sidebar" class="hs-overlay [--auto-close:lg] hs-overlay-open:translate-x-0 -translate-x-full transition-all duration-300 transform w-[260px] h-full hidden fixed inset-y-0 start-0 z-[60] bg-white border-e border-gray-200 lg:block lg:translate-x-0 lg:end-auto lg:bottom-0 dark:bg-neutral-800 dark:border-neutral-700" role="dialog" tabindex="-1" aria-label="Sidebar">
         <div class="relative flex flex-col h-full max-h-full">
             <div class="px-6 pt-4 mb-4">
@@ -87,6 +114,36 @@
                     });
                 })
                 .catch(error => console.error('Error loading menu:', error));
+                
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const toggleSidebarButton = document.getElementById("toggle-sidebar");
+            const sidebar = document.getElementById("hs-application-sidebar");
+            const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+            const showSidebar = () => {
+                sidebar.classList.remove("hidden-sidebar");
+                sidebar.classList.add("visible-sidebar");
+                sidebarOverlay.style.display = "block";
+            };
+
+            const hideSidebar = () => {
+                sidebar.classList.remove("visible-sidebar");
+                sidebar.classList.add("hidden-sidebar");
+                sidebarOverlay.style.display = "none";
+            };
+
+            toggleSidebarButton.addEventListener("click", () => {
+                const isSidebarVisible = sidebar.classList.contains("visible-sidebar");
+                if (isSidebarVisible) {
+                    hideSidebar();
+                } else {
+                    showSidebar();
+                }
+            });
+
+            sidebarOverlay.addEventListener("click", hideSidebar);
         });
     </script>
 </body>

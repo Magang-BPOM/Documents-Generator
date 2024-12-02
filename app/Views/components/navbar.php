@@ -97,7 +97,7 @@
                             src="<?= session()->get('foto_profil') ?>"
                             alt="Avatar">
                     </button>
-                    <!-- Menampilkan NIP pengguna -->
+
                     <span><?= session()->get('nip') ?></span>
 
                 </div>

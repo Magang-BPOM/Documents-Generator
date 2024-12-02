@@ -44,16 +44,14 @@ class SuratUser extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-
     public function surat()
     {
         $suratQuery = $this->select('
-            DISTINCT(surat.id) as surat_id,
-            surat.nomor_surat,
-            surat.waktu_mulai,
-            surat.penanda_tangan,
-            surat.jabatan_ttd
-        ')
+                DISTINCT(surat.id) as surat_id,
+                surat.nomor_surat,
+                surat.waktu_mulai,
+                surat.id_penanda_tangan
+            ')
             ->join('surat', 'surat_user.surat_id = surat.id')
             ->where('surat.status', 'aktif')
             ->findAll();
@@ -62,123 +60,148 @@ class SuratUser extends Model
         foreach ($suratQuery as $surat) {
             $users = $this->select('user.nama, user.nip')
                 ->join('user', 'surat_user.user_id = user.id')
-                ->where('surat_user.surat_id', $surat['surat_id']) 
+                ->where('surat_user.surat_id', $surat['surat_id'])
                 ->findAll();
 
-                $kepada = [];
-                foreach ($users as $user) {
-                    $kepada[] = $user['nama'] . ' | ' . $user['nip'];
-                }
-                
-                $result[] = [
-                    'id' => $surat['surat_id'],
-                    'nomor_surat' => $surat['nomor_surat'],
-                    'kepada' => $kepada, 
-                    'waktu_mulai' => $surat['waktu_mulai'],
-                    'penanda_tangan' => $surat['penanda_tangan'],
-                    'jabatan_ttd' => $surat['jabatan_ttd']
-                ];
+            $kepada = [];
+            foreach ($users as $user) {
+                $kepada[] = "{$user['nama']} | {$user['nip']}";
+            }
+            $penandaTangan = $this->db->table('user')
+                ->select('nama, nip, jabatan')
+                ->where('id', $surat['id_penanda_tangan'])
+
+                ->where('role !=', 'admin')
+                ->get()
+                ->getRowArray();
+
+
+            $result[] = [
+                'id' => $surat['surat_id'],
+                'nomor_surat' => $surat['nomor_surat'],
+                'kepada' => $kepada,
+                'waktu_mulai' => $surat['waktu_mulai'],
+                'penanda_tangan' => $penandaTangan ? $penandaTangan['nama'] : null,
+                'nip_penanda_tangan' => $penandaTangan ? $penandaTangan['nip'] : null,
+                'jabatan_penanda_tangan' => $penandaTangan ? $penandaTangan['jabatan'] : null,
+            ];
         }
 
         return $result;
     }
 
+
     public function suratbyUser()
     {
-      
         $userId = session()->get('user_id');
-        $userName = session()->get('nama'); 
-    
+        $userName = session()->get('nama');
+
         if (!$userId || !$userName) {
             return [];
         }
 
-
-        $suratQuery = $this->db->table('surat_user')
+        $suratQuery = $this->db->table('surat_user su')
             ->select('
-                DISTINCT(surat.id) as surat_id,
-                surat.nomor_surat,
-                surat.waktu_mulai,
-                surat.penanda_tangan,
-                surat.jabatan_ttd
-            ')
-            ->join('surat', 'surat_user.surat_id = surat.id')
-            ->join('user', 'surat_user.user_id = user.id')
-            ->groupStart() 
-                ->where('surat_user.user_id', $userId) 
-                ->orWhere("FIND_IN_SET('$userName', user.nama)")
+            DISTINCT(s.id) as surat_id,
+            s.nomor_surat,
+            s.waktu_mulai,
+            s.id_penanda_tangan,
+            s.status,
+            su.id_created 
+        ')
+            ->join('surat s', 'su.surat_id = s.id')
+            ->join('user u', 'su.user_id = u.id') // Bergabung dengan user untuk mendapatkan nama
+            ->groupStart()
+            ->where('su.id_created', $userId) // Surat dibuat oleh user
+            ->orWhere('u.nama', $userName)    // Nama user ada di surat
             ->groupEnd()
-            ->where('surat.status', 'aktif')
+            ->where('s.status', 'aktif')
             ->get()
             ->getResultArray();
-    
+
         $result = [];
+
         foreach ($suratQuery as $surat) {
-            $users = $this->db->table('surat_user')
-                ->select('user.nama, user.nip')
-                ->join('user', 'surat_user.user_id = user.id')
-                ->where('surat_user.surat_id', $surat['surat_id'])
+            $users = $this->db->table('surat_user su')
+                ->select('u.nama, u.nip')
+                ->join('user u', 'su.user_id = u.id')
+                ->where('su.surat_id', $surat['surat_id'])
                 ->get()
                 ->getResultArray();
-                foreach ($users as $user) {
-                    $kepada[] = $user['nama'] . ' | ' . $user['nip'];
-                }
-             
-                
-                $result[] = [
-                    'id' => $surat['surat_id'],
-                    'nomor_surat' => $surat['nomor_surat'],
-                    'kepada' => $kepada, 
-                    'waktu_mulai' => $surat['waktu_mulai'],
-                    'penanda_tangan' => $surat['penanda_tangan'],
-                    'jabatan_ttd' => $surat['jabatan_ttd']
-                ];
-                
+
+            $kepada = [];
+            foreach ($users as $user) {
+                $kepada[] = "{$user['nama']} | {$user['nip']}";
+            }
+
+            $penandaTangan = $this->db->table('user')
+                ->select('nama, nip, jabatan')
+                ->where('id', $surat['id_penanda_tangan'])
+
+                ->where('role !=', 'admin')
+                ->get()
+                ->getRowArray();
+
+
+            $result[] = [
+                'id' => $surat['surat_id'],
+                'nomor_surat' => $surat['nomor_surat'],
+                'kepada' => $kepada,
+                'waktu_mulai' => $surat['waktu_mulai'],
+                'penanda_tangan' => $penandaTangan ? $penandaTangan['nama'] : null,
+                'nip_penanda_tangan' => $penandaTangan ? $penandaTangan['nip'] : null,
+                'jabatan_penanda_tangan' => $penandaTangan ? $penandaTangan['jabatan'] : null,
+                'id_created' => $surat['id_created'],
+            ];
         }
-    
+
         return $result;
     }
-    
+
+
+
 
     public function suratArsip()
     {
         $userId = session()->get('user_id');
 
-
         $suratQuery = $this->select('
                 DISTINCT(surat.id) as surat_id,
                 surat.nomor_surat,
                 surat.waktu_mulai,
-                surat.penanda_tangan,
-                surat.jabatan_ttd
+                surat.id_penanda_tangan
             ')
             ->join('surat', 'surat_user.surat_id = surat.id')
             ->where('surat.status', 'arsip')
             ->findAll();
 
-
         $result = [];
         foreach ($suratQuery as $surat) {
-
+            // Ambil data "kepada"
             $users = $this->select('user.nama, user.nip')
                 ->join('user', 'surat_user.user_id = user.id')
                 ->where('surat_user.surat_id', $surat['surat_id'])
                 ->findAll();
 
-
             $kepada = [];
             foreach ($users as $user) {
-                $kepada[] = $user['nama'] . ' | ' . $user['nip'];
+                $kepada[] = "{$user['nama']} | {$user['nip']}";
             }
 
+            $penandaTangan = $this->db->table('user')
+                ->select('nama, nip, jabatan')
+                ->where('id', $surat['id_penanda_tangan'])
+                ->get()
+                ->getRowArray();
 
             $result[] = [
                 'id' => $surat['surat_id'],
                 'nomor_surat' => $surat['nomor_surat'],
                 'kepada' => implode(' ; ', $kepada),
                 'waktu_mulai' => $surat['waktu_mulai'],
-                'penanda_tangan' => $surat['penanda_tangan'],
-                'jabatan_ttd' => $surat['jabatan_ttd']
+                'penanda_tangan' => $penandaTangan ? $penandaTangan['nama'] : null,
+                'nip_penanda_tangan' => $penandaTangan ? $penandaTangan['nip'] : null,
+                'jabatan_penanda_tangan' => $penandaTangan ? $penandaTangan['jabatan'] : null,
             ];
         }
 

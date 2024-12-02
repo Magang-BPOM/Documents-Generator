@@ -35,17 +35,31 @@ class SuratTable extends Migration
             'tujuan'         => [
                 'type'       => 'TEXT',
             ],
+            'kota_tujuan'         => [
+                'type'       => 'TEXT',
+            ],
             'biaya'         => [
                 'type'       => 'TEXT',
                 'null' => true,
             ],
-            'penanda_tangan' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
+            'kategori_biaya' => [
+                'type'       => 'ENUM',
+                'constraint' => ['A', 'B', 'C', 'D'],
+                'default'    => 'A',
             ],
-            'jabatan_ttd' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
+
+            'id_pembebanan_anggaran' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+                'null'       => false,
+            ],
+
+            'id_penanda_tangan' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned' => true,
+                'null' => false,
             ],
             'status'       => [
                 'type'       => 'ENUM',
@@ -57,12 +71,17 @@ class SuratTable extends Migration
                 'null' => true,
             ],
             'updated_at' => [
-                'type' => 'DATETIME', 
+                'type' => 'DATETIME',
                 'null' => true,
             ],
         ]);
 
         $this->forge->addKey('id', true);
+        $this->forge->addKey('id_pembebanan_anggaran');
+        $this->forge->addKey('id_penanda_tangan');
+
+        $this->forge->addForeignKey('id_pembebanan_anggaran', 'pembebanan_anggaran', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_penanda_tangan', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('surat');
     }
 
