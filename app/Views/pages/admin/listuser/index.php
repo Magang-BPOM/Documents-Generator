@@ -95,7 +95,7 @@ Semua User
 <div id="editModalTemplate" class="hidden absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-lg w-[600px] mx-auto relative z-50">
         <h3 class="text-xl font-semibold mb-4">Edit User</h3>
-        <form id="editForm" action="/user/update/<?= $item['id'] ?>" method="POST" enctype="multipart/form-data">
+        <form id="editForm" action="" method="POST" enctype="multipart/form-data">
 
             <input type="hidden" id="user_id" name="id">
 
@@ -128,15 +128,17 @@ Semua User
                 <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
                 <select id="role" name="role" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:focus:ring-blue-500" required>
                     <option value="admin">Admin</option>
-                    <option value="user">User</option>
+                    <option value="pegawai">Pegawai</option>
                 </select>
             </div>
 
             <!-- Profile Picture -->
             <div class="mb-4">
                 <label for="foto" class="block text-sm font-medium text-gray-700">Profile Picture</label>
-                <input type="file" id="foto" name="foto" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm dark:bg-neutral-800 dark:border-neutral-700 dark:text-white">
+                <input type="file" id="foto" name="foto_profil" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm dark:bg-neutral-800 dark:border-neutral-700 dark:text-white">
+                <p id="fotoPreview" class="text-sm text-gray-500 mt-2"></p>
             </div>
+
 
             <div class="flex justify-end">
                 <button type="submit" class="py-2 px-4 bg-blue-600 text-white rounded-lg">Save Changes</button>
@@ -148,55 +150,141 @@ Semua User
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const editButtons = document.querySelectorAll('.edit-btn');
-        const editModalTemplate = document.getElementById('editModalTemplate');
-        const closeModalBtn = document.getElementById('closeModal');
-
-        editButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const userId = button.getAttribute('data-id');
-                const nip = button.getAttribute('data-nip');
-                const nama = button.getAttribute('data-nama');
-                const jabatan = button.getAttribute('data-jabatan');
-                const pangkat = button.getAttribute('data-pangkat');
-                const role = button.getAttribute('data-role');
-                const foto = button.getAttribute('data-foto');
-
-                document.getElementById('user_id').value = userId;
-                document.getElementById('nip').value = nip;
-                document.getElementById('nama').value = nama;
-                document.getElementById('jabatan').value = jabatan;
-                document.getElementById('pangkat').value = pangkat;
-                document.getElementById('role').value = role;
-
-                editModalTemplate.classList.remove('hidden');
+    document.addEventListener("DOMContentLoaded", function () {
+      
+        <?php if (session()->getFlashdata('success')): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '<?= session()->getFlashdata('success') ?>',
+                timer: 3000, // 3 seconds
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = "<?= base_url('admin/listuser') ?>";
             });
-        });
+        <?php endif; ?>
 
-        closeModalBtn.addEventListener('click', function() {
-            editModalTemplate.classList.add('hidden');
+        <?php if (session()->getFlashdata('error')): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '<?= session()->getFlashdata('error') ?>',
+                confirmButtonText: 'OK'
+            });
+        <?php endif; ?>
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const editButtons = document.querySelectorAll('.edit-btn');
+    const editModalTemplate = document.getElementById('editModalTemplate');
+    const closeModalBtn = document.getElementById('closeModal');
+    const editForm = document.getElementById('editForm');
+
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Ambil data dari atribut tombol
+            const userId = button.getAttribute('data-id');
+            const nip = button.getAttribute('data-nip');
+            const nama = button.getAttribute('data-nama');
+            const jabatan = button.getAttribute('data-jabatan');
+            const pangkat = button.getAttribute('data-pangkat');
+            const role = button.getAttribute('data-role');
+            const foto = button.getAttribute('data-foto');
+
+            document.getElementById('user_id').value = userId;
+            document.getElementById('nip').value = nip;
+            document.getElementById('nama').value = nama;
+            document.getElementById('jabatan').value = jabatan;
+            document.getElementById('pangkat').value = pangkat;
+
+
+            const roleSelect = document.getElementById('role');
+            Array.from(roleSelect.options).forEach(option => {
+                option.selected = (option.value === role);
+            });
+
+            const fotoPreview = document.getElementById('fotoPreview');
+            if (foto) {
+                fotoPreview.textContent = `File saat ini: ${foto}`;
+            } else {
+                fotoPreview.textContent = 'Belum ada foto.';
+            }
+
+            editForm.setAttribute('action', `/user/update/${userId}`);
+
+            editModalTemplate.classList.remove('hidden');
         });
     });
 
-    <?php if (session()->getFlashdata('success')): ?>
-            <
-            script >
-            Swal.fire({
-                icon: 'success',
-                title: 'Sukses!',
-                text: '<?= session()->getFlashdata('success') ?>',
+    closeModalBtn.addEventListener('click', function() {
+        editModalTemplate.classList.add('hidden');
+    });
+});
+
+document.querySelector('.bulkDeleteBtn').addEventListener('click', function() {
+        const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
+
+        if (selectedIds.length === 0) {
+            alert('Silakan pilih data yang ingin hapus.');
+            return;
+        }
+
+        fetch(this.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    selectedIds
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    swal("Sukses", "Data berhasil dihapus.", "success")
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000)
+                } else {
+                    swal("Gagal", "Gagal menghapus data.", "error");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                swal("Error", "Terjadi kesalahan saat menghapus data.", "error");
             });
-    </script>
-    <?php elseif (session()->getFlashdata('error')): ?>
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '<?= session()->getFlashdata('error') ?>',
-            });
-        </script>
-    <?php endif; ?>
+    });
+
+
+    document.getElementById("search_table").addEventListener("keyup", function() {
+        const searchValue = this.value.toLowerCase();
+        const table = document.querySelector("tbody");
+        const rows = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const cells = row.getElementsByTagName("td");
+            let isMatch = false;
+
+            for (let j = 0; j < cells.length - 1; j++) {
+                if (cells[j].textContent.toLowerCase().includes(searchValue)) {
+                    isMatch = true;
+                    break;
+                }
+            }
+
+            row.style.display = isMatch ? "" : "none";
+        }
+    });
+    document.getElementById('selectAll').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.rowCheckbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+    
 
     </script>
 

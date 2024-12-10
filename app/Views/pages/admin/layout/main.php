@@ -64,9 +64,12 @@
     </div>
 
     <!-- JavaScript Resources -->
-    <script src="<?= base_url('assets/vendor/sweetalert2/sweetalert.js') ?>"></script>
-    <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
-    <script src="<?= base_url('assets/js/main.js') ?>"></script>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/select2/dist/js/select2.min.js"></script>
+    <script src="node_modules/moment/min/moment.min.js"></script>
+    <script src="node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+
+
 
     <!-- Toggle Theme Script -->
     <script>

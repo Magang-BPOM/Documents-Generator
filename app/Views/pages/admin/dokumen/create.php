@@ -114,10 +114,17 @@ Pembuatan Dokumen
             </div>
 
 
-            <div class="col-span-2">
+            <div class="col-span-1">
                 <label for="tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Tujuan</label>
                 <input type="text" name="tujuan" id="tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
             </div>
+
+            
+            <div class="col-span-1">
+                <label for="kota_tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Kota Tujuan</label>
+                <input type="text" name="kota_tujuan" id="kota_tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+            </div>
+
 
             <!-- Opsi Tambahan -->
             <div class="col-span-2">
@@ -177,14 +184,16 @@ Pembuatan Dokumen
             </div>
 
            
-                <div class="col-span-1">
-                    <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">Penanda Tangan</label>
-                    <input type="text" name="penanda_tangan" id="penanda_tangan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                </div>
-                <div class="col-">
-                    <label for="jabatan_ttd" class="required block font-medium text-gray-700 dark:text-neutral-300">Jabatan Penanda Tangan</label>
-                    <input type="text" name="jabatan_ttd" id="jabatan_ttd" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                </div>
+               <div class="col-span-2">
+                <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">Pembebanan Anggaran</label>
+                <select name="penanda_tangan" id="penanda_tangan"
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                    <?php foreach ($penanda_tangan as $item): ?>
+                        <option value="<?= $item['id'] ?>"><?= $item['nama'] ?> - <?= $item['jabatan'] ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+               
       
 
             <!-- Button -->

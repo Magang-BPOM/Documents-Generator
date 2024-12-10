@@ -38,6 +38,11 @@ Semua Dokumen
                     <div class="sm:col-span-2 md:grow">
                         <div class="flex justify-end gap-x-2">
                        
+                            <button data-trashed="false" data-url="<?= base_url('admin/dokumen/unarchive') ?>" type="button" class="UnarchiveBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                              Pulihkan
+                            </button>
+
+
                             <button data-trashed="false" data-url="<?= base_url('dokumen/delete') ?>" type="button" class="bulkDeleteBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Hapus
                             </button>
@@ -120,11 +125,11 @@ Semua Dokumen
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['kepada']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu_mulai']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_ttd']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="<?= base_url('/admin/dokumen/generate/' . $item['id']) ?>"
+                                <a href="<?= base_url('dokumen/generateSPD/' . $item['id']) ?>"
                                     class="text-blue-600 hover:underline">
-                                    Lihat PDF
+                                    Surat Perjalanan Dinas
                                 </a>
                             </td>
                         </tr>
@@ -185,6 +190,41 @@ Semua Dokumen
                 swal("Error", "Terjadi kesalahan saat menghapus data.", "error");
             });
     });
+    });
+
+    document.querySelector('.UnarchiveBtn').addEventListener('click', function() {
+        const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
+
+        if (selectedIds.length === 0) {
+            swal("Peringatan", "Silakan pilih data yang ingin dipulihkan.", "warning");
+            return;
+        }
+
+        fetch(this.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    selectedIds
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    swal("Sukses", "Data berhasil dipulihkan.", "success")
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000)
+                } else {
+                    swal("Gagal", "Gagal memulihkan data.", "error");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                swal("Error", "Terjadi kesalahan saat memulihkan data.", "error");
+            });
     });
 
 

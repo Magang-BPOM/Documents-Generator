@@ -5,11 +5,11 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-// $routes->get('/', 'Home::index');
-$routes->get('/', 'User::index');
 
-$routes->post('/login', 'User::login');
-$routes->post('/logout', 'User::logout');
+$routes->get('/', 'UserController::index');
+
+$routes->post('/login', 'UserController::login');
+$routes->post('/logout', 'UserController::logout');
 
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
@@ -20,20 +20,21 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('/admin/dokumen/store', 'DokumenController::store');
         $routes->get('/admin/dokumen/generate/(:num)', 'DokumenController::generate/$1');
         $routes->get('/admin/dokumen/generateSPD/(:num)', 'DokumenController::generateSPD/$1');
-        $routes->get('/admin/dokumen/generate-word/(:num)', 'DokumenController::generateWord/$1');
+        $routes->get('/admin/dokumen/generate-word/(:num)', 'DokumenController::generateDocx/$1');
         $routes->get('/admin/dokumen/archive', 'DokumenController::arsip_index');
+        $routes->post('/admin/dokumen/unarchive', 'DokumenController::unarchive');
         $routes->post('/admin/dokumen/bulkArsip', 'DokumenController::bulkArsip');
         $routes->post('/admin/dokumen/delete', 'DokumenController::delete');
 
-        $routes->get('/admin/listuser', 'User::listuser');
-        $routes->get('/user/create', 'User::create');
-        $routes->post('/user/store', 'User::store');
-        $routes->post('/user/delete', 'User::delete');
-        $routes->get('user/edit/(:segment)', 'UserController::edit/$1');
-        $routes->post('user/update/(:segment)', 'UserController::update/$1');
+        $routes->get('/admin/listuser', 'UserController::listuser');
+        $routes->get('/user/create', 'UserController::create');
+        $routes->post('/user/store', 'UserController::store');
+        $routes->post('/user/delete', 'UserController::delete');
+        $routes->get('/user/edit/(:segment)', 'UserController::edit/$1');
+        $routes->post('/user/update/(:segment)', 'UserController::update/$1');
     });
 
-    // Rute untuk User
+    // Rute untuk UserController
     $routes->group('', ['filter' => 'role:pegawai'], function ($routes) {
         $routes->get('/dashboard', 'DashboardController::user');
         $routes->get('/dokumen', 'DokumenController::index');

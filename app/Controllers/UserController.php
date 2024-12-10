@@ -7,7 +7,7 @@ use App\Models\User as ModelsUser;
 use App\Models\SuratUser as SuratUser;
 use CodeIgniter\HTTP\ResponseInterface;
 
-class User extends BaseController
+class UserController extends BaseController
 {
 
     public function index()
@@ -66,8 +66,8 @@ class User extends BaseController
         $fotoProfilPath = 'https://i.pravatar.cc/150?img=1'; 
 
         if ($file->isValid() && !$file->hasMoved()) {
-            // $uploadDir = FCPATH . 'uploads/user_profiles';
-            $uploadDir = WRITEPATH . 'uploads/user_profiles';
+            $uploadDir = FCPATH . 'uploads/user_profiles';
+            // $uploadDir = WRITEPATH . 'uploads/user_profiles';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
@@ -118,17 +118,19 @@ class User extends BaseController
             ],
             'jabatan'     => 'required',
             'pangkat'     => 'permit_empty|max_length[100]',
-            'foto_profil' => 'uploaded[foto_profil]|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]',
+            'foto_profil' => 'permit_empty|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);
     
+
         if (!$validation->run($this->request->getPost())) {
+      
             return redirect()->back()->withInput()->with('validation', $validation);
         }
-
+        
         $userModel = new \App\Models\User();
         $user = $userModel->find($id);
-    
+
         if (!$user) {
             return redirect()->to('/user/edit')->with('error', 'User tidak ditemukan');
         }
@@ -140,10 +142,11 @@ class User extends BaseController
             'pangkat'     => $this->request->getPost('pangkat'),
             'role'        => $this->request->getPost('role'),
         ];
-
+  
+ 
         $file = $this->request->getFile('foto_profil');
         if ($file && $file->isValid() && !$file->hasMoved()) {
-            $uploadDir = WRITEPATH . 'uploads/user_profiles';
+            $uploadDir = FCPATH . 'uploads/user_profiles';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
@@ -152,10 +155,11 @@ class User extends BaseController
             $data['foto_profil'] = base_url('uploads/user_profiles/' . $newName);
         }
 
+
         if ($userModel->update($id, $data)) {
-            return redirect()->to('/admin/listUser')->with('success', 'User berhasil diperbarui!');
+            return redirect()->to('admin/listuser')->with('success', 'User berhasil diperbarui!');
         } else {
-            return redirect()->to('/admin/listUser')->with('error', 'Gagal memperbarui user.');
+            return redirect()->to('admin/listuser')->with('error', 'Gagal memperbarui user.');
         }
     }
     
@@ -163,13 +167,13 @@ class User extends BaseController
 
     public function delete()
     {
-        $userModel = new ModelsUser();
+        $userModel = new \App\Models\User();;
 
         $request = $this->request->getJSON();
         $selectedIds = $request->selectedIds ?? [];
 
         if (empty($selectedIds)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
+            return $this->response->setJSON(['error' => false, 'message' => 'Tidak ada data yang dipilih']);
         }
 
         $userModel->whereIn('id', $selectedIds)->delete();

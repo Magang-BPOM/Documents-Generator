@@ -11,6 +11,7 @@ use App\Models\SuratUser as SuratUser;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use \ConvertApi\ConvertApi;
+use IntlDateFormatter;
 
 class DokumenController extends BaseController
 {
@@ -53,7 +54,7 @@ class DokumenController extends BaseController
     public function create()
     {
         $role = session()->get('role');
-        $penandaTangan = $this->userModel
+        $penanda_tangan = $this->userModel
             ->where('is_penanda_tangan', 1)
             ->where('role !=', 'admin')
             ->findAll();
@@ -61,12 +62,12 @@ class DokumenController extends BaseController
 
         $data = [
             'users' => $this->userModel
-                ->where('role !=', 'admin') 
+                ->where('role !=', 'admin')
                 ->findAll(),
 
             'dasar' => $this->dasarModel->findAll(),
             'pembebanan_anggaran' => $this->pembebanan_anggaran->findAll(),
-            'penanda_tangan' => $penandaTangan,
+            'penanda_tangan' => $penanda_tangan,
         ];
 
         if ($role == 'admin') {
@@ -82,12 +83,12 @@ class DokumenController extends BaseController
         $selectedIds = $request->selectedIds ?? [];
 
         if (empty($selectedIds)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
+            return $this->response->setJSON(['error' => false, 'message' => 'Tidak ada data yang dipilih']);
         }
 
         $this->suratModel->whereIn('id', $selectedIds)->delete();
 
-        return $this->response->setJSON(['success' => true, 'message' => 'Data berhasil diarsipkan']);
+        return $this->response->setJSON(['success' => true, 'message' => 'Data berhasil dihapus']);
     }
 
 
@@ -109,23 +110,23 @@ class DokumenController extends BaseController
             'penanda_tangan' => 'required',
             'selected_user' => 'required',
         ];
-    
+
         if ($this->request->getPost('opsi_tambahan') === 'show') {
             $validationRules['untuk'] = 'required';
         }
-    
+
         if (!$this->validate($validationRules)) {
             session()->setFlashdata('error', 'Validasi gagal. Mohon periksa input Anda.');
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
-    
+
         $ttdTanggal = $this->request->getPost('waktu_mulai');
-    
+
         if ($this->isHoliday($ttdTanggal)) {
             session()->setFlashdata('error', 'Tanggal tidak dapat dipilih karena merupakan hari libur.');
             return redirect()->back()->withInput();
         }
-    
+
         try {
             $dataSurat = [
                 'nomor_surat' => $this->request->getPost('nomor_surat'),
@@ -140,11 +141,11 @@ class DokumenController extends BaseController
                 'id_pembebanan_anggaran' => $this->request->getPost('id_pembebanan_anggaran'),
                 'id_penanda_tangan' => $this->request->getPost('penanda_tangan'),
             ];
-    
+
             $suratModel = new Surat();
             $suratModel->insert($dataSurat);
             $suratId = $suratModel->getInsertID();
-    
+
             $suratUserModel = new SuratUser();
             $userIds = explode(',', $this->request->getPost('selected_user'));
             foreach ($userIds as $userId) {
@@ -156,7 +157,7 @@ class DokumenController extends BaseController
                     ]);
                 }
             }
-    
+
             $dasarSuratModel = new DasarSurat();
             $selectDasar = explode(',', $this->request->getPost('selected_dasar'));
             foreach ($selectDasar as $dasar) {
@@ -167,7 +168,7 @@ class DokumenController extends BaseController
                     ]);
                 }
             }
-    
+
             session()->setFlashdata('success', 'Surat berhasil disimpan.');
             return redirect()->to('/dokumen');
         } catch (\Exception $e) {
@@ -175,7 +176,7 @@ class DokumenController extends BaseController
             return redirect()->back()->withInput();
         }
     }
-    
+
 
     public function generate($suratId)
     {
@@ -320,6 +321,16 @@ class DokumenController extends BaseController
         $dompdf->stream("Surat-Perjalanan-Tugas-$suratId.pdf", ["Attachment" => false]);
     }
 
+    public function generateWord($suratId)
+    {
+        $pdfPath = WRITEPATH . "pdfs/Surat-Tugas-$suratId.pdf";
+
+        if (!file_exists($pdfPath)) {
+            throw new \RuntimeException("PDF file not found: $pdfPath");
+        }
+
+        return $this->convertPdfToWordWithConvertApi($pdfPath);
+    }
 
     public function convertPdfToWordWithConvertApi($pdfPath)
     {
@@ -344,175 +355,252 @@ class DokumenController extends BaseController
         }
     }
 
-    public function generateWord($suratId)
-    {
-        $pdfPath = WRITEPATH . "pdfs/Surat-Tugas-$suratId.pdf";
 
-        if (!file_exists($pdfPath)) {
-            throw new \RuntimeException("PDF file not found: $pdfPath");
+
+    public function generateDocx($suratId)
+    {
+        helper('url');
+        $suratModel = new Surat();
+        $surat = $suratModel->find($suratId);
+        if (!$surat) {
+            log_message('error', "Surat with ID $suratId not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
         }
 
-        return $this->convertPdfToWordWithConvertApi($pdfPath);
+        $suratUserModel = new SuratUser();
+
+        $users = $suratUserModel
+            ->select('user.*')
+            ->join('user', 'user.id = surat_user.user_id')
+            ->where('surat_user.surat_id', $suratId)
+            ->findAll();
+
+        $DasarSuratModel = new DasarSurat();
+        $listdasar = $DasarSuratModel
+            ->select('dasar.*')
+            ->join('dasar', 'dasar.id = dasarsurat.id_dasar')
+            ->where('dasarsurat.id_surat', $suratId)
+            ->findAll();
+
+        $userModel = new User();
+        $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
+        if (!$penandaTangan) {
+            log_message('error', "Penanda tangan for ID {$surat['id_penanda_tangan']} not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Penanda tangan not found.");
+        }
+
+
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+
+        $phpWord->setDefaultFontName('Bookman Old Style');
+        $phpWord->setDefaultFontSize(12);
+
+        $section = $phpWord->addSection([
+            'marginLeft' => 1440,
+            'marginRight' => 1440,
+            'marginTop' => 3000,
+            'marginBottom' => 0,
+            'pageSizeW' => 11906,
+            'pageSizeH' => 18700,
+            'differentFirstPageHeaderFooter' => true,
+
+        ]);
+
+        // Header
+        $header = $section->addHeader();
+        $header->firstPage();
+        $header->addImage(FCPATH . 'header.jpg', [
+            'width' => 560,
+            'positioning' => \PhpOffice\PhpWord\Style\Image::POSITION_ABSOLUTE,
+            'posHorizontal' => \PhpOffice\PhpWord\Style\Image::POSITION_ABSOLUTE,
+            'posVertical' => \PhpOffice\PhpWord\Style\Image::POSITION_ABSOLUTE,
+            'marginLeft' => -280,
+            'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER
+        ]);
+
+        $table = $section->addTable([
+            'alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
+            'cellMargin' => 20,
+            'width' => 1000,
+        ]);
+
+
+        $table->addRow();
+        $titleCell = $table->addCell(10000, ['gridSpan' => 3]);
+        $titleCell->addText('SURAT TUGAS', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+
+
+        $table->addRow();
+        $numberCell = $table->addCell(10000, ['gridSpan' => 3]);
+        $numberCell->addText('NOMOR: ' . ($surat['nomor_surat'] ?? ''), [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+
+        $table->addRow();
+        $table->addCell(10000, ['gridSpan' => 3])->addTextBreak();
+
+        $table->addRow();
+        $table->addCell(2000)->addText('Menimbang');
+        $table->addCell(200)->addText(':', []);
+        $table->addCell(7800)->addText('Bahwa dalam rangka melaksanakan kebijakan pengawasan di bidang obat dan makanan.', [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]); // Column 3
+
+        $table->addRow();
+        $table->addCell(2000)->addText('Dasar');
+        $table->addCell(200)->addText(':', []);
+        $dasarCell = $table->addCell(7800);
+        if (!empty($listdasar)) {
+            $i = 1;
+            foreach ($listdasar as $dasar) {
+                $dasarCell->addText("{$i}. {$dasar['undang']}", [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+                $i++;
+            }
+        } else {
+            $dasarCell->addText('Tidak ada dasar yang ditemukan.', [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+        }
+
+        $table->addRow();
+        $memberiTugasCell = $table->addCell(10000, ['gridSpan' => 3]);
+        $memberiTugasCell->addText('Memberi Tugas', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+
+        $table->addRow();
+        $table->addCell(2000)->addText('Kepada');
+        $table->addCell(200)->addText(':', []);
+        $kepadaCell = $table->addCell(7800);
+        $i = 1;
+        foreach ($users as $user) {
+            $kepadaCell->addText("{$i}. Nama: {$user['nama']}", [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+            $kepadaCell->addText("   NIP: {$user['nip']}", [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+            $kepadaCell->addText("   Pangkat/Gol: {$user['pangkat']}", [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+            $kepadaCell->addText("   Jabatan: {$user['jabatan']}", [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+            $i++;
+        }
+
+        function formatTanggalRentang($mulai, $berakhir)
+        {
+            $formatterHari = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN, 'EEEE');
+            $formatterBulan = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN, 'MMMM');
+            
+            $hariMulai = ucfirst($formatterHari->format(strtotime($mulai)));
+            $hariBerakhir = ucfirst($formatterHari->format(strtotime($berakhir)));
+        
+            $tanggalMulai = date('d', strtotime($mulai));
+            $tanggalBerakhir = date('d', strtotime($berakhir));
+        
+            $bulanMulai = ucfirst($formatterBulan->format(strtotime($mulai)));
+            $bulanBerakhir = ucfirst($formatterBulan->format(strtotime($berakhir)));
+        
+            $tahunMulai = date('Y', strtotime($mulai));
+            $tahunBerakhir = date('Y', strtotime($berakhir));
+        
+            if ($bulanMulai === $bulanBerakhir && $tahunMulai === $tahunBerakhir) {
+                return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} - {$tanggalBerakhir} {$bulanMulai} {$tahunMulai}";
+            }
+        
+            if ($tahunMulai === $tahunBerakhir) {
+                return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} {$bulanMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunMulai}";
+            }
+        
+            return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} {$bulanMulai} {$tahunMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunBerakhir}";
+        }
+        
+
+        $waktuMulai = $surat['waktu_mulai'] ?? '';
+        $waktuBerakhir = $surat['waktu_berakhir'] ?? '';
+        
+        $waktuRentang = formatTanggalRentang($waktuMulai, $waktuBerakhir);
+
+        $table->addRow();
+        $table->addCell(2000)->addText('Untuk');
+        $table->addCell(200)->addText(':', []);
+        $untukCell = $table->addCell(7800);
+        $untukCell->addText('1. Sebagai: ' . ($surat['sebagai'] ?? ''), [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+        $untukCell->addText(
+            "2. Waktu: {$waktuRentang}",
+            [],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]
+        );
+        $untukCell->addText('3. Tujuan: ' . ($surat['tujuan'] ?? ''), [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+
+        $table->addRow();
+        $signatureCell = $table->addCell(10000, ['gridSpan' => 3, 'alignment' => 'right']);
+        $signatureCell->addTextBreak();
+
+
+        $signatureTable = $section->addTable([
+            'alignment' => 'right',
+        ]);
+
+        $signatureTable->addRow();
+        $signatureCell = $signatureTable->addCell(10000, [
+            'gridSpan' => 3, 
+            'alignment' => 'right', 
+        ]);
+        $signatureCell->addText(
+            'Surabaya, ' . date('d F Y', strtotime($surat['created_at'] ?? date('Y-m-d'))),
+            ['size' => 12],
+            ['alignment' => 'right']
+        );
+
+        $signatureTable->addRow();
+        $positionCell = $signatureTable->addCell(10000, [
+            'gridSpan' => 3, 
+            'alignment' => 'right',
+        ]);
+        $positionCell->addText(
+            $penandaTangan['jabatan'] ?? '',
+            ['size' => 12],
+            ['alignment' => 'right']
+        );
+
+        $signatureTable->addRow();
+        $emptyCell = $signatureTable->addCell(10000, [
+            'gridSpan' => 3,
+            'alignment' => 'right',
+        ]);
+        $emptyCell->addTextBreak(3);
+
+        $signatureTable->addRow();
+        $nameCell = $signatureTable->addCell(10000, [
+            'gridSpan' => 3,
+            'alignment' => 'right',
+        ]);
+        $nameCell->addText(
+            $penandaTangan['nama'] ?? '',
+            ['size' => 12],
+            ['alignment' => 'right']
+        );
+
+
+        $section->addText(
+            'Petugas tidak diperkenankan menerima gratifikasi dalam bentuk apapun.',
+            [
+                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::LEFT,
+                'borderSize' => 1
+
+            ]
+        );
+
+
+
+        $footer = $section->addFooter();
+        $footer->firstPage();
+        $footer->addImage(FCPATH . 'end.jpg', [
+            'width' => 600,
+            'positioning' => \PhpOffice\PhpWord\Style\Image::POSITION_ABSOLUTE,
+            'posHorizontal' => \PhpOffice\PhpWord\Style\Image::POSITION_ABSOLUTE,
+            'posVertical' => \PhpOffice\PhpWord\Style\Image::POSITION_ABSOLUTE,
+            'marginLeft' => -75,
+            'marginTop' => -130,
+            'wrappingStyle' => 'behind'
+        ]);
+
+        // Save the document
+        $fileName = "Surat-Tugas-$suratId.docx";
+        $tempFile = WRITEPATH . $fileName;
+
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save($tempFile);
+
+        return $this->response->download($tempFile, null)->setFileName($fileName);
     }
-
-
-    // public function generateDocx($suratId)
-    // {
-
-    //     helper('url');
-    //     $suratModel = new Surat();
-    //     $surat = $suratModel->find($suratId);
-    //     if (!$surat) {
-    //         log_message('error', "Surat with ID $suratId not found.");
-    //         throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
-    //     }
-
-    //     $suratUserModel = new SuratUser();
-    //     $users = $suratUserModel
-    //         ->select('user.*')
-    //         ->join('user', 'user.id = surat_user.user_id')
-    //         ->where('surat_user.surat_id', $suratId)
-    //         ->findAll();
-
-    //     $DasarSuratModel = new DasarSurat();
-    //     $listdasar = $DasarSuratModel
-    //         ->select('dasar.*')
-    //         ->join('dasar', 'dasar.id = dasarsurat.id_dasar')
-    //         ->where('dasarsurat.id_surat', $suratId)
-    //         ->findAll();
-
-    //     function formatTGL($tanggal, $format = 'tanggal')
-    //     {
-    //         // Tentukan format berdasarkan pilihan
-    //         $dateType = ($format === 'hari') ? \IntlDateFormatter::FULL : \IntlDateFormatter::LONG;
-
-    //         $fmt = new \IntlDateFormatter(
-    //             'id_ID', // Locale Indonesia
-    //             $dateType, // Pilihan format (FULL untuk hari, LONG untuk tanggal)
-    //             \IntlDateFormatter::NONE, // Tidak menggunakan format waktu
-    //             'Asia/Jakarta', // Timezone
-    //             \IntlDateFormatter::GREGORIAN // Kalender Gregorian
-    //         );
-
-    //         return $fmt->format(new \DateTime($tanggal));
-    //     }
-
-    //     // Buat Dokumen Word
-    //     $phpWord = new \PhpOffice\PhpWord\PhpWord();
-
-    //     // Menambahkan Halaman
-    //     $section = $phpWord->addSection();
-
-    //     // Menambahkan Header
-    //     $header = $section->addHeader();
-    //     $header->addImage(FCPATH . 'header.jpg', [
-    //         'width' => 500,
-    //         'height' => 95,
-    //         'alignment' => 'left'
-    //     ]);
-
-    //     // Tambahkan Konten Surat
-    //     $section->addTextBreak();
-
-    //     $section->addText("Isi Surat:", ['size' => 12]);
-    //     $section->addText($surat['nomor_surat'] ?? '', ['size' => 12]);
-    //     $section->addTextBreak();
-
-    //     $section->addText("Menimbang:", ['size' => 12]);
-    //     $section->addText($surat['menimbang'] ?? '', ['size' => 12]);
-
-    //     $section->addText("Dasar :");
-    //     $no = 1;
-    //     foreach ($listdasar as $dasar) {
-    //         $section->addText(
-    //             $no . ". " . $dasar['undang'],
-    //             ['size' => 12]
-    //         );
-    //         $no++;
-    //     }
-    //     // header('Content-Type: application/json');
-    //     // echo json_encode($users);
-    //     // exit;
-    //     $section->addText("Memberi Tugas", ['size' => 12, 'bold' => true, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-    //     $section->addTextBreak();
-
-    //     $section->addText("Kepada :", ['size' => 12]);
-
-    //     if (count($users) > 2) {
-    //         $section->addText("Nama-nama terlampir", ['size' => 12]);
-    //     } else {
-    //         foreach ($users as $user) {
-    //             $section->addListItem("Nama: " . $user['nama'], 0, ['size' => 12]);
-    //             $section->addListItem("NIP: " . $user['nip'], 0, ['size' => 12]);
-    //             $section->addListItem("Pangkat/Gol: " . $user['pangkat'], 0, ['size' => 12]);
-    //             $section->addListItem("Jabatan: " . $user['jabatan'], 0, ['size' => 12]);
-    //             $section->addTextBreak();
-    //         }
-    //     }
-
-    //     $section->addText("Untuk :", ['size' => 12, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
-    //     $section->addText($surat['sebagai'] ?? '', ['size' => 12]);
-    //     $section->addText('Waktu  : ' . formatTGL($surat['waktu'] ?? '', 'hari'), ['size' => 12]);
-    //     $section->addText('Tujuan : ' . ($surat['tujuan'] ?? ''), ['size' => 12]);
-    //     if (!empty($surat['untuk'])) {
-    //         $nod = 4;
-    //         foreach ($listdasar as $dasar) {
-    //             $section->addText(
-    //                 $nod . ". " . $surat['untuk'],
-    //                 ['size' => 12]
-    //             );
-    //             $nod++;
-    //         }
-    //     }
-
-    //     // Tambahkan teks instruksi tugas
-    //     $section->addText(
-    //         "Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.",
-    //         ['size' => 12],
-    //         ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]
-    //     );
-
-    //     // Tambahkan baris kosong untuk jarak
-    //     $section->addTextBreak(1);
-
-    //     // Tambahkan tanggal dan jabatan di sebelah kanan
-    //     $section->addText(
-    //         'Surabaya, ' . formatTGL($surat['created_at'], 'tanggal') . ',',
-    //         ['size' => 12],
-    //         ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::RIGHT]
-    //     );
-
-    //     $section->addText(
-    //         $surat['jabatan_ttd'] ?? '',
-    //         ['size' => 12],
-    //         ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::RIGHT]
-    //     );
-
-    //     // Tambahkan ruang kosong untuk tanda tangan
-    //     $section->addTextBreak(3);
-
-    //     // Tambahkan nama penanda tangan
-    //     $section->addText(
-    //         $surat['penanda_tangan'] ?? '',
-    //         ['size' => 12],
-    //         ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::RIGHT]
-    //     );
-
-    //     // Menambahkan Footer
-    //     $footer = $section->addFooter();
-    //     $footer->addImage(FCPATH . 'end.jpg', ['width' => 500, 'height' => 150, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::LEFT]);
-
-    //     // Simpan File DOCX
-    //     $fileName = "Surat-Tugas-$suratId.docx";
-    //     $tempFile = WRITEPATH . $fileName;
-
-    //     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-    //     $objWriter->save($tempFile);
-
-    //     // Berikan File ke User
-    //     return $this->response->download($tempFile, null)->setFileName($fileName);
-    // }
-
 
     private function convertImageToBase64($imagePath)
     {
@@ -579,7 +667,7 @@ class DokumenController extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Tidak ada data yang dipilih']);
         }
 
-        $this->suratModel->whereIn('id', $selectedIds)->set(['status' => 'aaktif'])->update();
+        $this->suratModel->whereIn('id', $selectedIds)->set(['status' => 'aktif'])->update();
 
         return $this->response->setJSON(['success' => true, 'message' => 'Data berhasil dipulihkan']);
     }

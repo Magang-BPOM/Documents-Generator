@@ -97,16 +97,16 @@ function formatTanggalRentang($mulai, $berakhir)
         }
 
         .numbered-list {
-    list-style: none; /* Hilangkan numbering default */
-    padding: 0;
-    margin: 0;
-}
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-.numbered-list li {
-    display: flex; /* Gunakan flex untuk menyelaraskan elemen */
-    align-items: center; /* Selaraskan elemen secara vertikal */
-    margin-bottom: 8px; /* Jarak antar item */
-}
+        .numbered-list li {
+            display: flex; 
+            align-items: center;
+            margin-bottom: 8px;
+        }
 
 
         .numbered-list li::before {
