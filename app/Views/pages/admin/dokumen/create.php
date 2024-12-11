@@ -102,24 +102,23 @@ Pembuatan Dokumen
             </div>
 
             <div class="col-span-1">
-                <label for="waktu" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan dimulai</label>
+                <label for="waktu_mulai" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan dimulai</label>
                 <input type="date" name="waktu_mulai" id="waktu_mulai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                <span id="error-message" class="text-red-500 mt-2 hidden"></span>
+                <span id="error-message-start" class="text-red-500 mt-2 hidden"></span>
             </div>
 
             <div class="col-span-1">
-                <label for="waktu" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan berakhir</label>
+                <label for="waktu_berakhir" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan berakhir</label>
                 <input type="date" name="waktu_berakhir" id="waktu_berakhir" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                <span id="error-message" class="text-red-500 mt-2 hidden"></span>
+                <span id="error-message-end" class="text-red-500 mt-2 hidden"></span>
             </div>
-
 
             <div class="col-span-1">
                 <label for="tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Tujuan</label>
                 <input type="text" name="tujuan" id="tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
             </div>
 
-            
+
             <div class="col-span-1">
                 <label for="kota_tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Kota Tujuan</label>
                 <input type="text" name="kota_tujuan" id="kota_tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
@@ -129,7 +128,7 @@ Pembuatan Dokumen
             <!-- Opsi Tambahan -->
             <div class="col-span-2">
                 <label class="block text-lg font-medium text-gray-700 dark:text-neutral-300 mb-4">
-                    Opsi Tambahan
+                    Opsi Tambahan Biaya
                 </label>
                 <div class="flex flex-col space-y-4">
                     <!-- Radio Button Group -->
@@ -183,9 +182,9 @@ Pembuatan Dokumen
                 </select>
             </div>
 
-           
-               <div class="col-span-2">
-                <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">Pembebanan Anggaran</label>
+
+            <div class="col-span-1">
+                <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">Penanda Tangan</label>
                 <select name="penanda_tangan" id="penanda_tangan"
                     class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
                     <?php foreach ($penanda_tangan as $item): ?>
@@ -193,8 +192,14 @@ Pembuatan Dokumen
                     <?php endforeach; ?>
                 </select>
             </div>
-               
-      
+
+            
+            <div class="col-span-1">
+                <label for="ttd_tanggal" class="required block text-gray-700 dark:text-neutral-300">Tanggal Tanda Tangan</label>
+                <input type="date" name="ttd_tanggal" id="ttd_tanggal" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <span id="error-message-end" class="text-red-500 mt-2 hidden"></span>
+            </div>
+
 
             <!-- Button -->
             <div class="col-span-2 flex justify-start space-x-2">
@@ -210,9 +215,34 @@ Pembuatan Dokumen
     </form>
 </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        <?php if (session()->getFlashdata('success')): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '<?= session()->getFlashdata('success') ?>',
+                timer: 4000, 
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = "<?= base_url('admin/dokumen/create') ?>";
+            });
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('error')): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '<?= session()->getFlashdata('error') ?>',
+                confirmButtonText: 'OK'
+            });
+        <?php endif; ?>
+    });
+
+
     function toggleOpsiTambahan(show) {
         const opsiTambahanContainer = document.getElementById('opsi-tambahan-container');
         const opsiTambahanInput = document.getElementById('opsi_tambahan_input');
@@ -233,7 +263,6 @@ Pembuatan Dokumen
 
         let dasar = <?= json_encode($dasar); ?>;
 
-        console.log(dasar);
 
         function renderDropdown(showDasar) {
             dropdownDasar.innerHTML = showDasar.map(list => `
@@ -311,7 +340,6 @@ Pembuatan Dokumen
     })();
 
 
-    // Script Users
     (function() {
         const selectedUsers = new Set();
         const dropdownList = document.getElementById('dropdown-list');
@@ -408,43 +436,55 @@ Pembuatan Dokumen
         });
     })();
 
-    
+
     moment.locale('id');
     const dateInput = document.getElementById('waktu');
 
     dateInput.addEventListener('change', () => {
 
-        const dateValue = dateInput.value; 
-        const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY'); 
+        const dateValue = dateInput.value;
+        const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY');
         console.log('Formatted Date in Indonesian:', formattedDate);
     });
 
 
+    document.addEventListener("DOMContentLoaded", function() {
+        const today = new Date().toISOString().split("T")[0];
 
-    <?php if (session()->getFlashdata('generate_success')): ?>
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Surat berhasil dibuat. Proses generate akan dimulai.',
-            timer: 3000, 
-            timerProgressBar: true,
-            showConfirmButton: false,
-            willClose: () => {
-                window.location.href = "<?= base_url('admin/dokumen/generate') ?>/" + <?= session()->getFlashdata('surat_id') ?>;
+        const waktuMulai = document.getElementById("waktu_mulai");
+        const waktuBerakhir = document.getElementById("waktu_berakhir");
+
+        // Set minimum date untuk waktu mulai dan berakhir
+        waktuMulai.setAttribute("min", today);
+        waktuBerakhir.setAttribute("min", today);
+
+        // Validasi waktu mulai
+        waktuMulai.addEventListener("change", function() {
+            const selectedStartDate = waktuMulai.value;
+
+            if (new Date(selectedStartDate) < new Date(today)) {
+                alert("Waktu pelaksanaan dimulai tidak boleh sebelum hari ini.");
+                waktuMulai.value = today;
+            }
+
+            // Pastikan waktu berakhir tidak bisa sebelum waktu mulai
+            waktuBerakhir.setAttribute("min", selectedStartDate);
+        });
+
+        // Validasi waktu berakhir
+        waktuBerakhir.addEventListener("change", function() {
+            const startDate = new Date(waktuMulai.value);
+            const endDate = new Date(waktuBerakhir.value);
+
+            if (endDate < startDate) {
+                alert("Waktu pelaksanaan berakhir tidak boleh sebelum waktu mulai.");
+                waktuBerakhir.value = "";
             }
         });
-    <?php endif; ?>
+    });
 
-    <?php if (session()->getFlashdata('generate_error')): ?>
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal!',
-            text: '<?= session()->getFlashdata('generate_error') ?>',
-        });
-    <?php endif; ?>
+
 </script>
-
-
 
 
 <?= $this->endSection(); ?>

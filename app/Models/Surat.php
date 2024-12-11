@@ -24,6 +24,7 @@ class Surat extends Model
         'kategori_biaya',
         'id_pembebanan_anggaran',
         'id_penanda_tangan',
+        'ttd_tanggal',
         'status'
     ];
 

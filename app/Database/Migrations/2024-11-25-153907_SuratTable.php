@@ -61,6 +61,10 @@ class SuratTable extends Migration
                 'unsigned' => true,
                 'null' => false,
             ],
+            'ttd_tanggal' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
             'status'       => [
                 'type'       => 'ENUM',
                 'constraint' => ['aktif', 'arsip'],

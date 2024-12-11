@@ -181,15 +181,22 @@ Pembuatan Dokumen
                 </div>
 
 
-                <div class="col-span-1">
-                    <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">Penanda Tangan</label>
-                    <select name="penanda_tangan" id="penanda_tangan"
-                        class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
-                        <?php foreach ($penanda_tangan as $user): ?>
-                            <option value="<?= $user['id'] ?>"><?= $user['nama'] ?> - NIP: <?= $user['nip'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+            <div class="col-span-1">
+                <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">Penanda Tangan</label>
+                <select name="penanda_tangan" id="penanda_tangan"
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                    <?php foreach ($penanda_tangan as $item): ?>
+                        <option value="<?= $item['id'] ?>"><?= $item['nama'] ?> - <?= $item['jabatan'] ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            
+            <div class="col-span-1">
+                <label for="ttd_tanggal" class="required block text-gray-700 dark:text-neutral-300">Tanggal Tanda Tangan</label>
+                <input type="date" name="ttd_tanggal" id="ttd_tanggal" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <span id="error-message-end" class="text-red-500 mt-2 hidden"></span>
+            </div>
 
                 <div class="col-span-2 flex justify-start space-x-2">
                     <a href="/surat" class="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">

@@ -42,6 +42,7 @@ class SuratSeeder extends Seeder
             'id_pembebanan_anggaran'=> $requestData['id_pembebanan_anggaran'],
             'ttd_tanggal' => $requestData['ttd_tanggal'],
             'id_penanda_tangan' => $requestData['id_penanda_tangan'],
+            'ttd_tanggal' => date('Y-m-d H:i:s'),
             'status' => 'aktif',
             'created_at' => date('Y-m-d H:i:s'),
         ];

@@ -11,6 +11,7 @@ use App\Models\SuratUser as SuratUser;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use \ConvertApi\ConvertApi;
+use DateTime;
 use IntlDateFormatter;
 
 class DokumenController extends BaseController
@@ -108,6 +109,7 @@ class DokumenController extends BaseController
             'kategori_biaya' => 'required',
             'id_pembebanan_anggaran' => 'required|integer',
             'penanda_tangan' => 'required',
+            'ttd_tanggal' => 'required|valid_date',
             'selected_user' => 'required',
         ];
 
@@ -116,35 +118,59 @@ class DokumenController extends BaseController
         }
 
         if (!$this->validate($validationRules)) {
-            session()->setFlashdata('error', 'Validasi gagal. Mohon periksa input Anda.');
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+
+            return redirect()->back()->withInput()->with('error', 'Validasi gagal. Mohon periksa input Anda.');
         }
 
-        $ttdTanggal = $this->request->getPost('waktu_mulai');
+        $waktuMulai = $this->request->getPost('waktu_mulai');
+        $waktuBerakhir = $this->request->getPost('waktu_berakhir');
+        $ttdTanggal = $this->request->getPost('ttd_tanggal');
+        $nomorSurat = $this->request->getPost('nomor_surat');
 
-        if ($this->isHoliday($ttdTanggal)) {
-            session()->setFlashdata('error', 'Tanggal tidak dapat dipilih karena merupakan hari libur.');
-            return redirect()->back()->withInput();
+
+        $suratModel = new Surat();
+        if ($suratModel->where('nomor_surat', $nomorSurat)->first()) {
+            return redirect()->back()->withInput()->with('error', 'Nomor surat sudah digunakan. Mohon gunakan nomor lain.');
+        }
+
+        $dayOfWeek = date('w', strtotime($ttdTanggal));
+
+        if ($dayOfWeek == 0 || $dayOfWeek == 6) {
+            return redirect()->back()->withInput()->with('error', 'Tanggal Tanda Tangan tidak boleh pada hari Sabtu atau Minggu.');
+        }
+
+        if (new DateTime($waktuMulai) < new DateTime('today')) {
+            return redirect()->back()->withInput()->with('error', 'Waktu pelaksanaan dimulai tidak boleh sebelum hari ini.');
+        }
+
+        if (new DateTime($waktuBerakhir) < new DateTime($waktuMulai)) {
+            return redirect()->back()->withInput()->with('error', 'Waktu pelaksanaan berakhir tidak boleh sebelum waktu mulai.');
+        }
+
+        if ($this->isHoliday($waktuMulai) || $this->isHoliday($waktuBerakhir)) {
+            return redirect()->back()->withInput()->with('error', 'Tanggal Tanda Tangan tidak dapat dipilih karena merupakan hari libur.');
         }
 
         try {
             $dataSurat = [
-                'nomor_surat' => $this->request->getPost('nomor_surat'),
+                'nomor_surat' => $nomorSurat,
                 'menimbang' => $this->request->getPost('menimbang'),
                 'sebagai' => $this->request->getPost('sebagai'),
-                'waktu_mulai' => $this->request->getPost('waktu_mulai'),
-                'waktu_berakhir' => $this->request->getPost('waktu_berakhir'),
+                'waktu_mulai' => $waktuMulai,
+                'waktu_berakhir' => $waktuBerakhir,
                 'tujuan' => $this->request->getPost('tujuan'),
                 'kota_tujuan' => $this->request->getPost('kota_tujuan'),
                 'biaya' => $this->request->getPost('biaya'),
                 'kategori_biaya' => $this->request->getPost('kategori_biaya'),
                 'id_pembebanan_anggaran' => $this->request->getPost('id_pembebanan_anggaran'),
+                'ttd_tanggal' => $ttdTanggal,
                 'id_penanda_tangan' => $this->request->getPost('penanda_tangan'),
             ];
 
             $suratModel = new Surat();
             $suratModel->insert($dataSurat);
             $suratId = $suratModel->getInsertID();
+
 
             $suratUserModel = new SuratUser();
             $userIds = explode(',', $this->request->getPost('selected_user'));
@@ -169,11 +195,20 @@ class DokumenController extends BaseController
                 }
             }
 
-            session()->setFlashdata('success', 'Surat berhasil disimpan.');
-            return redirect()->to('/dokumen');
+
+            $this->generate($suratId);
+
+
+            $userRole = session()->get('role');
+            if ($userRole === 'pegawai') {
+                return redirect()->to('/dokumen');
+            } elseif ($userRole === 'admin') {
+                return redirect()->to('/admin/dokumen');
+            } else {
+                return redirect()->to('/');
+            }
         } catch (\Exception $e) {
-            session()->setFlashdata('error', 'Terjadi kesalahan saat menyimpan surat: ' . $e->getMessage());
-            return redirect()->back()->withInput();
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan surat: ' . $e->getMessage());
         }
     }
 
@@ -267,7 +302,6 @@ class DokumenController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
         }
 
-
         $suratUserModel = new SuratUser();
         $users = $suratUserModel
             ->select('user.*')
@@ -275,9 +309,9 @@ class DokumenController extends BaseController
             ->where('surat_user.surat_id', $suratId)
             ->findAll();
 
-        log_message('debug', 'Users count: ' . count($users));
         if (empty($users)) {
             log_message('error', "No users found for surat ID $suratId.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("No users found for this surat.");
         }
 
         $pembebananAnggaran = $pembebananAnggaranModel->getById($surat['id_pembebanan_anggaran']);
@@ -285,74 +319,54 @@ class DokumenController extends BaseController
             log_message('error', "Pembebanan anggaran for ID {$surat['id_pembebanan_anggaran']} not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Pembebanan anggaran not found.");
         }
+
         $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
         if (!$penandaTangan) {
             log_message('error', "Penanda tangan for ID {$surat['id_penanda_tangan']} not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Penanda tangan not found.");
         }
 
-        $data = [
-            'surat' => $surat,
-            'users' => $users,
-            'pembebanan_anggaran' => $pembebananAnggaran,
-            'penanda_tangan' => $penandaTangan,
-        ];
-
-        // Render PDF
-        $html = view('components/template_SPD', $data);
-
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
 
         $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('F4', 'landscape');
-        $dompdf->render();
-
         $outputDir = WRITEPATH . "pdfs";
         if (!is_dir($outputDir)) {
             mkdir($outputDir, 0777, true);
         }
 
         $outputPath = $outputDir . "/Surat-Perjalanan-Tugas-$suratId.pdf";
-        file_put_contents($outputPath, $dompdf->output());
 
-        $dompdf->stream("Surat-Perjalanan-Tugas-$suratId.pdf", ["Attachment" => false]);
-    }
+        $combinedHtml = '';
+        $totalUsers = count($users);
+        $currentUserIndex = 0;
 
-    public function generateWord($suratId)
-    {
-        $pdfPath = WRITEPATH . "pdfs/Surat-Tugas-$suratId.pdf";
+        foreach ($users as $user) {
+            $currentUserIndex++;
 
-        if (!file_exists($pdfPath)) {
-            throw new \RuntimeException("PDF file not found: $pdfPath");
-        }
+            $data = [
+                'surat' => $surat,
+                'user' => $user,
+                'pembebanan_anggaran' => $pembebananAnggaran,
+                'penanda_tangan' => $penandaTangan,
+            ];
 
-        return $this->convertPdfToWordWithConvertApi($pdfPath);
-    }
+            $html = view('components/template_SPD', $data);
 
-    public function convertPdfToWordWithConvertApi($pdfPath)
-    {
-        try {
-            $result = ConvertApi::convert('docx', [
-                'File' => $pdfPath,
-            ], 'pdf');
-
-            $outputDir = WRITEPATH . 'word/';
-            if (!is_dir($outputDir)) {
-                mkdir($outputDir, 0777, true);
+            if ($currentUserIndex < $totalUsers) {
+                $combinedHtml .= '<div style="page-break-after: always;">' . $html . '</div>';
+            } else {
+                $combinedHtml .= $html;
             }
-
-            $savedFiles = $result->saveFiles($outputDir);
-
-            $wordFilePath = $savedFiles[0];
-
-            return $this->response->download($wordFilePath, null)->setFileName(basename($wordFilePath));
-        } catch (\Exception $e) {
-            log_message('error', 'Error converting PDF to Word with ConvertAPI: ' . $e->getMessage());
-            throw new \RuntimeException('Failed to convert PDF to Word.');
         }
+
+        $dompdf->loadHtml($combinedHtml);
+        $dompdf->setPaper('F4', 'landscape');
+        $dompdf->render();
+
+        file_put_contents($outputPath, $dompdf->output());
+        $dompdf->stream("Surat-Perjalanan-Tugas-$suratId.pdf", ["Attachment" => false]);
     }
 
 
@@ -477,34 +491,34 @@ class DokumenController extends BaseController
         {
             $formatterHari = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN, 'EEEE');
             $formatterBulan = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN, 'MMMM');
-            
+
             $hariMulai = ucfirst($formatterHari->format(strtotime($mulai)));
             $hariBerakhir = ucfirst($formatterHari->format(strtotime($berakhir)));
-        
+
             $tanggalMulai = date('d', strtotime($mulai));
             $tanggalBerakhir = date('d', strtotime($berakhir));
-        
+
             $bulanMulai = ucfirst($formatterBulan->format(strtotime($mulai)));
             $bulanBerakhir = ucfirst($formatterBulan->format(strtotime($berakhir)));
-        
+
             $tahunMulai = date('Y', strtotime($mulai));
             $tahunBerakhir = date('Y', strtotime($berakhir));
-        
+
             if ($bulanMulai === $bulanBerakhir && $tahunMulai === $tahunBerakhir) {
                 return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} - {$tanggalBerakhir} {$bulanMulai} {$tahunMulai}";
             }
-        
+
             if ($tahunMulai === $tahunBerakhir) {
                 return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} {$bulanMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunMulai}";
             }
-        
+
             return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} {$bulanMulai} {$tahunMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunBerakhir}";
         }
-        
+
 
         $waktuMulai = $surat['waktu_mulai'] ?? '';
         $waktuBerakhir = $surat['waktu_berakhir'] ?? '';
-        
+
         $waktuRentang = formatTanggalRentang($waktuMulai, $waktuBerakhir);
 
         $table->addRow();
@@ -530,8 +544,8 @@ class DokumenController extends BaseController
 
         $signatureTable->addRow();
         $signatureCell = $signatureTable->addCell(10000, [
-            'gridSpan' => 3, 
-            'alignment' => 'right', 
+            'gridSpan' => 3,
+            'alignment' => 'right',
         ]);
         $signatureCell->addText(
             'Surabaya, ' . date('d F Y', strtotime($surat['created_at'] ?? date('Y-m-d'))),
@@ -541,7 +555,7 @@ class DokumenController extends BaseController
 
         $signatureTable->addRow();
         $positionCell = $signatureTable->addCell(10000, [
-            'gridSpan' => 3, 
+            'gridSpan' => 3,
             'alignment' => 'right',
         ]);
         $positionCell->addText(

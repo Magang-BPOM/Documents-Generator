@@ -1,3 +1,32 @@
+<?php
+if (!function_exists('tanggalIndonesia')) {
+    function tanggalIndonesia($tanggal)
+    {
+        $bulan = [
+            1 => 'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember'
+        ];
+        $tanggal_parts = explode('-', $tanggal);
+        $tahun = $tanggal_parts[0];
+        $bulan_text = $bulan[(int)$tanggal_parts[1]];
+        $hari = (int)$tanggal_parts[2];
+
+        return "{$hari} {$bulan_text} {$tahun}";
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -9,7 +38,7 @@
         @page {
             size: 330mm 210mm;
         }
-
+ 
         body {
             font-family: Arial, sans-serif;
             font-size: 8px;
@@ -172,25 +201,8 @@
 
                     <td>Nama / NIP Pegawai yang melaksanakan perjalanan dinas</td>
                     <td colspan="2">
-                        <?php
-                        if (!empty($users)) {
-                            $nama_list = [];
-                            $nip_list = [];
-
-                            foreach ($users as $user) {
-                                $nama_list[] = esc($user['nama']);
-                                $nip_list[] = esc($user['nip']);
-                            }
-
-                            $nama_output = implode(' - ', $nama_list);
-                            $nip_output = implode(' - ', $nip_list);
-
-                            echo "<p>{$nama_output}</p>";
-                            echo "<p>NIP: {$nip_output}</p>";
-                        } else {
-                            echo "<p>Data pengguna tidak tersedia</p>";
-                        }
-                        ?>
+                         <p><?= esc($user['nama']) ?></p>
+                         <p>NIP: <?= esc($user['nip']) ?></p>
                     </td>
                 </tr>
                 <tr>
@@ -205,36 +217,8 @@
                     </td>
                     <td colspan="2">
                         <ul style="list-style-type: lower-alpha; padding-left: 20px; margin: 0;">
-                            <li>
-                                <?php
-                                if (!empty($users)) {
-                                    $pangkat_list = [];
-
-                                    foreach ($users as $user) {
-                                        $pangkat_list[] = esc($user['pangkat']);
-                                    }
-
-                                    echo implode(' - ', $pangkat_list);
-                                } else {
-                                    echo "Data pengguna tidak tersedia";
-                                }
-                                ?>
-                            </li>
-                            <li>
-                                <?php
-                                if (!empty($users)) {
-                                    $jabatan_list = [];
-
-                                    foreach ($users as $user) {
-                                        $jabatan_list[] = esc($user['jabatan']);
-                                    }
-
-                                    echo implode(' - ', $jabatan_list);
-                                } else {
-                                    echo "Data pengguna tidak tersedia";
-                                }
-                                ?>
-                            </li>
+                            <li><?= esc($user['pangkat']) ?></li>
+                            <li><?= esc($user['jabatan']) ?></li>
                             <li><?= esc($surat['kategori_biaya']) ?></li>
                         </ul>
                     </td>
@@ -485,32 +469,9 @@
 
         </div>
     </div>
+
+    <div class="page-break"></div>
 </body>
-<?php
 
-function tanggalIndonesia($tanggal)
-{
-    $bulan = [
-        1 => 'Januari',
-        'Februari',
-        'Maret',
-        'April',
-        'Mei',
-        'Juni',
-        'Juli',
-        'Agustus',
-        'September',
-        'Oktober',
-        'November',
-        'Desember'
-    ];
-    $tanggal_parts = explode('-', $tanggal);
-    $tahun = $tanggal_parts[0];
-    $bulan_text = $bulan[(int)$tanggal_parts[1]];
-    $hari = (int)$tanggal_parts[2];
-
-    return "{$hari} {$bulan_text} {$tahun}";
-}
-?>
 
 </html>
