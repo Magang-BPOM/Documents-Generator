@@ -346,6 +346,11 @@ function formatTanggalRentang($mulai, $berakhir)
                 <li>
                     Tujuan: <?= esc($surat['tujuan']) ?>
                 </li>
+                <?php if (!empty($surat['biaya'])): ?>
+                    <li>
+                        Biaya: <?= esc($surat['biaya']) ?>
+                    </li>
+                <?php endif; ?>
             </ol>
         </div>
 

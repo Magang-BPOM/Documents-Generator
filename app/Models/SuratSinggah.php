@@ -4,31 +4,20 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class Surat extends Model
+class SuratSinggah extends Model
 {
-    protected $table            = 'surat';
+    protected $table            = 'surat_singgah';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = [
-        'nomor_surat',
-        'menimbang',
-        'sebagai',
-        'waktu_mulai',
-        'waktu_berakhir',
-        'tujuan',
-        'kota_tujuan',
-        'biaya',
-        'kategori_biaya',
-        'id_pembebanan_anggaran',
-        'id_penanda_tangan',
-        'ttd_tanggal',
-        'status',
-        'is_new'
-    ];
-
+    protected $allowedFields    = [
+        'surat_id',
+        'berangkat_dari',
+        'ke', 
+        'nama_tempat', 
+        'tanggal'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -37,10 +26,11 @@ class Surat extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 
     // Validation
     protected $validationRules      = [];

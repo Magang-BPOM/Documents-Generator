@@ -18,6 +18,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/admin/dokumen', 'DokumenController::index');
         $routes->get('/admin/dokumen/create', 'DokumenController::create');
         $routes->post('/admin/dokumen/store', 'DokumenController::store');
+        $routes->post('/dokumen/markAsRead/(:num)', 'DokumenController::markAsRead/$1');
         $routes->get('/admin/dokumen/generate/(:num)', 'DokumenController::generate/$1');
         $routes->get('/admin/dokumen/generateSPD/(:num)', 'DokumenController::generateSPD/$1');
         $routes->get('/admin/dokumen/generate-word/(:num)', 'DokumenController::generateDocx/$1');
@@ -42,6 +43,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/dokumen/generateSPD/(:num)', 'DokumenController::generateSPD/$1');
         $routes->get('/dokumen/create', 'DokumenController::create');
         $routes->post('/dokumen/store', 'DokumenController::store');
+        $routes->post('/dokumen/markAsRead/(:num)', 'DokumenController::markAsRead/$1');
         $routes->get('/dokumen/archive', 'DokumenController::arsip_index');
         $routes->post('/dokumen/delete', 'DokumenController::delete');
         $routes->post('/dokumen/bulkArsip', 'DokumenController::bulkArsip');

@@ -24,6 +24,37 @@ if (!function_exists('tanggalIndonesia')) {
         return "{$hari} {$bulan_text} {$tahun}";
     }
 }
+
+?>
+<?php
+if (!function_exists('toRoman')) {
+    function toRoman($number)
+    {
+        $map = [
+            'M' => 1000,
+            'CM' => 900,
+            'D' => 500,
+            'CD' => 400,
+            'C' => 100,
+            'XC' => 90,
+            'L' => 50,
+            'XL' => 40,
+            'X' => 10,
+            'IX' => 9,
+            'V' => 5,
+            'IV' => 4,
+            'I' => 1,
+        ];
+        $result = '';
+        foreach ($map as $roman => $value) {
+            while ($number >= $value) {
+                $result .= $roman;
+                $number -= $value;
+            }
+        }
+        return $result;
+    }
+}
 ?>
 
 
@@ -38,7 +69,7 @@ if (!function_exists('tanggalIndonesia')) {
         @page {
             size: 330mm 210mm;
         }
- 
+
         body {
             font-family: Arial, sans-serif;
             font-size: 8px;
@@ -49,23 +80,24 @@ if (!function_exists('tanggalIndonesia')) {
         }
 
         .header-table {
-        width: 100%;
-        border-collapse: collapse;
-        border:0 !important 
-    }
+            width: 100%;
+            border-collapse: collapse;
+            border: 0 !important
+        }
 
-    .address-cell {
-        text-align: center;
-        font-weight: bold;
-        font-size: 12px;
-        width: 70% Imp !important; 
-    }
+        .address-cell {
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            width: 70% Imp !important;
+        }
 
-    .info-cell {
-        text-align: left;
-        font-size: 12px;
-        width: 30% !important; 
-    }
+        .info-cell {
+            text-align: left;
+            font-size: 12px;
+            width: 30% !important;
+        }
+
         .container {
             display: table;
             width: 100%;
@@ -173,20 +205,20 @@ if (!function_exists('tanggalIndonesia')) {
     <div class="container">
         <!-- Kolom Kiri -->
         <div class="left">
-        <table class="header-table">
-        <tr>
-            <td class="address-cell" style=" width: 70% !important;border:0 !important">
-                <p>BALAI BESAR PENGAWAS OBAT DAN MAKANAN</p>
-                <p>Jl. Karang Menjangan No.20</p>
-                <p>SURABAYA</p>
-            </td>
-            <td class="info-cell" style=" width: 30% !important; border:0 !important">
-                <p>Lembar Ke:</p>
-                <p>Kode No.:</p>
-                <p>Nomor: <?= esc($surat['nomor_surat']) ?></p>
-            </td>
-        </tr>
-        </table>
+            <table class="header-table">
+                <tr>
+                    <td class="address-cell" style=" width: 70% !important;border:0 !important">
+                        <p>BALAI BESAR PENGAWAS OBAT DAN MAKANAN</p>
+                        <p>Jl. Karang Menjangan No.20</p>
+                        <p>SURABAYA</p>
+                    </td>
+                    <td class="info-cell" style=" width: 30% !important; border:0 !important">
+                        <p>Lembar Ke:</p>
+                        <p>Kode No.:</p>
+                        <p>Nomor: <?= esc($surat['nomor_surat']) ?></p>
+                    </td>
+                </tr>
+            </table>
             <p style="font-weight: bold;font-size:12px;text-align:center;text-decoration:underline;margin-bottom : 15px;margin-top:15px">SURAT PERJALANAN DINAS (SPD)</p>
 
 
@@ -201,8 +233,8 @@ if (!function_exists('tanggalIndonesia')) {
 
                     <td>Nama / NIP Pegawai yang melaksanakan perjalanan dinas</td>
                     <td colspan="2">
-                         <p><?= esc($user['nama']) ?></p>
-                         <p>NIP: <?= esc($user['nip']) ?></p>
+                        <p><?= esc($user['nama']) ?></p>
+                        <p>NIP: <?= esc($user['nip']) ?></p>
                     </td>
                 </tr>
                 <tr>
@@ -334,7 +366,7 @@ if (!function_exists('tanggalIndonesia')) {
             <div class="wrap">
                 <div class="sign">
                     <p>Dikeluarkan di: Surabaya</p>
-                    <p class="date">Pada Tanggal: <?= tanggalIndonesia($surat['created_at']) ?></p>
+                    <p class="date">Pada Tanggal: <?= tanggalIndonesia($surat['ttd_tanggal']) ?></p>
                     <p class="title">PEJABAT PEMBUAT KOMITMEN</p>
                     <p class="nama" style=" text-decoration: underline;"><?= esc($penanda_tangan['nama']) ?></p>
                     <p><?= esc($penanda_tangan['nip']) ?></p>
@@ -347,6 +379,7 @@ if (!function_exists('tanggalIndonesia')) {
 
         <!-- Kolom Kanan -->
         <div class="right">
+
             <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                 <tr>
                     <td>
@@ -367,67 +400,104 @@ if (!function_exists('tanggalIndonesia')) {
 
 
                 </tr>
-                <tr>
-                    <td>
-                        <div class="tes" style="padding:4px">
-                            <p>II. Tiba di: <?= esc($surat['kota_tujuan']) ?></p>
-                            <p>Pada Tanggal: 20 Oktober 2024</p>
-                            <p>Kepala:</p>
-                            <div class="wrap" style="display:flex;justify-content:flex-end;text-align:center;margin-top:-10px;">
-                                <p>Azana Style</p>
-                                <p>Front One Hotel Pamekasan - Madura</p>
-                                <br>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tes" style="padding:4px">
-                            <p>Berangkat dari:</p>
-                            <p>Ke: Surabaya</p>
-                            <p>Pada Tanggal:<?= tanggalIndonesia($surat['waktu_berakhir']) ?></p>
-                            <p>Kepala:</p>
-                            <div class="wrap" style="display:flex;justify-content:flex-end;text-align:center;margin-top:-10px;">
-                                <p>Azana Style</p>
-                                <p>Front One Hotel Pamekasan - Madura</p>
-                                <br>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="tes" style="margin-bottom:48px">
-                            <p>III. Tiba di:</p>
-                            <p>Pada Tanggal:</p>
-                            <p>Kepala:</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tes" style="margin-bottom:48px">
-                            <p>Berangkat dari:</p>
-                            <p>Ke:</p>
-                            <p>Pada Tanggal:</p>
-                            <p>Kepala:</p>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="tes" style="margin-bottom:48px">
-                            <p>IV. Tiba di:</p>
-                            <p>Pada Tanggal:</p>
-                            <p>Kepala:</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tes" style="margin-bottom:48px">
-                            <p>Berangkat dari:</p>
-                            <p>Ke:</p>
-                            <p>Pada Tanggal:</p>
-                            <p>Kepala:</p>
-                        </div>
-                    </td>
-                </tr>
+                <?php if (!empty($tempatSinggah)): ?>
+                    <?php foreach ($tempatSinggah as $index => $singgah): ?>
+                        <tr>
+                            <td>
+                                <div class="tes" style="padding:6px">
+                                    <p><?= toRoman($index + 2) ?>. Tiba di: <?= esc($singgah['ke'] ?? '-') ?></p>
+                                    <p>Pada Tanggal: <?= esc(tanggalIndonesia($singgah['tanggal'] ?? '-')) ?></p>
+                                    <p>Kepala:</p>
+                                    <div class="wrap" style="display:flex;justify-content:flex-end;text-align:center;margin-top:-10px;">
+                                        <p><?= esc($singgah['nama_tempat'] ?? '-') ?></p>
+                                        <br>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="tes" style="padding:6px">
+                                    <p>Berangkat dari: <?= esc($singgah['ke'] ?? '-') ?></p>
+                                    <p>Ke:
+                                        <?= isset($tempatSinggah[$index + 1])
+                                            ? esc($tempatSinggah[$index + 1]['ke'] ?? '-')
+                                            : 'Surabaya' ?>
+                                    </p>
+                                    <p>Pada Tanggal: 
+                                        <?= isset($tempatSinggah[$index + 1])
+                                            ? esc(tanggalIndonesia($tempatSinggah[$index + 1]['tanggal'] ?? '-'))
+                                            : (!empty($surat['waktu_berakhir']) 
+                                                ? esc(tanggalIndonesia($surat['waktu_berakhir'])) 
+                                                : '-') ?>
+                                    </p>
+                                    <p>Kepala:</p>
+                                    <div class="wrap" style="display:flex;justify-content:flex-end;text-align:center;margin-top:-10px;">
+                                        <p><?= esc($singgah['nama_tempat'] ?? '-') ?></p>
+                                        <br>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+
+                    <?php
+                    // Tambahkan baris kosong jika jumlah tempat singgah kurang dari 3
+                    $additionalRows = max(0, 3 - count($tempatSinggah));
+                    for ($i = 0; $i < $additionalRows; $i++):
+                    ?>
+                        <tr>
+                            <td>
+                                <div class="tes" style="padding:6px">
+                                    <p>Tiba di: </p>
+                                    <p>Pada Tanggal: </p>
+                                    <p>Kepala:</p>
+                                    <div class="wrap" style="display:flex;justify-content:flex-end;text-align:center;margin-top:-10px;">
+                                        <br>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="tes" style="padding:6px">
+                                    <p>Berangkat dari: </p>
+                                    <p>Ke: </p>
+                                    <p>Pada Tanggal: </p>
+                                    <p>Kepala:</p>
+                                    <div class="wrap" style="display:flex;justify-content:flex-end;text-align:center;margin-top:-10px;">
+                                        <br>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endfor; ?>
+
+                <?php else: ?>
+                    <!-- Jika tidak ada tempat singgah, tambahkan 3 baris kosong -->
+                    <?php for ($i = 0; $i < 3; $i++): ?>
+                        <tr>
+                            <td>
+                                <div class="tes" style="padding:6px">
+                                    <p>Tiba di: </p>
+                                    <p>Pada Tanggal: </p>
+                                    <p>Kepala:</p>
+                                    <div class="wrap" style="display:flex;justify-content:flex-end;text-align:center;margin-top:-10px;">
+                                        <br>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="tes" style="padding:6px">
+                                    <p>Berangkat dari: </p>
+                                    <p>Ke: </p>
+                                    <p>Pada Tanggal: </p>
+                                    <p>Kepala:</p>
+                                    <div class="wrap" style="display:flex;justify-content:flex-end;text-align:center;margin-top:-10px;">
+                                        <br>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endfor; ?>
+                <?php endif; ?>
+
                 <tr>
                     <td>
                         <p>Tiba di: Surabaya</p>

@@ -54,6 +54,7 @@ class SuratUser extends Model
             ')
             ->join('surat', 'surat_user.surat_id = surat.id')
             ->where('surat.status', 'aktif')
+            ->orderBy('surat.created_at', 'DESC')
             ->findAll();
 
         $result = [];
@@ -107,15 +108,18 @@ class SuratUser extends Model
             s.waktu_mulai,
             s.id_penanda_tangan,
             s.status,
+            s.created_at,
+            s.is_new,
             su.id_created 
         ')
             ->join('surat s', 'su.surat_id = s.id')
-            ->join('user u', 'su.user_id = u.id') // Bergabung dengan user untuk mendapatkan nama
+            ->join('user u', 'su.user_id = u.id') 
             ->groupStart()
-            ->where('su.id_created', $userId) // Surat dibuat oleh user
-            ->orWhere('u.nama', $userName)    // Nama user ada di surat
+            ->where('su.id_created', $userId) 
+            ->orWhere('u.nama', $userName)    
             ->groupEnd()
             ->where('s.status', 'aktif')
+            ->orderBy('s.created_at', 'DESC')
             ->get()
             ->getResultArray();
 
@@ -151,7 +155,8 @@ class SuratUser extends Model
                 'penanda_tangan' => $penandaTangan ? $penandaTangan['nama'] : null,
                 'nip_penanda_tangan' => $penandaTangan ? $penandaTangan['nip'] : null,
                 'jabatan_penanda_tangan' => $penandaTangan ? $penandaTangan['jabatan'] : null,
-                'id_created' => $surat['id_created'],
+                'created_at' => $surat['created_at'],
+                'is_new' => $surat['is_new']
             ];
         }
 

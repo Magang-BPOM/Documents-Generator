@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\PembabananAnggaranModel;
 use App\Models\Surat as Surat;
+use App\Models\SuratSinggah;
 use App\Models\User as User;
 use App\Models\Dasar as Dasar;
 use App\Models\DasarSurat as DasarSurat;
@@ -96,6 +97,7 @@ class DokumenController extends BaseController
     public function store()
     {
         $pembuatId = session()->get('user_id');
+        
         $validationRules = [
             'nomor_surat' => 'required',
             'menimbang' => 'required',
@@ -114,8 +116,9 @@ class DokumenController extends BaseController
         ];
 
         if ($this->request->getPost('opsi_tambahan') === 'show') {
-            $validationRules['untuk'] = 'required';
+            $validationRules['biaya'] = 'required|string';
         }
+        log_message('debug', 'Data biaya: ' . $this->request->getPost('biaya'));
 
         if (!$this->validate($validationRules)) {
 
@@ -126,8 +129,9 @@ class DokumenController extends BaseController
         $waktuBerakhir = $this->request->getPost('waktu_berakhir');
         $ttdTanggal = $this->request->getPost('ttd_tanggal');
         $nomorSurat = $this->request->getPost('nomor_surat');
+        $biaya = $this->request->getPost('biaya') ?? null;
 
-
+        $isNew = 1;
         $suratModel = new Surat();
         if ($suratModel->where('nomor_surat', $nomorSurat)->first()) {
             return redirect()->back()->withInput()->with('error', 'Nomor surat sudah digunakan. Mohon gunakan nomor lain.');
@@ -147,7 +151,7 @@ class DokumenController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Waktu pelaksanaan berakhir tidak boleh sebelum waktu mulai.');
         }
 
-        if ($this->isHoliday($waktuMulai) || $this->isHoliday($waktuBerakhir)) {
+        if ($this->isHoliday($ttdTanggal)) {
             return redirect()->back()->withInput()->with('error', 'Tanggal Tanda Tangan tidak dapat dipilih karena merupakan hari libur.');
         }
 
@@ -163,14 +167,31 @@ class DokumenController extends BaseController
                 'biaya' => $this->request->getPost('biaya'),
                 'kategori_biaya' => $this->request->getPost('kategori_biaya'),
                 'id_pembebanan_anggaran' => $this->request->getPost('id_pembebanan_anggaran'),
+                'biaya'=>$biaya,
                 'ttd_tanggal' => $ttdTanggal,
                 'id_penanda_tangan' => $this->request->getPost('penanda_tangan'),
+                'is_new' => $isNew
             ];
 
             $suratModel = new Surat();
             $suratModel->insert($dataSurat);
             $suratId = $suratModel->getInsertID();
 
+            $tempatSinggahModel = new SuratSinggah();
+            $tempatSinggahData = $this->request->getPost('tempat_singgah');
+            $tempatSinggahBatch = [];
+
+            foreach ($tempatSinggahData['nama_tempat'] as $index => $namaTempat) {
+                $tempatSinggahBatch[] = [
+                    'surat_id' => $suratId,
+                    'berangkat_dari' => $tempatSinggahData['berangkat_dari'][$index] ?? null,
+                    'ke' => $tempatSinggahData['ke'][$index] ?? null,
+                    'nama_tempat' => $namaTempat,
+                    'tanggal' => $tempatSinggahData['tanggal'][$index] ?? null,
+                ];
+            }
+
+            $tempatSinggahModel->insertBatch($tempatSinggahBatch);
 
             $suratUserModel = new SuratUser();
             $userIds = explode(',', $this->request->getPost('selected_user'));
@@ -212,6 +233,31 @@ class DokumenController extends BaseController
         }
     }
 
+    public function markAsRead($id)
+    {
+        log_message('debug', "Memproses markAsRead untuk dokumen ID: {$id}");
+        
+        $suratModel = new Surat();
+    
+        $surat = $suratModel->find($id);
+    
+        if (!$surat) {
+            log_message('error', "Dokumen dengan ID {$id} tidak ditemukan");
+            return $this->response->setStatusCode(404)->setJSON(['message' => 'Dokumen tidak ditemukan']);
+        }
+    
+        $update = $suratModel->update($id, ['is_new' => 0]);
+    
+        if (!$update) {
+            log_message('error', "Gagal memperbarui status is_new untuk dokumen ID {$id}");
+            return $this->response->setStatusCode(500)->setJSON(['message' => 'Gagal memperbarui status dokumen']);
+        }
+    
+        log_message('debug', "Status is_new untuk dokumen ID {$id} berhasil diperbarui");
+        return $this->response->setJSON(['message' => 'Status dokumen berhasil diperbarui']);
+    }
+    
+    
 
     public function generate($suratId)
     {
@@ -326,6 +372,9 @@ class DokumenController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Penanda tangan not found.");
         }
 
+        $suratSinggahModel = new SuratSinggah();
+        $tempatSinggah = $suratSinggahModel->where('surat_id', $surat['id'])->findAll();
+
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
@@ -350,6 +399,7 @@ class DokumenController extends BaseController
                 'user' => $user,
                 'pembebanan_anggaran' => $pembebananAnggaran,
                 'penanda_tangan' => $penandaTangan,
+                'tempatSinggah' => $tempatSinggah
             ];
 
             $html = view('components/template_SPD', $data);

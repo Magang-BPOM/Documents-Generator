@@ -101,13 +101,17 @@ Semua Dokumen
                 <tbody class="bg-white divide-y divide-gray-200 dark:bg-neutral-900 dark:divide-neutral-800">
                     <?php $no = 1; ?>
                     <?php foreach ($surat_user as $item): ?>
-
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <input type="checkbox" name="selected[]" value="<?= $item['id'] ?>" class="rowCheckbox form-checkbox">
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= $no++ ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['nomor_surat']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <?= esc($item['nomor_surat']) ?>
+                                <?php if ($item['is_new'] === 1): ?> 
+                                    <span class="ml-2 text-red-600 font-bold" title="Dokumen Baru">●</span>
+                                <?php endif; ?>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <?= esc($item['kepada'][0] ?? 'Tidak ada data') ?>
                                 <?php if (is_array($item['kepada']) && count($item['kepada']) > 1): ?>
@@ -116,16 +120,19 @@ Semua Dokumen
                                         class="text-blue-600 hover:underline ml-2">Selengkapnya</button>
                                 <?php endif; ?>
                             </td>
-
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu_mulai']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_penanda_tangan']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <a href="<?= base_url('dokumen/edit/' . $item['id']) ?>" class="text-blue-500 hover:underline">Edit</a>
+                                <a href="<?= base_url('dokumen/delete/' . $item['id']) ?>" class="text-red-500 hover:underline ml-2">Hapus</a>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
 
-
             </table>
+
         </div>
 
         <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
@@ -180,12 +187,11 @@ Semua Dokumen
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 <script>
+    function showUsersModal(users) {
+        const modalContent = document.getElementById('modal-content');
+        const modal = document.getElementById('modal');
 
-function showUsersModal(users) {
-    const modalContent = document.getElementById('modal-content');
-    const modal = document.getElementById('modal');
-
-    modalContent.innerHTML = `
+        modalContent.innerHTML = `
         <ul class="space-y-2">
             ${users.map(user => {
                 const [nama, nip] = user.split(' | '); 
@@ -198,12 +204,12 @@ function showUsersModal(users) {
             }).join('')}
         </ul>
     `;
-    modal.classList.remove('hidden');
-}
+        modal.classList.remove('hidden');
+    }
 
-function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
-}
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+    }
 
 
 
@@ -223,7 +229,8 @@ function closeModal() {
                     kepada: <?= json_encode($item['kepada']) ?>,
                     waktu_mulai: '<?= esc($item['waktu_mulai']) ?>',
                     penanda_tangan: '<?= esc($item['penanda_tangan']) ?>',
-                    jabatan_penanda_tangan: '<?= esc($item['jabatan_penanda_tangan']) ?>'
+                    jabatan_penanda_tangan: '<?= esc($item['jabatan_penanda_tangan']) ?>',
+                    is_new: '<?= esc($item['is_new']) ?>'
                 },
             <?php endforeach; ?>
         ];
@@ -239,21 +246,37 @@ function closeModal() {
             paginatedData.forEach((item, index) => {
                 const row = document.createElement('tr');
                 const rowNumber = startIdx + index + 1;
+
+                const isNewIndicator = item.is_new ==1 ?
+                    `<span class="ml-2 text-red-600 font-bold" title="Dokumen Baru">●</span>` :
+                    '';
+
                 row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
-            <td class="px-6 py-4 whitespace-nowrap">${rowNumber}</td> <!-- Tambahkan nomor -->
-            <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                ${item.kepada.length > 0 ? item.kepada[0] : 'Tidak ada data'} 
-                ${item.kepada.length > 1 ? `<button onclick='showUsersModal(${JSON.stringify(item.kepada)})' class="text-blue-600 hover:underline">Selengkapnya</button>` : ''}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
-            <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
-            <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_penanda_tangan}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                 <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
-            </td>
-        `;
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">${rowNumber}</td>
+                    <td class="px-6 py-4 whitespace-nowrap dokumen-item" data-id="${item.id}">
+                        ${item.nomor_surat} ${isNewIndicator}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        ${item.kepada.length > 0 ? item.kepada[0] : 'Tidak ada data'}
+                        ${item.kepada.length > 1 ? `<button onclick='showUsersModal(${JSON.stringify(item.kepada)})' class="text-blue-600 hover:underline">Selengkapnya</button>` : ''}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_penanda_tangan}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
+                    </td>
+                `;
+
+                const dokumenItem = row.querySelector('.dokumen-item');
+                if (dokumenItem) {
+                    dokumenItem.addEventListener('click', () => markAsRead(item.id, dokumenItem));
+                }
+
+
                 tableBody.appendChild(row);
             });
 
@@ -263,28 +286,41 @@ function closeModal() {
         }
 
 
-        itemsPerPageSelect.addEventListener('change', (e) => {
-            itemsPerPage = parseInt(e.target.value);
-            currentPage = 1;
-            updateTable();
-        });
+        function markAsRead(id, dokumenElement) {
+            console.log(`Memproses dokumen ID: ${id}`);
+            fetch(`dokumen/markAsRead/${id}`, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                console.log(`Response status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error('Gagal memperbarui status dokumen');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
 
+                // Hapus ikon "baru" dari tampilan
+                const icon = dokumenElement.querySelector('span');
+                if (icon) {
+                    console.log('Menghapus ikon baru...');
+                    icon.remove();
+                }
 
-        prevPageBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                updateTable();
-            }
-        });
+                // Perbarui data array agar mencerminkan perubahan
+                const dokumenIndex = data.findIndex(doc => doc.id === id);
+                if (dokumenIndex !== -1) {
+                    data[dokumenIndex].is_new = false;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
 
-        nextPageBtn.addEventListener('click', () => {
-            if (currentPage * itemsPerPage < data.length) {
-                currentPage++;
-                updateTable();
-            }
-        });
 
         updateTable();
+
     });
 
 

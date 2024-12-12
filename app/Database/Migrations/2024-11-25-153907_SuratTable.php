@@ -70,6 +70,12 @@ class SuratTable extends Migration
                 'constraint' => ['aktif', 'arsip'],
                 'default'    => 'aktif',
             ],
+            'is_new' => [
+                    'type' => 'TINYINT',
+                    'constraint' => 1,
+                    'default' => 1, 
+                    'null' => false,
+                ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,

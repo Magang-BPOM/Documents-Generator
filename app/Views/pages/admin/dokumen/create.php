@@ -47,12 +47,12 @@ Pembuatan Dokumen
 
             <div class="col-span-1">
                 <label for="nomor_surat" class="required block font-medium text-gray-700 dark:text-neutral-300">Nomor Surat</label>
-                <input type="text" name="nomor_surat" id="nomor_surat" placeholder="contoh:PW.01.05.11A.07.24.1816" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                <input value="<?= old('nomor_surat') ?>" type="text" name="nomor_surat" id="nomor_surat" placeholder="contoh:PW.01.05.11A.07.24.1816" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
             </div>
 
             <div class="col-span-1">
                 <label for="menimbang" class="required block font-medium text-gray-700 dark:text-neutral-300">Menimbang</label>
-                <input type="text" name="menimbang" id="menimbang" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                <input value="<?= old('menimbang') ?>" type="text" name="menimbang" id="menimbang" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
             </div>
 
             <div class="col-span-2 text-lg">
@@ -97,38 +97,37 @@ Pembuatan Dokumen
             <label for="untuk" class="required block font-medium text-gray-700 dark:text-neutral-300">Isian section Untuk</label>
 
             <div class="col-span-2">
-                <label for="sebagai" class="required block text-gray-700 dark:text-neutral-300">Sebagai</label>
-                <input type="text" name="sebagai" id="sebagai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <label for="sebagai" class="required block text-gray-700 dark:text-neutral-300">Sebagai/Tujuan</label>
+                <textarea name="sebagai" id="sebagai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 min-h-[3rem]" required><?= old('sebagai') ?></textarea>
             </div>
-
             <div class="col-span-1">
                 <label for="waktu_mulai" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan dimulai</label>
-                <input type="date" name="waktu_mulai" id="waktu_mulai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <input value="<?= old('waktu_mulai') ?>" type="date" name="waktu_mulai" id="waktu_mulai" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
                 <span id="error-message-start" class="text-red-500 mt-2 hidden"></span>
             </div>
 
             <div class="col-span-1">
                 <label for="waktu_berakhir" class="required block text-gray-700 dark:text-neutral-300">Waktu pelaksanaan berakhir</label>
-                <input type="date" name="waktu_berakhir" id="waktu_berakhir" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <input value="<?= old('waktu_berakhir') ?>" type="date" name="waktu_berakhir" id="waktu_berakhir" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
                 <span id="error-message-end" class="text-red-500 mt-2 hidden"></span>
             </div>
 
             <div class="col-span-1">
-                <label for="tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Tujuan</label>
-                <input type="text" name="tujuan" id="tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <label for="tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Alamat Lengkap Tujuan</label>
+                <input value="<?= old('tujuan') ?>" type="text" name="tujuan" id="tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
             </div>
 
 
             <div class="col-span-1">
                 <label for="kota_tujuan" class="required block mt-2 text-gray-700 dark:text-neutral-300">Kota Tujuan</label>
-                <input type="text" name="kota_tujuan" id="kota_tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <input value="<?= old('kota_tujuan') ?>" type="text" name="kota_tujuan" id="kota_tujuan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
             </div>
 
 
             <!-- Opsi Tambahan -->
             <div class="col-span-2">
                 <label class="block text-lg font-medium text-gray-700 dark:text-neutral-300 mb-4">
-                    Opsi Tambahan Biaya
+                    Opsi Tambahan Untuk Biaya
                 </label>
                 <div class="flex flex-col space-y-4">
                     <!-- Radio Button Group -->
@@ -149,10 +148,13 @@ Pembuatan Dokumen
 
                     <!-- Textarea for Opsi Tambahan -->
                     <div id="opsi-tambahan-container" class="hidden transition-all duration-300">
-                        <textarea name="untuk" id="untuk" rows="4"
-                            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3"
-                            placeholder="Contoh input: 'Biaya : DIPA Balai Besar POM di Surabaya Tahun 2024.' (akhiran ';')">
-                        </textarea>
+                        <textarea
+                            name="biaya"
+                            id="biaya"
+                            rows="4"
+                            placeholder="Contoh input: 'DIPA Balai Besar POM di Surabaya Tahun 2024.' (akhiran ';')"
+                            class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 text-black p-3"></textarea>
+
                         <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
                             Masukkan informasi tambahan dengan format yang sesuai.
                         </p>
@@ -160,16 +162,36 @@ Pembuatan Dokumen
                 </div>
             </div>
 
-            <div class="col-span-1">
-                <label for="kategori_biaya" class="required block font-medium text-gray-700 dark:text-neutral-300">Kategori Biaya</label>
-                <select name="kategori_biaya" id="kategori_biaya"
-                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
-                    <option value="A">Kategori A</option>
-                    <option value="B">Kategori B</option>
-                    <option value="C">Kategori C</option>
-                    <option value="D">Kategori D</option>
-                </select>
+            <div class="col-span-2">
+                <label class="block text-lg font-medium text-gray-700 dark:text-neutral-300">Tempat Singgah/Hotel</label>
+                <div id="tempat-singgah-container">
+                    <div class="flex items-center mb-4 mt-4">
+                        <input type="text"
+                            name="tempat_singgah[berangkat_dari][]"
+                            placeholder="Berangkat Dari"
+                            class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                            required>
+                        <input type="text"
+                            name="tempat_singgah[ke][]"
+                            placeholder="Ke"
+                            class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                            required>
+                        <input type="text"
+                            name="tempat_singgah[nama_tempat][]"
+                            placeholder="Nama Hotel/Tempat Singgah"
+                            class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                            required>
+                        <input type="date"
+                            name="tempat_singgah[tanggal][]"
+                            class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                            required>
+                        <button type="button" onclick="hapusTempatSinggah(this)" class="bg-red-500 text-white px-3 py-2 rounded">-</button>
+                    </div>
+                </div>
+                <button type="button" onclick="tambahTempatSinggah()" class="w-full bg-neutral-50 border border-blue-500 px-3 py-2 rounded text-blue-500">Tambah Tempat Singgah</button>
             </div>
+
+
 
             <!-- Pembebanan Anggaran Dropdown -->
             <div class="col-span-1">
@@ -179,6 +201,17 @@ Pembuatan Dokumen
                     <?php foreach ($pembebanan_anggaran as $item): ?>
                         <option value="<?= $item['id'] ?>"><?= $item['akun'] ?> - <?= $item['instansi'] ?></option>
                     <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="col-span-1">
+                <label for="kategori_biaya" class="required block font-medium text-gray-700 dark:text-neutral-300">Kategori Biaya</label>
+                <select name="kategori_biaya" id="kategori_biaya"
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                    <option value="A" <?= old('kategori_biaya') == 'A' ? 'selected' : '' ?>>Kategori A</option>
+                    <option value="B" <?= old('kategori_biaya') == 'B' ? 'selected' : '' ?>>Kategori B</option>
+                    <option value="C" <?= old('kategori_biaya') == 'C' ? 'selected' : '' ?>>Kategori C</option>
+                    <option value="D" <?= old('kategori_biaya') == 'D' ? 'selected' : '' ?>>Kategori D</option>
                 </select>
             </div>
 
@@ -193,7 +226,7 @@ Pembuatan Dokumen
                 </select>
             </div>
 
-            
+
             <div class="col-span-1">
                 <label for="ttd_tanggal" class="required block text-gray-700 dark:text-neutral-300">Tanggal Tanda Tangan</label>
                 <input type="date" name="ttd_tanggal" id="ttd_tanggal" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
@@ -217,15 +250,50 @@ Pembuatan Dokumen
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    function tambahTempatSinggah() {
+        const container = document.getElementById('tempat-singgah-container');
+        const newInput = document.createElement('div');
+        newInput.className = 'flex items-center mb-2';
+        newInput.innerHTML = `
+                     
+            <input type="text" 
+                name="tempat_singgah[berangkat_dari][]" 
+                placeholder="Berangkat Dari"
+                class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                required>
+            <input type="text" 
+                name="tempat_singgah[ke][]" 
+                placeholder="Ke"
+                class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                required>
+            <input type="text" 
+                name="tempat_singgah[nama_tempat][]" 
+                placeholder="Nama Hotel/Tempat Singgah"
+                class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                required>
+            <input type="date" 
+                name="tempat_singgah[tanggal][]" 
+                class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
+                required>
+            
+            <button type="button" onclick="hapusTempatSinggah(this)" class="bg-red-500 text-white px-3 py-2 rounded">-</button>
+     
+        `;
+        container.appendChild(newInput);
+    }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        
+    function hapusTempatSinggah(btn) {
+        btn.closest('.flex').remove();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+
         <?php if (session()->getFlashdata('success')): ?>
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
                 text: '<?= session()->getFlashdata('success') ?>',
-                timer: 4000, 
+                timer: 4000,
                 showConfirmButton: false
             }).then(() => {
                 window.location.href = "<?= base_url('admin/dokumen/create') ?>";
@@ -243,16 +311,15 @@ Pembuatan Dokumen
     });
 
 
-    function toggleOpsiTambahan(show) {
-        const opsiTambahanContainer = document.getElementById('opsi-tambahan-container');
-        const opsiTambahanInput = document.getElementById('opsi_tambahan_input');
-        if (show) {
-            opsiTambahanContainer.classList.remove('hidden');
-            opsiTambahanInput.value = 'show';
+    function toggleOpsiTambahan(isVisible) {
+        const container = document.getElementById('opsi-tambahan-container');
+        if (isVisible) {
+            container.classList.remove('hidden');
         } else {
-            opsiTambahanContainer.classList.add('hidden');
+            container.classList.add('hidden');
         }
     }
+
 
     (function() {
         const selectedDasar = new Set();
@@ -482,8 +549,6 @@ Pembuatan Dokumen
             }
         });
     });
-
-
 </script>
 
 
