@@ -1,4 +1,4 @@
-<?= $this->extend('pages/user/layout/main'); ?>
+<?= $this->extend('pages/admin/layout/main'); ?>
 
 <?= $this->section('title'); ?>
 Pembuatan Surat
@@ -39,7 +39,8 @@ Pembuatan Dokumen
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="<?= base_url('dokumen/store') ?>" ">
+        <!-- Form -->
+        <form method="POST" action="<?= base_url('admin/dokumen/store') ?>" ">
             <?= csrf_field(); ?>
 
             <div class=" grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -248,9 +249,35 @@ Pembuatan Dokumen
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-     function tambahTempatSinggah() {
+    document.addEventListener('DOMContentLoaded', () => {
+        const waktuMulaiInput = document.getElementById('waktu_mulai');
+        const waktuBerakhirInput = document.getElementById('waktu_berakhir');
+        const errorContainer = document.getElementById('error-message');
+
+        function updateDateConstraints() {
+            const waktuMulai = waktuMulaiInput.value;
+
+            // Set min attribute on waktuBerakhirInput
+            if (waktuMulai) {
+                waktuBerakhirInput.setAttribute('min', waktuMulai);
+            } else {
+                waktuBerakhirInput.removeAttribute('min'); // Reset if no valid date
+            }
+        }
+
+        waktuMulaiInput.addEventListener('change', () => {
+            updateDateConstraints();
+            validateDates();
+        });
+
+        waktuBerakhirInput.addEventListener('change', validateDates);
+
+        // Initialize constraints on page load
+        updateDateConstraints();
+    });
+
+    function tambahTempatSinggah() {
         const container = document.getElementById('tempat-singgah-container');
         const newInput = document.createElement('div');
         newInput.className = 'flex items-center mb-2';
@@ -286,7 +313,6 @@ Pembuatan Dokumen
         btn.closest('.flex').remove();
     }
 
-
     document.addEventListener("DOMContentLoaded", function() {
 
         <?php if (session()->getFlashdata('success')): ?>
@@ -297,7 +323,7 @@ Pembuatan Dokumen
                 timer: 4000,
                 showConfirmButton: false
             }).then(() => {
-                window.location.href = "<?= base_url('dokumen/create') ?>";
+                window.location.href = "<?= base_url('admin/dokumen/create') ?>";
             });
         <?php endif; ?>
 
@@ -312,16 +338,15 @@ Pembuatan Dokumen
     });
 
 
-    function toggleOpsiTambahan(show) {
-        const opsiTambahanContainer = document.getElementById('opsi-tambahan-container');
-        const opsiTambahanInput = document.getElementById('opsi_tambahan_input');
-        if (show) {
-            opsiTambahanContainer.classList.remove('hidden');
-            opsiTambahanInput.value = 'show';
+    function toggleOpsiTambahan(isVisible) {
+        const container = document.getElementById('opsi-tambahan-container');
+        if (isVisible) {
+            container.classList.remove('hidden');
         } else {
-            opsiTambahanContainer.classList.add('hidden');
+            container.classList.add('hidden');
         }
     }
+
 
     (function() {
         const selectedDasar = new Set();
@@ -331,7 +356,6 @@ Pembuatan Dokumen
         const dasarHiddenInput = document.getElementById('selected_dasar_input');
 
         let dasar = <?= json_encode($dasar); ?>;
-
 
 
         function renderDropdown(showDasar) {
@@ -516,33 +540,7 @@ Pembuatan Dokumen
         const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY');
         console.log('Formatted Date in Indonesian:', formattedDate);
     });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        <?php if (session()->getFlashdata('success')): ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: '<?= session()->getFlashdata('success') ?>',
-                timer: 3000,
-                timerProgressBar: true,
-                showConfirmButton: false
-            });
-        <?php endif; ?>
-
-        <?php if (session()->getFlashdata('error')): ?>
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: '<?= session()->getFlashdata('error') ?>',
-                timer: 3000,
-                timerProgressBar: true,
-                showConfirmButton: false
-            });
-        <?php endif; ?>
-    });
 </script>
-
-
 
 
 <?= $this->endSection(); ?>
