@@ -359,13 +359,18 @@ Pembuatan Dokumen
 
 
         function renderDropdown(showDasar) {
-            dropdownDasar.innerHTML = showDasar.map(list => `
-            <div class="dasar-option p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 cursor-pointer"
-                data-id="${list.id}"
-                data-undang="${list.undang.replace(/\n/g, '')}">
-                <div class="font-medium">${list.undang}</div>
-            </div>
-        `).join('');
+            dropdownDasar.innerHTML = showDasar.map(list => {
+                const isSelected = selectedDasar.has(list.id); // Periksa apakah dasar sudah dipilih
+                return `
+                <div class="dasar-option p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 cursor-pointer ${isSelected ? 'bg-gray-200 dark:bg-neutral-800 text-gray-400' : ''}"
+                    data-id="${list.id}"
+                    data-undang="${list.undang.replace(/\n/g, '')}">
+                    <div class="font-medium">
+                        ${list.undang} ${isSelected ? `<span class="text-green-600 dark:text-green-400">(Sudah dipilih)</span>` : ''}
+                    </div>
+                </div>
+                `;
+            }).join('');
 
             document.querySelectorAll('.dasar-option').forEach(option => {
                 option.addEventListener('click', function() {
@@ -444,19 +449,25 @@ Pembuatan Dokumen
         let users = <?= json_encode($users); ?>;
 
         function renderDropdown(filteredUsers) {
-            dropdownList.innerHTML = filteredUsers.map(user => `
-            <div class="user-option p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 cursor-pointer"
-                data-id="${user.id}"
-                data-nama="${user.nama}"
-                data-nip="${user.nip}"
-                data-jabatan="${user.jabatan}"
-                data-pangkat="${user.pangkat}">
-                <div class="font-medium">${user.nama}</div>
-                <div class= text-gray-600 dark:text-gray-400">
-                    NIP: ${user.nip} | ${user.jabatan}
+            dropdownList.innerHTML = filteredUsers.map(user => {
+                const isSelected = selectedUsers.has(user.id); // Periksa apakah user sudah dipilih
+                return `
+                <div class="user-option p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 cursor-pointer ${isSelected ? 'bg-gray-200 dark:bg-neutral-800 text-gray-400' : ''}"
+                    data-id="${user.id}"
+                    data-nama="${user.nama}"
+                    data-nip="${user.nip}"
+                    data-jabatan="${user.jabatan}"
+                    data-pangkat="${user.pangkat}">
+                    <div class="font-medium">
+                        ${user.nama}
+                    </div>
+                    <div class="text-gray-600 dark:text-gray-400">
+                        NIP: ${user.nip} | ${user.jabatan}
+                    </div>
+                     ${isSelected ? `<span class="text-green-600 dark:text-white"> Sudah dipilih </span>` : ''}
                 </div>
-            </div>
-        `).join('');
+            `;
+            }).join('');
 
             document.querySelectorAll('.user-option').forEach(option => {
                 option.addEventListener('click', function() {
