@@ -250,6 +250,33 @@ Pembuatan Dokumen
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const waktuMulaiInput = document.getElementById('waktu_mulai');
+        const waktuBerakhirInput = document.getElementById('waktu_berakhir');
+        const errorContainer = document.getElementById('error-message');
+
+        function updateDateConstraints() {
+            const waktuMulai = waktuMulaiInput.value;
+
+            // Set min attribute on waktuBerakhirInput
+            if (waktuMulai) {
+                waktuBerakhirInput.setAttribute('min', waktuMulai);
+            } else {
+                waktuBerakhirInput.removeAttribute('min'); // Reset if no valid date
+            }
+        }
+
+        waktuMulaiInput.addEventListener('change', () => {
+            updateDateConstraints();
+            validateDates();
+        });
+
+        waktuBerakhirInput.addEventListener('change', validateDates);
+
+        // Initialize constraints on page load
+        updateDateConstraints();
+    });
+
     function tambahTempatSinggah() {
         const container = document.getElementById('tempat-singgah-container');
         const newInput = document.createElement('div');
@@ -512,42 +539,6 @@ Pembuatan Dokumen
         const dateValue = dateInput.value;
         const formattedDate = moment(dateValue).format('dddd, D MMMM YYYY');
         console.log('Formatted Date in Indonesian:', formattedDate);
-    });
-
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const today = new Date().toISOString().split("T")[0];
-
-        const waktuMulai = document.getElementById("waktu_mulai");
-        const waktuBerakhir = document.getElementById("waktu_berakhir");
-
-        // Set minimum date untuk waktu mulai dan berakhir
-        waktuMulai.setAttribute("min", today);
-        waktuBerakhir.setAttribute("min", today);
-
-        // Validasi waktu mulai
-        waktuMulai.addEventListener("change", function() {
-            const selectedStartDate = waktuMulai.value;
-
-            if (new Date(selectedStartDate) < new Date(today)) {
-                alert("Waktu pelaksanaan dimulai tidak boleh sebelum hari ini.");
-                waktuMulai.value = today;
-            }
-
-            // Pastikan waktu berakhir tidak bisa sebelum waktu mulai
-            waktuBerakhir.setAttribute("min", selectedStartDate);
-        });
-
-        // Validasi waktu berakhir
-        waktuBerakhir.addEventListener("change", function() {
-            const startDate = new Date(waktuMulai.value);
-            const endDate = new Date(waktuBerakhir.value);
-
-            if (endDate < startDate) {
-                alert("Waktu pelaksanaan berakhir tidak boleh sebelum waktu mulai.");
-                waktuBerakhir.value = "";
-            }
-        });
     });
 </script>
 
