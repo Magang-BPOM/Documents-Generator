@@ -35,7 +35,6 @@ Semua Dokumen
 
             <div class="sm:col-span-2 md:grow">
                 <div class="flex justify-end gap-x-2">
-
                     <div class="sm:col-span-2 md:grow">
                         <div class="flex justify-end gap-x-2">
                             <a href="/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
@@ -76,17 +75,14 @@ Semua Dokumen
                                         </button>
                                     </div>
                                 </div>
-
-
                             </div>
-
                         </div>
                     </div>
-
-
                 </div>
             </div>
+
         </div>
+
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-neutral-800">
@@ -106,13 +102,14 @@ Semua Dokumen
                 <tbody class="bg-white divide-y divide-gray-200 dark:bg-neutral-900 dark:divide-neutral-800">
                     <?php $no = 1; ?>
                     <?php foreach ($surat_user as $item): ?>
-
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <input type="checkbox" name="selected[]" value="<?= $item['id'] ?>" class="rowCheckbox form-checkbox">
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= $no++ ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['nomor_surat']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <?= esc($item['nomor_surat']) ?>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <?= esc($item['kepada'][0] ?? 'Tidak ada data') ?>
                                 <?php if (is_array($item['kepada']) && count($item['kepada']) > 1): ?>
@@ -121,36 +118,34 @@ Semua Dokumen
                                         class="text-blue-600 hover:underline ml-2">Selengkapnya</button>
                                 <?php endif; ?>
                             </td>
-
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu_mulai']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_penanda_tangan']) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-
-
             </table>
         </div>
 
-        <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-100">Daftar petugas</h2>
-                <button onclick="closeModal()" class="text-gray-600 dark:text-neutral-400 hover:text-gray-800 dark:hover:text-neutral-200">
-                    ✕
-                </button>
-            </div>
-            <div id="modal-content" class="mt-4 text-gray-700 dark:text-neutral-300">
-                <!-- Content goes here -->
-            </div>
-            <div class="mt-6 flex justify-end">
-                <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    Tutup
-                </button>
+
+        <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 items-center justify-center hidden z-50">
+            <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-100">Daftar petugas</h2>
+                    <button onclick="closeModal()" class="text-gray-600 dark:text-neutral-400 hover:text-gray-800 dark:hover:text-neutral-200">
+                        ✕
+                    </button>
+                </div>
+                <div id="modal-content" class="mt-4 text-gray-700 dark:text-neutral-300">
+                    <!-- Content goes here -->
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
 
         <div class="flex justify-between items-center">
@@ -185,12 +180,11 @@ Semua Dokumen
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 <script>
+    function showUsersModal(users) {
+        const modalContent = document.getElementById('modal-content');
+        const modal = document.getElementById('modal');
 
-function showUsersModal(users) {
-    const modalContent = document.getElementById('modal-content');
-    const modal = document.getElementById('modal');
-
-    modalContent.innerHTML = `
+        modalContent.innerHTML = `
         <ul class="space-y-2">
             ${users.map(user => {
                 const [nama, nip] = user.split(' | '); 
@@ -203,12 +197,12 @@ function showUsersModal(users) {
             }).join('')}
         </ul>
     `;
-    modal.classList.remove('hidden');
-}
+        modal.classList.remove('hidden');
+    }
 
-function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
-}
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+    }
 
 
 
@@ -246,7 +240,10 @@ function closeModal() {
                 const rowNumber = startIdx + index + 1;
                 row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
-            <td class="px-6 py-4 whitespace-nowrap">${rowNumber}</td> <!-- Tambahkan nomor -->
+            
+            <td class="px-6 py-4 whitespace-nowrap">${rowNumber} <?php if (!$item['is_read']): ?>
+                                    <span class="ml-2 text-xs font-semibold text-white bg-blue-500 px-2 py-1 rounded-full">New</span>
+                                <?php endif; ?></td> <!-- Tambahkan nomor -->
             <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
             <td class="px-6 py-4 whitespace-nowrap">
                 ${item.kepada.length > 0 ? item.kepada[0] : 'Tidak ada data'} 

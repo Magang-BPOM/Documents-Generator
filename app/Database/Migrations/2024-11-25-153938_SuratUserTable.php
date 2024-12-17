@@ -30,11 +30,19 @@ class CreateSuratUserTable extends Migration
                 'constraint' => 11,
                 'unsigned'   => true,
             ],
+            'is_read'   => [
+                'type'       => 'TINYINT',
+                'constraint' => 1,
+                'default'    => 0, // 0 berarti belum dibaca
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
             ],
-           
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
         ]);
 
         $this->forge->addKey('id', true);

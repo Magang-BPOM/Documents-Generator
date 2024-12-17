@@ -46,11 +46,23 @@ class DokumenController extends BaseController
         $data['surat_user'] = $suratUser->suratbyUser();
 
         if ($role == 'admin') {
-            return view('pages/admin/dokumen/index', $dataAdmin);
+            return view('pages/admin/dokumen/index', $data);
         } else {
             return view('pages/user/dokumen/index', $data);
         }
     }
+
+    public function markAsRead($id)
+    {
+        $result = $this->SuratUserModel->markAsRead($id);
+
+        if ($result) {
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Dokumen berhasil ditandai sebagai dibaca.']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menandai dokumen sebagai dibaca.']);
+        }
+    }
+
 
 
     public function create()
@@ -97,7 +109,7 @@ class DokumenController extends BaseController
     public function store()
     {
         $pembuatId = session()->get('user_id');
-        
+
         $validationRules = [
             'nomor_surat' => 'required',
             'menimbang' => 'required',
@@ -167,7 +179,7 @@ class DokumenController extends BaseController
                 'biaya' => $this->request->getPost('biaya'),
                 'kategori_biaya' => $this->request->getPost('kategori_biaya'),
                 'id_pembebanan_anggaran' => $this->request->getPost('id_pembebanan_anggaran'),
-                'biaya'=>$biaya,
+                'biaya' => $biaya,
                 'ttd_tanggal' => $ttdTanggal,
                 'id_penanda_tangan' => $this->request->getPost('penanda_tangan'),
                 'is_new' => $isNew
@@ -233,31 +245,7 @@ class DokumenController extends BaseController
         }
     }
 
-    public function markAsRead($id)
-    {
-        log_message('debug', "Memproses markAsRead untuk dokumen ID: {$id}");
-        
-        $suratModel = new Surat();
-    
-        $surat = $suratModel->find($id);
-    
-        if (!$surat) {
-            log_message('error', "Dokumen dengan ID {$id} tidak ditemukan");
-            return $this->response->setStatusCode(404)->setJSON(['message' => 'Dokumen tidak ditemukan']);
-        }
-    
-        $update = $suratModel->update($id, ['is_new' => 0]);
-    
-        if (!$update) {
-            log_message('error', "Gagal memperbarui status is_new untuk dokumen ID {$id}");
-            return $this->response->setStatusCode(500)->setJSON(['message' => 'Gagal memperbarui status dokumen']);
-        }
-    
-        log_message('debug', "Status is_new untuk dokumen ID {$id} berhasil diperbarui");
-        return $this->response->setJSON(['message' => 'Status dokumen berhasil diperbarui']);
-    }
-    
-    
+
 
     public function generate($suratId)
     {
@@ -337,10 +325,23 @@ class DokumenController extends BaseController
     public function generateSPD($suratId)
     {
         helper('url');
-
+        $userId = session()->get('user_id');
+        
+        
         $suratModel = new Surat();
         $pembebananAnggaranModel = new PembabananAnggaranModel();
         $userModel = new User();
+        $suratUser = new SuratUser();
+        
+        $selected = $suratUser->select('id')->where('user_id', $userId)->first();
+        // Mengatur header untuk respons JSON
+        // header('Content-Type: application/json');
+        // echo json_encode($selected);
+        // exit;
+        
+        $data = ['is_read' => 1];
+
+        $suratUser->update($selected, $data);
 
         $surat = $suratModel->find($suratId);
         if (!$surat) {

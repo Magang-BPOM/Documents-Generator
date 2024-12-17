@@ -12,7 +12,7 @@ class SuratUser extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['surat_id', 'user_id', 'id_created'];
+    protected $allowedFields    = ['surat_id', 'user_id', 'id_created', 'is_read'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -109,8 +109,8 @@ class SuratUser extends Model
             s.id_penanda_tangan,
             s.status,
             s.created_at,
-            s.is_new,
-            su.id_created 
+            su.is_read,
+            su.id_created
         ')
             ->join('surat s', 'su.surat_id = s.id')
             ->join('user u', 'su.user_id = u.id') 
@@ -156,11 +156,18 @@ class SuratUser extends Model
                 'nip_penanda_tangan' => $penandaTangan ? $penandaTangan['nip'] : null,
                 'jabatan_penanda_tangan' => $penandaTangan ? $penandaTangan['jabatan'] : null,
                 'created_at' => $surat['created_at'],
-                'is_new' => $surat['is_new']
+                'is_read' => $surat['is_read']
             ];
         }
-
+        // header('Content-Type: application/json');
+        // echo json_encode($suratQuery);
+        // exit;
         return $result;
+    }
+
+    public function Read($id)
+    {
+        return $this->update($id, ['is_read' => true]);
     }
 
 

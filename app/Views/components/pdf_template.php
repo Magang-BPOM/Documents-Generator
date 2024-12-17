@@ -357,10 +357,10 @@ function formatTanggalRentang($mulai, $berakhir)
 
         <p>Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.</p>
         <div class="signature" style="margin-right: 60px;margin-top:20px;">
-            <p style="text-align:right;margin-right:40px">Surabaya, <?= formatTGL($surat['created_at'], 'tanggal') ?>,</p>
+            <p style="text-align:right;margin-right:70px">Surabaya, <?= formatTGL($surat['created_at'], 'tanggal') ?>,</p>
             <p style="text-align:right;"><?= esc($penanda_tangan['jabatan']) ?>,</p>
             <br><br><br><br>
-            <p style="text-align:right;margin-right:25px"><?= esc($penanda_tangan['nama']) ?></p>
+            <p style="text-align:right;margin-right:70px"><?= esc($penanda_tangan['nama']) ?></p>
         </div>
 
 

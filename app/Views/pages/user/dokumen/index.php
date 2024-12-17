@@ -35,16 +35,20 @@ Semua Dokumen
 
             <div class="sm:col-span-2 md:grow">
                 <div class="flex justify-end gap-x-2">
-
                     <div class="sm:col-span-2 md:grow">
                         <div class="flex justify-end gap-x-2">
                             <a href="/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Buat Surat
                             </a>
 
-                            <button data-trashed="true" data-url="<?= base_url('dokumen/bulkArsip') ?>" type="button" class="bulkArsipBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                            <button data-trashed="true" data-url="<?= base_url('admin/dokumen/bulkArsip') ?>" type="button" class="bulkArsipBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Arsip
                             </button>
+
+                            <button data-trashed="false" data-url="<?= base_url('admin/dokumen/delete') ?>" type="button" class="bulkDeleteBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                                Hapus
+                            </button>
+
 
                             <div class="relative inline-block text-left">
                                 <button id="export_drobdown_table"
@@ -71,17 +75,14 @@ Semua Dokumen
                                         </button>
                                     </div>
                                 </div>
-
-
                             </div>
-
                         </div>
                     </div>
-
-
                 </div>
             </div>
+
         </div>
+
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-neutral-800">
@@ -108,9 +109,6 @@ Semua Dokumen
                             <td class="px-6 py-4 whitespace-nowrap"><?= $no++ ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <?= esc($item['nomor_surat']) ?>
-                                <?php if ($item['is_new'] === 1): ?> 
-                                    <span class="ml-2 text-red-600 font-bold" title="Dokumen Baru">●</span>
-                                <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <?= esc($item['kepada'][0] ?? 'Tidak ada data') ?>
@@ -123,19 +121,14 @@ Semua Dokumen
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu_mulai']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_penanda_tangan']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="<?= base_url('dokumen/edit/' . $item['id']) ?>" class="text-blue-500 hover:underline">Edit</a>
-                                <a href="<?= base_url('dokumen/delete/' . $item['id']) ?>" class="text-red-500 hover:underline ml-2">Hapus</a>
-                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-
             </table>
-
         </div>
 
-        <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+
+        <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 items-center justify-center hidden z-50">
             <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-100">Daftar petugas</h2>
@@ -144,7 +137,7 @@ Semua Dokumen
                     </button>
                 </div>
                 <div id="modal-content" class="mt-4 text-gray-700 dark:text-neutral-300">
-                    <!-- isi konten modal -->
+                    <!-- Content goes here -->
                 </div>
                 <div class="mt-6 flex justify-end">
                     <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
@@ -229,8 +222,7 @@ Semua Dokumen
                     kepada: <?= json_encode($item['kepada']) ?>,
                     waktu_mulai: '<?= esc($item['waktu_mulai']) ?>',
                     penanda_tangan: '<?= esc($item['penanda_tangan']) ?>',
-                    jabatan_penanda_tangan: '<?= esc($item['jabatan_penanda_tangan']) ?>',
-                    is_new: '<?= esc($item['is_new']) ?>'
+                    jabatan_penanda_tangan: '<?= esc($item['jabatan_penanda_tangan']) ?>'
                 },
             <?php endforeach; ?>
         ];
@@ -246,37 +238,24 @@ Semua Dokumen
             paginatedData.forEach((item, index) => {
                 const row = document.createElement('tr');
                 const rowNumber = startIdx + index + 1;
-
-                const isNewIndicator = item.is_new ==1 ?
-                    `<span class="ml-2 text-red-600 font-bold" title="Dokumen Baru">●</span>` :
-                    '';
-
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox">
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">${rowNumber}</td>
-                    <td class="px-6 py-4 whitespace-nowrap dokumen-item" data-id="${item.id}">
-                        ${item.nomor_surat} ${isNewIndicator}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        ${item.kepada.length > 0 ? item.kepada[0] : 'Tidak ada data'}
-                        ${item.kepada.length > 1 ? `<button onclick='showUsersModal(${JSON.stringify(item.kepada)})' class="text-blue-600 hover:underline">Selengkapnya</button>` : ''}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_penanda_tangan}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
-                    </td>
-                `;
-
-                const dokumenItem = row.querySelector('.dokumen-item');
-                if (dokumenItem) {
-                    dokumenItem.addEventListener('click', () => markAsRead(item.id, dokumenItem));
-                }
-
-
+            <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
+            
+            <td class="px-6 py-4 whitespace-nowrap">${rowNumber} <?php if (!$item['is_read']): ?>
+                                    <span class="ml-2 text-xs font-semibold text-white bg-blue-500 px-2 py-1 rounded-full">New</span>
+                                <?php endif; ?></td> <!-- Tambahkan nomor -->
+            <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                ${item.kepada.length > 0 ? item.kepada[0] : 'Tidak ada data'} 
+                ${item.kepada.length > 1 ? `<button onclick='showUsersModal(${JSON.stringify(item.kepada)})' class="text-blue-600 hover:underline">Selengkapnya</button>` : ''}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_penanda_tangan}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
+            </td>
+        `;
                 tableBody.appendChild(row);
             });
 
@@ -286,41 +265,28 @@ Semua Dokumen
         }
 
 
-        function markAsRead(id, dokumenElement) {
-            console.log(`Memproses dokumen ID: ${id}`);
-            fetch(`dokumen/markAsRead/${id}`, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(response => {
-                console.log(`Response status: ${response.status}`);
-                if (!response.ok) {
-                    throw new Error('Gagal memperbarui status dokumen');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Response data:', data);
+        itemsPerPageSelect.addEventListener('change', (e) => {
+            itemsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            updateTable();
+        });
 
-                // Hapus ikon "baru" dari tampilan
-                const icon = dokumenElement.querySelector('span');
-                if (icon) {
-                    console.log('Menghapus ikon baru...');
-                    icon.remove();
-                }
 
-                // Perbarui data array agar mencerminkan perubahan
-                const dokumenIndex = data.findIndex(doc => doc.id === id);
-                if (dokumenIndex !== -1) {
-                    data[dokumenIndex].is_new = false;
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable();
+            }
+        });
 
+        nextPageBtn.addEventListener('click', () => {
+            if (currentPage * itemsPerPage < data.length) {
+                currentPage++;
+                updateTable();
+            }
+        });
 
         updateTable();
-
     });
 
 
@@ -463,7 +429,7 @@ Semua Dokumen
             alert('Silakan pilih data yang ingin di export');
             return;
         }
-        window.location.href = `/dokumen/generate-word/${selectedIds}`;
+        window.location.href = `/admin/dokumen/generate-word/${selectedIds}`;
     }
 
     function exportPDF() {
@@ -472,7 +438,7 @@ Semua Dokumen
             alert('Silakan pilih data yang ingin di export');
             return;
         }
-        window.location.href = `/dokumen/generate/${selectedIds}`;
+        window.location.href = `/admin/dokumen/generate/${selectedIds}`;
     }
 </script>
 
