@@ -46,7 +46,7 @@ class DokumenController extends BaseController
         $data['surat_user'] = $suratUser->suratbyUser();
 
         if ($role == 'admin') {
-            return view('pages/admin/dokumen/index', $data);
+            return view('pages/admin/dokumen/index', $dataAdmin);
         } else {
             return view('pages/user/dokumen/index', $data);
         }
