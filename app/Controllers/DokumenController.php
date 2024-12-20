@@ -33,8 +33,7 @@ class DokumenController extends BaseController
         $this->dasarModel = new Dasar();
         $this->dasarSurat = new DasarSurat();
         $this->pembebanan_anggaran = new PembabananAnggaranModel();
-        $secretKey = 'secret_O8ZWpkGWj365X5w1';
-        ConvertApi::setApiCredentials($secretKey);
+   
     }
 
     public function index()

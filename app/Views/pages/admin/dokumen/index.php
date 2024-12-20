@@ -87,6 +87,7 @@ Semua Dokumen
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-neutral-800">
                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <input type="checkbox" id="selectAll" class="form-checkbox">
                         </th>
@@ -111,13 +112,19 @@ Semua Dokumen
                                 <?= esc($item['nomor_surat']) ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <?= esc($item['kepada'][0] ?? 'Tidak ada data') ?>
+                                <?php if (is_array($item['kepada']) && isset($item['kepada'][0]['nama'])): ?>
+                                    <?= esc($item['kepada'][0]['nama']); ?> (<?= esc($item['kepada'][0]['nip']); ?>)
+                                <?php else: ?>
+                                    Tidak ada data
+                                <?php endif; ?>
+
                                 <?php if (is_array($item['kepada']) && count($item['kepada']) > 1): ?>
                                     <button
                                         onclick="showUsersModal(<?= htmlspecialchars(json_encode($item['kepada'])) ?>)"
                                         class="text-blue-600 hover:underline ml-2">Selengkapnya</button>
                                 <?php endif; ?>
                             </td>
+
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu_mulai']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_penanda_tangan']) ?></td>
@@ -128,8 +135,9 @@ Semua Dokumen
         </div>
 
 
-        <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 items-center justify-center hidden z-50">
-            <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg">
+        
+        <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
+            <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg relative">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-100">Daftar petugas</h2>
                     <button onclick="closeModal()" class="text-gray-600 dark:text-neutral-400 hover:text-gray-800 dark:hover:text-neutral-200">
@@ -187,11 +195,11 @@ Semua Dokumen
         modalContent.innerHTML = `
         <ul class="space-y-2">
             ${users.map(user => {
-                const [nama, nip] = user.split(' | '); 
+              
                 return `
                     <li class="flex justify-between items-center bg-gray-50 dark:bg-neutral-700 p-3 rounded-md shadow-sm">
-                        <span class="text-sm font-medium">${nama}</span>
-                        <span class="text-sm text-gray-500 dark:text-neutral-400">${nip}</span>
+                        <span class="text-sm font-medium">${user.nama}</span>
+                        <span class="text-sm text-gray-500 dark:text-neutral-400">${user.nip}</span>
                     </li>
                 `;
             }).join('')}
@@ -238,24 +246,32 @@ Semua Dokumen
             paginatedData.forEach((item, index) => {
                 const row = document.createElement('tr');
                 const rowNumber = startIdx + index + 1;
+
+                const hasUnreadUsers = item.kepada.some(user => parseInt(user.is_read) === 0);
+
                 row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
-            
-            <td class="px-6 py-4 whitespace-nowrap">${rowNumber} <?php if (!$item['is_read']): ?>
-                                    <span class="ml-2 text-xs font-semibold text-white bg-blue-500 px-2 py-1 rounded-full">New</span>
-                                <?php endif; ?></td> <!-- Tambahkan nomor -->
-            <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                ${item.kepada.length > 0 ? item.kepada[0] : 'Tidak ada data'} 
-                ${item.kepada.length > 1 ? `<button onclick='showUsersModal(${JSON.stringify(item.kepada)})' class="text-blue-600 hover:underline">Selengkapnya</button>` : ''}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
-            <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
-            <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_penanda_tangan}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
-            </td>
-        `;
+                     <td class="px-6 py-4 whitespace-nowrap">
+                        ${hasUnreadUsers ? `<span class="text-xs font-semibold text-white bg-green-500 px-2 py-1 rounded-full">New</span>` : ''}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        ${rowNumber}
+                    </td>
+               
+                    <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        ${item.kepada.length > 0 ? `${item.kepada[0].nama} | ${item.kepada[0].nip}` : 'Tidak ada data'} 
+                        ${item.kepada.length > 1 ? `<button onclick='showUsersModal(${JSON.stringify(item.kepada)})' class="text-blue-600 hover:underline">Selengkapnya</button>` : ''}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_penanda_tangan}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
+                    </td>
+                `;
+
+           
                 tableBody.appendChild(row);
             });
 

@@ -87,6 +87,7 @@ Semua Dokumen
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-neutral-800">
                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <input type="checkbox" id="selectAll" class="form-checkbox">
                         </th>
@@ -111,7 +112,12 @@ Semua Dokumen
                                 <?= esc($item['nomor_surat']) ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <?= esc($item['kepada'][0] ?? 'Tidak ada data') ?>
+                                <?php if (is_array($item['kepada']) && isset($item['kepada'][0]['nama'])): ?>
+                                    <?= esc($item['kepada'][0]['nama']); ?> (<?= esc($item['kepada'][0]['nip']); ?>)
+                                <?php else: ?>
+                                    Tidak ada data
+                                <?php endif; ?>
+
                                 <?php if (is_array($item['kepada']) && count($item['kepada']) > 1): ?>
                                     <button
                                         onclick="showUsersModal(<?= htmlspecialchars(json_encode($item['kepada'])) ?>)"
@@ -128,8 +134,8 @@ Semua Dokumen
         </div>
 
 
-        <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 items-center justify-center hidden z-50">
-            <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg">
+        <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
+            <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg relative">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xl font-semibold text-gray-800 dark:text-neutral-100">Daftar petugas</h2>
                     <button onclick="closeModal()" class="text-gray-600 dark:text-neutral-400 hover:text-gray-800 dark:hover:text-neutral-200">
@@ -146,7 +152,6 @@ Semua Dokumen
                 </div>
             </div>
         </div>
-
 
         <div class="flex justify-between items-center">
             <!-- Filter for items per page -->
@@ -180,18 +185,17 @@ Semua Dokumen
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 <script>
-    function showUsersModal(users) {
+     function showUsersModal(users) {
         const modalContent = document.getElementById('modal-content');
         const modal = document.getElementById('modal');
 
         modalContent.innerHTML = `
         <ul class="space-y-2">
             ${users.map(user => {
-                const [nama, nip] = user.split(' | '); 
                 return `
                     <li class="flex justify-between items-center bg-gray-50 dark:bg-neutral-700 p-3 rounded-md shadow-sm">
-                        <span class="text-sm font-medium">${nama}</span>
-                        <span class="text-sm text-gray-500 dark:text-neutral-400">${nip}</span>
+                        <span class="text-sm font-medium">${user.nama}</span>
+                        <span class="text-sm text-gray-500 dark:text-neutral-400">${user.nip}</span>
                     </li>
                 `;
             }).join('')}
@@ -203,7 +207,6 @@ Semua Dokumen
     function closeModal() {
         document.getElementById('modal').classList.add('hidden');
     }
-
 
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -227,26 +230,47 @@ Semua Dokumen
             <?php endforeach; ?>
         ];
 
-
         function updateTable() {
+            const userId = <?= json_encode(session()->get('user_id')); ?>;
+            console.log("User ID:", userId);
+
+            if (!userId) {
+                console.error("User ID is not defined or null.");
+                return;
+            }
+
             const startIdx = (currentPage - 1) * itemsPerPage;
             const endIdx = startIdx + itemsPerPage;
             const paginatedData = data.slice(startIdx, endIdx);
 
+            console.log("Paginated Data:", paginatedData);
+
             tableBody.innerHTML = '';
 
             paginatedData.forEach((item, index) => {
-                const row = document.createElement('tr');
+                console.log("Kepada Data Lengkap:", item.kepada);
+
+                const userEntry = item.kepada.find(user => user.user_id === userId);
+                console.log("User Entry (Setelah Pencarian):", userEntry);
+
+                if (!userEntry) return;
+
+                const isUnreadForUser = parseInt(userEntry.is_read || 0) === 0;
+
                 const rowNumber = startIdx + index + 1;
+
+                const row = document.createElement('tr');
                 row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap">
+                ${isUnreadForUser 
+                    ? `<span class="text-xs font-semibold text-white bg-green-500 px-2 py-1 rounded-full">New</span>` 
+                    : `<span class="text-xs font-semibold text-gray-500 bg-gray-200 px-2 py-1 rounded-full">Old</span>`}
+            </td>
             <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
-            
-            <td class="px-6 py-4 whitespace-nowrap">${rowNumber} <?php if (!$item['is_read']): ?>
-                                    <span class="ml-2 text-xs font-semibold text-white bg-blue-500 px-2 py-1 rounded-full">New</span>
-                                <?php endif; ?></td> <!-- Tambahkan nomor -->
+            <td class="px-6 py-4 whitespace-nowrap">${rowNumber}</td>
             <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-                ${item.kepada.length > 0 ? item.kepada[0] : 'Tidak ada data'} 
+                ${item.kepada.length > 0 ? `${item.kepada[0].nama} | ${item.kepada[0].nip}` : 'Tidak ada data'} 
                 ${item.kepada.length > 1 ? `<button onclick='showUsersModal(${JSON.stringify(item.kepada)})' class="text-blue-600 hover:underline">Selengkapnya</button>` : ''}
             </td>
             <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
