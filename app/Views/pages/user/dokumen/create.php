@@ -40,7 +40,7 @@ Pembuatan Dokumen
         <?php endif; ?>
 
         <!-- Form -->
-        <form method="POST" action="<?= base_url('admin/dokumen/store') ?>" ">
+        <form method="POST" action="<?= base_url('dokumen/store') ?>" ">
             <?= csrf_field(); ?>
 
             <div class=" grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -221,6 +221,7 @@ Pembuatan Dokumen
                 <select name="penanda_tangan" id="penanda_tangan"
                     class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
                     <?php foreach ($penanda_tangan as $item): ?>
+                       
                         <option value="<?= $item['id'] ?>"><?= $item['nama'] ?> - <?= $item['jabatan'] ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -258,11 +259,10 @@ Pembuatan Dokumen
         function updateDateConstraints() {
             const waktuMulai = waktuMulaiInput.value;
 
-            // Set min attribute on waktuBerakhirInput
             if (waktuMulai) {
                 waktuBerakhirInput.setAttribute('min', waktuMulai);
             } else {
-                waktuBerakhirInput.removeAttribute('min'); // Reset if no valid date
+                waktuBerakhirInput.removeAttribute('min'); 
             }
         }
 
@@ -273,7 +273,6 @@ Pembuatan Dokumen
 
         waktuBerakhirInput.addEventListener('change', validateDates);
 
-        // Initialize constraints on page load
         updateDateConstraints();
     });
 

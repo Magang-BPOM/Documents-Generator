@@ -8,6 +8,7 @@ use App\Models\SuratSinggah;
 use App\Models\User as User;
 use App\Models\Dasar as Dasar;
 use App\Models\DasarSurat as DasarSurat;
+use App\Models\RincianBiayaModel;
 use App\Models\SuratUser as SuratUser;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -33,7 +34,6 @@ class DokumenController extends BaseController
         $this->dasarModel = new Dasar();
         $this->dasarSurat = new DasarSurat();
         $this->pembebanan_anggaran = new PembabananAnggaranModel();
-   
     }
 
     public function index()
@@ -51,17 +51,6 @@ class DokumenController extends BaseController
         }
     }
 
-    public function markAsRead($id)
-    {
-        $result = $this->SuratUserModel->markAsRead($id);
-
-        if ($result) {
-            return $this->response->setJSON(['status' => 'success', 'message' => 'Dokumen berhasil ditandai sebagai dibaca.']);
-        } else {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menandai dokumen sebagai dibaca.']);
-        }
-    }
-
 
 
     public function create()
@@ -69,7 +58,6 @@ class DokumenController extends BaseController
         $role = session()->get('role');
         $penanda_tangan = $this->userModel
             ->where('is_penanda_tangan', 1)
-            ->where('role !=', 'admin')
             ->findAll();
 
 
@@ -184,6 +172,7 @@ class DokumenController extends BaseController
                 'is_new' => $isNew
             ];
 
+
             $suratModel = new Surat();
             $suratModel->insert($dataSurat);
             $suratId = $suratModel->getInsertID();
@@ -243,7 +232,6 @@ class DokumenController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan surat: ' . $e->getMessage());
         }
     }
-
 
 
     public function generate($suratId)
@@ -325,19 +313,19 @@ class DokumenController extends BaseController
     {
         helper('url');
         $userId = session()->get('user_id');
-        
-        
+
+
         $suratModel = new Surat();
         $pembebananAnggaranModel = new PembabananAnggaranModel();
         $userModel = new User();
         $suratUser = new SuratUser();
-        
+
         $selected = $suratUser->select('id')->where('user_id', $userId)->first();
         // Mengatur header untuk respons JSON
         // header('Content-Type: application/json');
         // echo json_encode($selected);
         // exit;
-        
+
         $data = ['is_read' => 1];
 
         $suratUser->update($selected, $data);
@@ -666,6 +654,277 @@ class DokumenController extends BaseController
         return $this->response->download($tempFile, null)->setFileName($fileName);
     }
 
+
+    public function createRBPD($suratId, $userId)
+    {
+
+
+        $suratModel = new Surat();
+        $userModel = new User();
+        $suratUserModel = new SuratUser();
+        $userRole = session()->get('role');
+
+        $surat = $suratModel->find($suratId);
+
+        if (!$surat) {
+            return redirect()->back()->with('error', 'Surat tidak ditemukan.');
+        }
+
+        $penerima = $suratUserModel->where('surat_id', $suratId)
+            ->where('user_id', $userId)
+            ->join('user', 'surat_user.user_id = user.id')
+            ->select('user.id, user.nama, user.nip')
+            ->first();
+
+        if (!$penerima) {
+            return redirect()->back()->with('error', 'Penerima tidak valid.');
+        }
+
+        $bendahara = $userModel->where('role', 'admin')->findAll();
+
+        $penandaTangan = $userModel->select('id, nama, nip,jabatan')
+            ->where('id', $surat['id_penanda_tangan'])
+            ->first();
+
+        if (!$penandaTangan) {
+            return redirect()->back()->with('error', 'Penanda tangan tidak valid.');
+        }
+
+        if ($userRole === 'admin') {
+            return view('pages/admin/dokumen/create_rbpd', [
+                'surat' => $surat,
+                'penerima' => $penerima,
+                'bendahara' => $bendahara,
+                'penanda_tangan' => $penandaTangan,
+            ]);
+        } elseif ($userRole === 'pegawai') {
+            return view('pages/user/dokumen/create_rbpd', [
+                'surat' => $surat,
+            'penerima' => $penerima,
+            'bendahara' => $bendahara,
+            'penanda_tangan' => $penandaTangan,
+            ]);
+        } else {
+            return redirect()->back()->with('error', 'Role tidak dikenali.');
+        }
+    }
+
+
+    public function detailRBPD($suratId)
+    {
+        $suratModel = new Surat();
+        $suratUserModel = new SuratUser();
+        $userRole = session()->get('role');
+
+        $surat = $suratModel->find($suratId);
+        if (!$surat) {
+            return redirect()->back()->with('error', 'Surat tidak ditemukan.');
+        }
+
+        $userId = session()->get('user_id');
+        if (!$userId) {
+            return redirect()->back()->with('error', 'User tidak valid.');
+        }
+
+        $updated = $suratUserModel
+            ->where('surat_id', $suratId)
+            ->where('user_id', $userId)
+            ->set(['is_read' => 1])
+            ->update();
+
+
+        if (!$updated) {
+            log_message('error', "Failed to update is_read for surat_id: $suratId and user_id: $userId");
+            return redirect()->back()->with('error', 'Gagal memperbarui status baca.');
+        } else {
+            log_message('info', "Successfully updated is_read for surat_id: $suratId and user_id: $userId");
+        }
+        $penerima = $suratUserModel
+            ->select('surat_user.id as surat_user_id, user.id as user_id, user.nama, user.nip, COUNT(rincian_biaya.id) as jumlah_rincian, MAX(rincian_biaya.id) as rbpd_created')
+            ->join('user', 'surat_user.user_id = user.id')
+            ->join('rincian_biaya', 'rincian_biaya.surat_user_id = surat_user.id', 'left')
+            ->where('surat_user.surat_id', $suratId)
+            ->groupBy('surat_user.id')
+            ->get()
+            ->getResultArray();
+
+
+        if ($userRole === 'admin') {
+            return view('pages/admin/dokumen/detail_rbpd', [
+                'surat' => $surat,
+                'penerima' => $penerima,
+            ]);
+        } elseif ($userRole === 'pegawai') {
+            return view('pages/user/dokumen/detail_rbpd', [
+                'surat' => $surat,
+                'penerima' => $penerima,
+            ]);
+        } else {
+            return redirect()->back()->with('error', 'Role tidak dikenali.');
+        }
+    }
+
+
+
+    public function storeRBPD()
+    {
+        $rbpdModel = new RincianBiayaModel();
+        $suratUserModel = new SuratUser();
+        $userRole = session()->get('role');
+
+        $validation = $this->validate([
+            'nomor_spd' => 'required',
+            'tanggal' => 'required|valid_date',
+            'perincian_biaya' => 'required',
+            'jumlah' => 'required',
+            'bendahara_id' => 'required|integer',
+            'penerima_id' => 'required|integer',
+            'id_penanda_tangan' => 'required|integer',
+            'surat_id' => 'required|integer',
+        ]);
+
+        if (!$validation) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $suratId = $this->request->getPost('surat_id');
+        $userId = $this->request->getPost('penerima_id');
+        $tanggal = $this->request->getPost('tanggal');
+        $bendaharaId = $this->request->getPost('bendahara_id');
+        $idPenandaTangan = $this->request->getPost('id_penanda_tangan');
+        $perincianBiaya = $this->request->getPost('perincian_biaya');
+        $jumlah = $this->request->getPost('jumlah');
+        $keterangan = $this->request->getPost('keterangan');
+
+        $suratUser = $suratUserModel->where('surat_id', $suratId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$suratUser) {
+            return redirect()->back()->withInput()->with('error', 'Data surat_user tidak ditemukan.');
+        }
+
+        $suratUserId = $suratUser['id'];
+
+        try {
+            foreach ($perincianBiaya as $index => $biaya) {
+                $existingData = $rbpdModel->where('surat_id', $suratId)
+                    ->where('surat_user_id', $suratUserId)
+                    ->where('perincian_biaya', $biaya)
+                    ->first();
+
+                if ($existingData) {
+                    continue;
+                }
+
+                $data = [
+                    'surat_id' => $suratId,
+                    'surat_user_id' => $suratUserId,
+                    'tanggal' => $tanggal,
+                    'perincian_biaya' => $biaya,
+                    'jumlah' => $jumlah[$index],
+                    'keterangan' => $keterangan[$index] ?? null,
+                    'bendahara_id' => $bendaharaId,
+                    'id_penanda_tangan' => $idPenandaTangan,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ];
+
+                if (!$rbpdModel->insert($data)) {
+                    throw new \Exception('Gagal menyimpan rincian biaya.');
+                }
+            }
+          
+            if ($userRole === 'admin') {
+                return redirect()->to("admin/dokumen/detailRBPD/$suratId")->with('message', 'RBPD berhasil disimpan.');
+            } else if ($userRole === 'pegawai') {
+                return redirect()->to("user/dokumen/detailRBPD/$suratId")->with('message', 'RBPD berhasil disimpan.');
+            } else {
+                return redirect()->back()->with('error', 'Role tidak dikenali.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+
+
+    public function generateRBPD($suratId, $penerimaId)
+    {
+        $suratModel = new Surat();
+        $rincianBiayaModel = new RincianBiayaModel();
+        $userModel = new User();
+        $suratUserModel = new SuratUser();
+
+        // Fetch surat data
+        $surat = $suratModel->find($suratId);
+        if (!$surat) {
+            log_message('error', "Surat with ID $suratId not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
+        }
+
+        // Fetch penerima data
+        $penerima = $userModel->find($penerimaId);
+        if (!$penerima) {
+            log_message('error', "Penerima with ID $penerimaId not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Penerima with ID $penerimaId not found.");
+        }
+
+        // Fetch surat_user_id
+        $suratUser = $suratUserModel
+            ->where('surat_id', $suratId)
+            ->where('user_id', $penerimaId)
+            ->first();
+
+        if (!$suratUser) {
+            log_message('error', "Surat user with surat ID $suratId and penerima ID $penerimaId not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat user not found.");
+        }
+
+        $suratUserId = $suratUser['id'];
+
+        $rincianBiaya = $rincianBiayaModel
+            ->where('surat_id', $suratId)
+            ->where('surat_user_id', $suratUserId)
+            ->findAll();
+
+        if (empty($rincianBiaya)) {
+            log_message('error', "No rincian biaya found for surat ID $suratId and surat_user ID $suratUserId.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("No rincian biaya found for this RBPD.");
+        }
+
+        // Fetch penanda tangan data
+        $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
+        if (!$penandaTangan) {
+            log_message('error', "Penanda tangan for ID {$surat['id_penanda_tangan']} not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Penanda tangan not found.");
+        }
+
+        $data = [
+            'surat' => $surat,
+            'penerima' => $penerima,
+            'rincian_biaya' => $rincianBiaya,
+            'penanda_tangan' => $penandaTangan,
+            'header_image' => $this->convertImageToBase64('header.jpg'),
+            'footer_image' => $this->convertImageToBase64('end.jpg'),
+        ];
+
+        $html = view('components/pdf_template_rbpd', $data);
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('F4', 'portrait');
+        $dompdf->render();
+
+        $dompdf->stream("RBPD-$suratId-$penerimaId.pdf", ["Attachment" => false]);
+    }
+
+
+
+
     private function convertImageToBase64($imagePath)
     {
 
@@ -690,6 +949,30 @@ class DokumenController extends BaseController
 
         return in_array($selectedDate, $holidayDates);
     }
+
+
+    public function updateIsRead($suratId, $userId)
+    {
+        $suratUser = new SuratUser();
+
+
+
+        $updated = $suratUser
+            ->where('surat_id', $suratId)
+            ->where('user_id', $userId)
+            ->set(['is_read' => 1])
+            ->update();
+
+
+        if ($updated) {
+            log_message('info', "Successfully updated is_read for surat_id: $suratId, user_id: $userId");
+            return ['success' => true, 'message' => 'Status updated successfully'];
+        } else {
+            log_message('error', "Failed to update is_read for surat_id: $suratId, user_id: $userId");
+            return ['success' => false, 'message' => 'Failed to update status'];
+        }
+    }
+
 
     public function arsip_index()
     {

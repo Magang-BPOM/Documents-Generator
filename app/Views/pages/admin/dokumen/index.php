@@ -36,7 +36,7 @@ Semua Dokumen
             <div class="sm:col-span-2 md:grow">
                 <div class="flex justify-end gap-x-2">
                     <div class="sm:col-span-2 md:grow">
-                        <div class="flex justify-end gap-x-2">
+                    <div class="flex justify-end gap-x-2">
                             <a href="/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Buat Surat
                             </a>
@@ -124,7 +124,6 @@ Semua Dokumen
                                         class="text-blue-600 hover:underline ml-2">Selengkapnya</button>
                                 <?php endif; ?>
                             </td>
-
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['waktu_mulai']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['penanda_tangan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan_penanda_tangan']) ?></td>
@@ -135,7 +134,6 @@ Semua Dokumen
         </div>
 
 
-        
         <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
             <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg relative">
                 <div class="flex justify-between items-center">
@@ -154,7 +152,6 @@ Semua Dokumen
                 </div>
             </div>
         </div>
-
 
         <div class="flex justify-between items-center">
             <!-- Filter for items per page -->
@@ -188,14 +185,13 @@ Semua Dokumen
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 <script>
-    function showUsersModal(users) {
+     function showUsersModal(users) {
         const modalContent = document.getElementById('modal-content');
         const modal = document.getElementById('modal');
 
         modalContent.innerHTML = `
         <ul class="space-y-2">
             ${users.map(user => {
-              
                 return `
                     <li class="flex justify-between items-center bg-gray-50 dark:bg-neutral-700 p-3 rounded-md shadow-sm">
                         <span class="text-sm font-medium">${user.nama}</span>
@@ -211,7 +207,6 @@ Semua Dokumen
     function closeModal() {
         document.getElementById('modal').classList.add('hidden');
     }
-
 
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -234,44 +229,89 @@ Semua Dokumen
                 },
             <?php endforeach; ?>
         ];
-
-
         function updateTable() {
+            const userId = <?= json_encode(session()->get('user_id')); ?>;
+            console.log("User ID:", userId);
+
+            if (!userId) {
+                console.error("User ID is not defined or null.");
+                return;
+            }
+
             const startIdx = (currentPage - 1) * itemsPerPage;
             const endIdx = startIdx + itemsPerPage;
             const paginatedData = data.slice(startIdx, endIdx);
 
+            console.log("Paginated Data:", paginatedData);
+
             tableBody.innerHTML = '';
 
             paginatedData.forEach((item, index) => {
-                const row = document.createElement('tr');
+                console.log("Kepada Data Lengkap:", item.kepada);
+
                 const rowNumber = startIdx + index + 1;
+                const row = document.createElement('tr');
 
-                const hasUnreadUsers = item.kepada.some(user => parseInt(user.is_read) === 0);
+                const statusCell = document.createElement('td');
+                statusCell.className = "px-6 py-4 whitespace-nowrap";
+                const userId = <?= json_encode(session()->get('user_id')); ?>; 
 
-                row.innerHTML = `
-                     <td class="px-6 py-4 whitespace-nowrap">
-                        ${hasUnreadUsers ? `<span class="text-xs font-semibold text-white bg-green-500 px-2 py-1 rounded-full">New</span>` : ''}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox"></td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        ${rowNumber}
-                    </td>
-               
-                    <td class="px-6 py-4 whitespace-nowrap">${item.nomor_surat}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        ${item.kepada.length > 0 ? `${item.kepada[0].nama} | ${item.kepada[0].nip}` : 'Tidak ada data'} 
-                        ${item.kepada.length > 1 ? `<button onclick='showUsersModal(${JSON.stringify(item.kepada)})' class="text-blue-600 hover:underline">Selengkapnya</button>` : ''}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">${item.waktu_mulai}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${item.penanda_tangan}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${item.jabatan_penanda_tangan}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline">Surat Perjalanan Dinas</a>
-                    </td>
+                const currentUser = item.kepada.find(user => parseInt(user.user_id) === parseInt(userId));
+                const isUnreadForCurrentUser = currentUser && parseInt(currentUser.is_read || 0) === 0;
+
+                statusCell.innerHTML = isUnreadForCurrentUser
+                    ? `<span class="text-xs font-semibold text-white bg-green-500 px-2 py-1 rounded-full">New</span>`
+                    : `<span class="text-xs font-semibold text-gray-500 bg-gray-200 px-2 py-1 rounded-full">Old</span>`;
+                row.appendChild(statusCell);
+
+
+
+                const checkboxCell = document.createElement('td');
+                checkboxCell.className = "px-6 py-4 whitespace-nowrap";
+                checkboxCell.innerHTML = `<input type="checkbox" name="selected[]" value="${item.id}" class="rowCheckbox form-checkbox">`;
+                row.appendChild(checkboxCell);
+
+                const numberCell = document.createElement('td');
+                numberCell.className = "px-6 py-4 whitespace-nowrap";
+                numberCell.textContent = rowNumber;
+                row.appendChild(numberCell);
+
+                const suratCell = document.createElement('td');
+                suratCell.className = "px-6 py-4 whitespace-nowrap";
+                suratCell.textContent = item.nomor_surat;
+                row.appendChild(suratCell);
+
+                const kepadaCell = document.createElement('td');
+                kepadaCell.className = "px-6 py-4 whitespace-nowrap";
+                kepadaCell.innerHTML = `
+                    ${item.kepada.length > 0 ? `${item.kepada[0].nama} | ${item.kepada[0].nip}` : 'Tidak ada data'}
+                    ${item.kepada.length > 1 ? `<button onclick='showUsersModal(${JSON.stringify(item.kepada)})' class="text-blue-600 hover:underline">Selengkapnya</button>` : ''}
                 `;
+                row.appendChild(kepadaCell);
 
-           
+                const waktuCell = document.createElement('td');
+                waktuCell.className = "px-6 py-4 whitespace-nowrap";
+                waktuCell.textContent = item.waktu_mulai;
+                row.appendChild(waktuCell);
+
+                const penandaCell = document.createElement('td');
+                penandaCell.className = "px-6 py-4 whitespace-nowrap";
+                penandaCell.textContent = item.penanda_tangan;
+                row.appendChild(penandaCell);
+
+                const jabatanCell = document.createElement('td');
+                jabatanCell.className = "px-6 py-4 whitespace-nowrap";
+                jabatanCell.textContent = item.jabatan_penanda_tangan;
+                row.appendChild(jabatanCell);
+
+                const actionsCell = document.createElement('td');
+                actionsCell.className = "px-6 py-4 whitespace-nowrap";
+                actionsCell.innerHTML = `
+                    <a href="dokumen/generateSPD/${item.id}" class="text-blue-600 hover:underline block">SPD</a>
+                    <a href="dokumen/detailRBPD/${item.id}" class="text-blue-600 hover:underline block">RBPD</a>
+                `;
+                row.appendChild(actionsCell);
+
                 tableBody.appendChild(row);
             });
 
@@ -415,6 +455,7 @@ Semua Dokumen
                 swal("Error", "Terjadi kesalahan saat menghapus data.", "error");
             });
     });
+
 
     document.addEventListener('DOMContentLoaded', function() {
         const dropdownButton = document.getElementById('export_drobdown_table');

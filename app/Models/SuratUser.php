@@ -56,30 +56,29 @@ class SuratUser extends Model
             ->where('surat.status', 'aktif')
             ->orderBy('surat.created_at', 'DESC')
             ->findAll();
-    
+
         $result = [];
         foreach ($suratQuery as $surat) {
-            $users = $this->select('user.nama, user.nip, surat_user.is_read') 
+            $users = $this->select('user.nama, user.nip, surat_user.is_read')
                 ->join('user', 'surat_user.user_id = user.id')
                 ->where('surat_user.surat_id', $surat['surat_id'])
                 ->findAll();
-    
+
             $kepada = [];
             foreach ($users as $user) {
                 $kepada[] = [
                     'nama' => $user['nama'],
                     'nip' => $user['nip'],
-                    'is_read' => $user['is_read'], 
+                    'is_read' => $user['is_read'],
                 ];
             }
-    
+
             $penandaTangan = $this->db->table('user')
                 ->select('nama, nip, jabatan')
                 ->where('id', $surat['id_penanda_tangan'])
-                ->where('role !=', 'admin')
                 ->get()
                 ->getRowArray();
-    
+
             $result[] = [
                 'id' => $surat['surat_id'],
                 'nomor_surat' => $surat['nomor_surat'],
@@ -90,24 +89,24 @@ class SuratUser extends Model
                 'jabatan_penanda_tangan' => $penandaTangan ? $penandaTangan['jabatan'] : null,
             ];
         }
-    
+
         return $result;
     }
-    
+
 
 
     public function suratbyUser()
-{
-    $userId = session()->get('user_id');
-    $userName = session()->get('nama');
+    {
+        $userId = session()->get('user_id'); 
+        $userName = session()->get('nama');
 
-    if (!$userId || !$userName) {
-        return [];
-    }
+        if (!$userId || !$userName) {
+            return []; 
+        }
 
-    // Query utama untuk mengambil dokumen terkait user
-    $suratQuery = $this->db->table('surat_user su')
-        ->select('
+        // Query untuk mengambil dokumen yang sesuai dengan kriteria
+        $suratQuery = $this->db->table('surat_user su')
+            ->select('
             DISTINCT(s.id) as surat_id,
             s.nomor_surat,
             s.waktu_mulai,
@@ -117,59 +116,59 @@ class SuratUser extends Model
             su.is_read,
             su.user_id
         ')
-        ->join('surat s', 'su.surat_id = s.id')
-        ->join('user u', 'su.user_id = u.id')
-        ->groupStart()
-        ->where('su.user_id', $userId) 
-        ->orWhere('u.nama', $userName) 
-        ->groupEnd()
-        ->where('s.status', 'aktif')
-        ->orderBy('s.created_at', 'DESC')
-        ->get()
-        ->getResultArray();
-
-    $result = [];
-
-    foreach ($suratQuery as $surat) {
-       
-        $users = $this->db->table('surat_user su')
-            ->select('u.nama, u.nip,su.user_id, su.is_read')
+            ->join('surat s', 'su.surat_id = s.id') 
             ->join('user u', 'su.user_id = u.id')
-            ->where('su.surat_id', $surat['surat_id'])
+            ->groupStart()
+            ->where('su.user_id', $userId) 
+            ->orWhere('u.nama', $userName) 
+            ->groupEnd()
+            ->where('s.status', 'aktif') 
+            ->orderBy('s.created_at', 'DESC') 
             ->get()
             ->getResultArray();
 
-        $kepada = [];
-        foreach ($users as $user) {
-            $kepada[] = [
-                'user_id' => $user['user_id'],
-                'nama' => $user['nama'],
-                'nip' => $user['nip'],
-                'is_read' => isset($user['is_read']) ? (int) $user['is_read'] : 0, 
+        $result = [];
+
+        foreach ($suratQuery as $surat) {
+            // Ambil semua user yang terkait dengan surat
+            $users = $this->db->table('surat_user su')
+                ->select('u.nama, u.nip, su.user_id, su.is_read')
+                ->join('user u', 'su.user_id = u.id')
+                ->where('su.surat_id', $surat['surat_id'])
+                ->get()
+                ->getResultArray();
+
+            $kepada = [];
+            foreach ($users as $user) {
+                $kepada[] = [
+                    'user_id' => $user['user_id'],
+                    'nama' => $user['nama'],
+                    'nip' => $user['nip'],
+                    'is_read' => isset($user['is_read']) ? (int) $user['is_read'] : 0,
+                ];
+            }
+
+            // Ambil data penanda tangan
+            $penandaTangan = $this->db->table('user')
+                ->select('nama, nip, jabatan')
+                ->where('id', $surat['id_penanda_tangan'])
+                ->get()
+                ->getRowArray();
+
+            $result[] = [
+                'id' => $surat['surat_id'],
+                'nomor_surat' => $surat['nomor_surat'],
+                'kepada' => $kepada,
+                'waktu_mulai' => $surat['waktu_mulai'],
+                'penanda_tangan' => $penandaTangan ? $penandaTangan['nama'] : null,
+                'nip_penanda_tangan' => $penandaTangan ? $penandaTangan['nip'] : null,
+                'jabatan_penanda_tangan' => $penandaTangan ? $penandaTangan['jabatan'] : null,
+                'created_at' => $surat['created_at'],
             ];
         }
 
-        $penandaTangan = $this->db->table('user')
-            ->select('nama, nip, jabatan')
-            ->where('id', $surat['id_penanda_tangan'])
-            ->where('role !=', 'admin')
-            ->get()
-            ->getRowArray();
-
-        $result[] = [
-            'id' => $surat['surat_id'],
-            'nomor_surat' => $surat['nomor_surat'],
-            'kepada' => $kepada,
-            'waktu_mulai' => $surat['waktu_mulai'],
-            'penanda_tangan' => $penandaTangan ? $penandaTangan['nama'] : null,
-            'nip_penanda_tangan' => $penandaTangan ? $penandaTangan['nip'] : null,
-            'jabatan_penanda_tangan' => $penandaTangan ? $penandaTangan['jabatan'] : null,
-            'created_at' => $surat['created_at'],
-        ];
+        return $result;
     }
-
-    return $result;
-}
 
     public function Read($id)
     {

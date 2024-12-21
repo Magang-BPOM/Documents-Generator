@@ -54,7 +54,6 @@
             </div>
             <!-- End Breadcrumb -->
         </div>
-        
         <?= $this->include('pages/user/layout/sidebar'); ?>
 
         <!-- Page Content -->
@@ -65,10 +64,9 @@
     </div>
 
     <!-- JavaScript Resources -->
-    <script src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="node_modules/select2/dist/js/select2.min.js"></script>
-    <script src="node_modules/moment/min/moment.min.js"></script>
-    <script src="node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+
+
+
 
 
     <!-- Toggle Theme Script -->
@@ -84,9 +82,27 @@
         }
 
         document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+        <?php if (session()->getFlashdata('sweetalert_success')): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: '<?= session()->getFlashdata('sweetalert_success') ?>',
+            });
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('sweetalert_error')): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '<?= session()->getFlashdata('sweetalert_error') ?>',
+            });
+        <?php endif; ?>
     </script>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    <script src="node_modules/moment/min/moment.min.js"></script>
 
 </body>
 
