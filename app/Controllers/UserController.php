@@ -12,12 +12,16 @@ class UserController extends BaseController
 
     public function index()
     {
+        $session = session();
+        $characters = 'abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Hindari karakter yang mirip seperti O dan 0, I dan 1
+        $captcha = substr(str_shuffle($characters), 0, 6); // Hasilkan captcha sederhana (angka acak)
+        $session->set('captcha', $captcha); // Simpan captcha ke session
 
         if (session()->get('logged_in')) {
             return redirect()->to('/dashboard');
         }
 
-        return view('auth/login');
+        return view('auth/login', ['captcha' => $captcha]);
     }
 
     public function listuser()
@@ -41,29 +45,31 @@ class UserController extends BaseController
 
         $validation->setRules([
             'nama'        => 'required',
-            'nip' => ['rules' => 'required|min_length[8]|max_length[100]|is_unique[user.nip]',
-                            'errors' => [
-                                'required' => 'NIP wajib diisi.',
-                                'is_unique' => 'NIP sudah terdaftar, gunakan NIP lain.',
-                                'min_length' => 'NIP minimal harus memiliki 8 karakter.',
-                                'max_length' => 'NIP maksimal boleh memiliki 100 karakter.'
-                            ]
-                        ],
+            'nip' => [
+                'rules' => 'required|min_length[8]|max_length[100]|is_unique[user.nip]',
+                'errors' => [
+                    'required' => 'NIP wajib diisi.',
+                    'is_unique' => 'NIP sudah terdaftar, gunakan NIP lain.',
+                    'min_length' => 'NIP minimal harus memiliki 8 karakter.',
+                    'max_length' => 'NIP maksimal boleh memiliki 100 karakter.'
+                ]
+            ],
             'jabatan'     => 'required',
             'pangkat'     => 'permit_empty|max_length[100]',
             'foto_profil' => 'uploaded[foto_profil]|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]',
             'password'    => 'required|min_length[6]|max_length[255]',
+            'is_penanda_tangan' =>'required',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);
 
         if (!$validation->run($this->request->getPost())) {
             return redirect()->back()->withInput()
                 ->with('validation', $validation)
-                ->with('error', $validation->getError('nip')); 
+                ->with('error', $validation->getError('nip'));
         }
-        
+
         $file = $this->request->getFile('foto_profil');
-        $fotoProfilPath = 'https://i.pravatar.cc/150?img=1'; 
+        $fotoProfilPath = 'https://i.pravatar.cc/150?img=1';
 
         if ($file->isValid() && !$file->hasMoved()) {
             $uploadDir = FCPATH . 'uploads/user_profiles';
@@ -86,6 +92,7 @@ class UserController extends BaseController
             'foto_profil' => $fotoProfilPath,
             'password'    => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
             'role'        => $this->request->getPost('role'),
+            'is_penanda_tangan' => $this->request->getPost('is_penanda_tangan'),
             'created_at'  => date('Y-m-d H:i:s'),
         ];
 
@@ -97,14 +104,13 @@ class UserController extends BaseController
             $session->setFlashdata('error', 'Gagal menambahkan user.');
             return redirect()->back()->withInput();
         }
-        
     }
 
 
     public function update($id)
     {
         $validation = \Config\Services::validation();
-    
+
         $validation->setRules([
             'nama'        => 'required',
             'nip'         => [
@@ -118,32 +124,34 @@ class UserController extends BaseController
             ],
             'jabatan'     => 'required',
             'pangkat'     => 'permit_empty|max_length[100]',
+            'is_penanda_tangan' =>'required',
             'foto_profil' => 'permit_empty|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);
-    
+
 
         if (!$validation->run($this->request->getPost())) {
-      
+
             return redirect()->back()->withInput()->with('validation', $validation);
         }
-        
+
         $userModel = new \App\Models\User();
         $user = $userModel->find($id);
 
         if (!$user) {
             return redirect()->to('/user/edit')->with('error', 'User tidak ditemukan');
         }
-    
+
         $data = [
             'nama'        => $this->request->getPost('nama'),
             'nip'         => $this->request->getPost('nip'),
             'jabatan'     => $this->request->getPost('jabatan'),
             'pangkat'     => $this->request->getPost('pangkat'),
+            'is_penanda_tangan' =>$this->request->getPost('is_penanda_tangan'),
             'role'        => $this->request->getPost('role'),
         ];
-  
- 
+
+
         $file = $this->request->getFile('foto_profil');
         if ($file && $file->isValid() && !$file->hasMoved()) {
             $uploadDir = FCPATH . 'uploads/user_profiles';
@@ -162,7 +170,7 @@ class UserController extends BaseController
             return redirect()->to('admin/listuser')->with('error', 'Gagal memperbarui user.');
         }
     }
-    
+
 
 
     public function delete()
@@ -178,7 +186,7 @@ class UserController extends BaseController
 
         $userModel->whereIn('id', $selectedIds)->delete();
 
-        return $this->response->setJSON(['success' => true, 'message' => 'Data berhasil diarsipkan']);
+        return view('pages/admin/listuser/create');
     }
 
 
@@ -190,17 +198,26 @@ class UserController extends BaseController
 
         $identifier = $this->request->getVar('identifier');
         $password = $this->request->getVar('password');
+        $captchaInput = $this->request->getVar('captcha');
+        $captchaSession = $session->get('captcha'); // Ambil captcha dari session
 
         $validation->setRules([
             'identifier' => 'required',
             'password' => 'required',
+            'captcha'   => 'required',
         ]);
 
-        // Cek validasi
+        // Cek validasi input
         if (!$validation->withRequest($this->request)->run()) {
             return redirect()->back()->with('errors', $validation->getErrors())->withInput();
         }
 
+        // Validasi captcha
+        if ($captchaInput != $captchaSession) {
+            return redirect()->back()->with('error', 'Captcha is incorrect.')->withInput();
+        }
+
+        // Lanjutkan proses autentikasi seperti sebelumnya
         $userModel = new ModelsUser();
         $user = $userModel->where('nip', $identifier)->first();
 
@@ -226,6 +243,7 @@ class UserController extends BaseController
             return redirect()->back()->withInput();
         }
     }
+
 
     public function logout()
     {

@@ -48,8 +48,8 @@ class UserTable extends Migration
                 'constraint' => '100',
             ],
             'is_penanda_tangan' => [
-                'type'       => 'TINYINT',
-                'constraint' => 1,
+                'type'       => 'BOOLEAN', 
+                'null'       => false,
                 'default'    => 0, 
             ],
             'created_at' => [

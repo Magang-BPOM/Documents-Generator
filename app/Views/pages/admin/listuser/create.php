@@ -18,6 +18,7 @@ Tambah Pengguna Baru
         <div class="flex items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-neutral-100">Tambah Pengguna Baru</h2>
         </div>
+
         <!-- Success Alert -->
         <?php if (session()->getFlashdata('message')): ?>
             <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
@@ -82,13 +83,18 @@ Tambah Pengguna Baru
                     </select>
                 </div>
 
+                <div class="col-span-1">
+                    <label for="is_penanda_tangan" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Accses Tanda Tangan Surat</label>
+                    <select name="is_penanda_tangan" id="is_penanda_tangan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                        <option value="0" <?= old('is_penanda_tangan') === '0' ? 'selected' : '' ?>>Tidak</option>
+                        <option value="1" <?= old('is_penanda_tangan') === '1' ? 'selected' : '' ?>>Ya</option>
+                    </select>
+                </div>
+
             </div>
 
             <!-- Button -->
             <div class="col-span-2 flex justify-start space-x-2 mt-6">
-                <a href="/user" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
-                    Kembali
-                </a>
 
                 <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
                     Tambah Pengguna
@@ -99,8 +105,8 @@ Tambah Pengguna Baru
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      
+    document.addEventListener("DOMContentLoaded", function() {
+
         <?php if (session()->getFlashdata('success')): ?>
             Swal.fire({
                 icon: 'success',
@@ -122,8 +128,7 @@ Tambah Pengguna Baru
             });
         <?php endif; ?>
     });
+
 </script>
-
-
 
 <?= $this->endSection(); ?>

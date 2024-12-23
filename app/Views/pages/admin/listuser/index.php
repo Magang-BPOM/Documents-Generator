@@ -57,6 +57,7 @@ Semua User
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pangkat</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penanda Tangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -71,6 +72,9 @@ Semua User
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['jabatan']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['pangkat']) ?></td>
                             <td class="px-6 py-4 whitespace-nowrap"><?= esc($item['role']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <?= esc($item['is_penanda_tangan'] == 1 ? 'Ya' : 'Tidak') ?>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <button class="text-blue-600 hover:underline edit-btn"
                                     data-id="<?= $item['id'] ?>"
@@ -132,6 +136,14 @@ Semua User
                 </select>
             </div>
 
+            <div class="mb-4">
+                <label for="is_penanda_tangan" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Accses Tanda Tangan Surat</label>
+                <select name="is_penanda_tangan" id="is_penanda_tangan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                    <option value="0" <?= old('is_penanda_tangan') === '0' ? 'selected' : '' ?>>Tidak</option>
+                    <option value="1" <?= old('is_penanda_tangan') === '1' ? 'selected' : '' ?>>Ya</option>
+                </select>
+            </div>
+
             <!-- Profile Picture -->
             <div class="mb-4">
                 <label for="foto" class="block text-sm font-medium text-gray-700">Profile Picture</label>
@@ -150,8 +162,8 @@ Semua User
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      
+    document.addEventListener("DOMContentLoaded", function() {
+
         <?php if (session()->getFlashdata('success')): ?>
             Swal.fire({
                 icon: 'success',
@@ -176,53 +188,53 @@ Semua User
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-    const editButtons = document.querySelectorAll('.edit-btn');
-    const editModalTemplate = document.getElementById('editModalTemplate');
-    const closeModalBtn = document.getElementById('closeModal');
-    const editForm = document.getElementById('editForm');
+        const editButtons = document.querySelectorAll('.edit-btn');
+        const editModalTemplate = document.getElementById('editModalTemplate');
+        const closeModalBtn = document.getElementById('closeModal');
+        const editForm = document.getElementById('editForm');
 
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Ambil data dari atribut tombol
-            const userId = button.getAttribute('data-id');
-            const nip = button.getAttribute('data-nip');
-            const nama = button.getAttribute('data-nama');
-            const jabatan = button.getAttribute('data-jabatan');
-            const pangkat = button.getAttribute('data-pangkat');
-            const role = button.getAttribute('data-role');
-            const foto = button.getAttribute('data-foto');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Ambil data dari atribut tombol
+                const userId = button.getAttribute('data-id');
+                const nip = button.getAttribute('data-nip');
+                const nama = button.getAttribute('data-nama');
+                const jabatan = button.getAttribute('data-jabatan');
+                const pangkat = button.getAttribute('data-pangkat');
+                const role = button.getAttribute('data-role');
+                const foto = button.getAttribute('data-foto');
 
-            document.getElementById('user_id').value = userId;
-            document.getElementById('nip').value = nip;
-            document.getElementById('nama').value = nama;
-            document.getElementById('jabatan').value = jabatan;
-            document.getElementById('pangkat').value = pangkat;
+                document.getElementById('user_id').value = userId;
+                document.getElementById('nip').value = nip;
+                document.getElementById('nama').value = nama;
+                document.getElementById('jabatan').value = jabatan;
+                document.getElementById('pangkat').value = pangkat;
 
 
-            const roleSelect = document.getElementById('role');
-            Array.from(roleSelect.options).forEach(option => {
-                option.selected = (option.value === role);
+                const roleSelect = document.getElementById('role');
+                Array.from(roleSelect.options).forEach(option => {
+                    option.selected = (option.value === role);
+                });
+
+                const fotoPreview = document.getElementById('fotoPreview');
+                if (foto) {
+                    fotoPreview.textContent = `File saat ini: ${foto}`;
+                } else {
+                    fotoPreview.textContent = 'Belum ada foto.';
+                }
+
+                editForm.setAttribute('action', `/user/update/${userId}`);
+
+                editModalTemplate.classList.remove('hidden');
             });
+        });
 
-            const fotoPreview = document.getElementById('fotoPreview');
-            if (foto) {
-                fotoPreview.textContent = `File saat ini: ${foto}`;
-            } else {
-                fotoPreview.textContent = 'Belum ada foto.';
-            }
-
-            editForm.setAttribute('action', `/user/update/${userId}`);
-
-            editModalTemplate.classList.remove('hidden');
+        closeModalBtn.addEventListener('click', function() {
+            editModalTemplate.classList.add('hidden');
         });
     });
 
-    closeModalBtn.addEventListener('click', function() {
-        editModalTemplate.classList.add('hidden');
-    });
-});
-
-document.querySelector('.bulkDeleteBtn').addEventListener('click', function() {
+    document.querySelector('.bulkDeleteBtn').addEventListener('click', function() {
         const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
 
         if (selectedIds.length === 0) {
@@ -284,8 +296,6 @@ document.querySelector('.bulkDeleteBtn').addEventListener('click', function() {
             checkbox.checked = this.checked;
         });
     });
-    
-
-    </script>
+</script>
 
 <?= $this->endSection(); ?>
