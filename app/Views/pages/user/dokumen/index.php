@@ -486,7 +486,7 @@ Semua Dokumen
             alert('Silakan pilih data yang ingin di export');
             return;
         }
-        window.location.href = `/admin/dokumen/generate-word/${selectedIds}`;
+        window.location.href = `/dokumen/generate-word/${selectedIds}`;
     }
 
     function exportPDF() {
@@ -495,7 +495,7 @@ Semua Dokumen
             alert('Silakan pilih data yang ingin di export');
             return;
         }
-        window.location.href = `/admin/dokumen/generate/${selectedIds}`;
+        window.location.href = `/dokumen/generate/${selectedIds}`;
     }
 </script>
 

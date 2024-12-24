@@ -479,12 +479,12 @@ class DokumenController extends BaseController
 
         $table->addRow();
         $titleCell = $table->addCell(10000, ['gridSpan' => 3]);
-        $titleCell->addText('SURAT TUGAS', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $titleCell->addText('SURAT TUGAS', ['size' => 12], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
 
 
         $table->addRow();
         $numberCell = $table->addCell(10000, ['gridSpan' => 3]);
-        $numberCell->addText('NOMOR: ' . ($surat['nomor_surat'] ?? ''), [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        $numberCell->addText('NOMOR: ' . ($surat['nomor_surat'] ?? ''), [], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
 
         $table->addRow();
         $table->addCell(10000, ['gridSpan' => 3])->addTextBreak();
@@ -492,7 +492,7 @@ class DokumenController extends BaseController
         $table->addRow();
         $table->addCell(2000)->addText('Menimbang');
         $table->addCell(200)->addText(':', []);
-        $table->addCell(7800)->addText('Bahwa dalam rangka melaksanakan kebijakan pengawasan di bidang obat dan makanan.', [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]); // Column 3
+        $table->addCell(7800)->addText(($surat['menimbang'] ?? ''), [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]); // Column 3
 
         $table->addRow();
         $table->addCell(2000)->addText('Dasar');
@@ -505,7 +505,7 @@ class DokumenController extends BaseController
                 $i++;
             }
         } else {
-            $dasarCell->addText('Tidak ada dasar yang ditemukan.', [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+            $dasarCell->addText('Tidak ada dasar yang ditemukan.', [], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
         }
 
         $table->addRow();
@@ -518,9 +518,9 @@ class DokumenController extends BaseController
         $kepadaCell = $table->addCell(7800);
         $i = 1;
         foreach ($users as $user) {
-            $kepadaCell->addText("{$i}. Nama: {$user['nama']}", [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
-            $kepadaCell->addText("   NIP: {$user['nip']}", [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
-            $kepadaCell->addText("   Pangkat/Gol: {$user['pangkat']}", [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+            $kepadaCell->addText("{$i}. Nama: {$user['nama']}", [], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+            $kepadaCell->addText("   NIP: {$user['nip']}", [], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+            $kepadaCell->addText("   Pangkat/Gol: {$user['pangkat']}", [], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
             $kepadaCell->addText("   Jabatan: {$user['jabatan']}", [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
             $i++;
         }
@@ -563,61 +563,61 @@ class DokumenController extends BaseController
         $table->addCell(2000)->addText('Untuk');
         $table->addCell(200)->addText(':', []);
         $untukCell = $table->addCell(7800);
-        $untukCell->addText('1. Sebagai: ' . ($surat['sebagai'] ?? ''), [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+        $untukCell->addText('1. Sebagai: ' . ($surat['sebagai'] ?? ''), [], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
         $untukCell->addText(
             "2. Waktu: {$waktuRentang}",
             [],
-            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]
+            ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]
         );
-        $untukCell->addText('3. Tujuan: ' . ($surat['tujuan'] ?? ''), [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
+        $untukCell->addText('3. Tujuan: ' . ($surat['tujuan'] ?? ''), [], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
 
         $table->addRow();
-        $signatureCell = $table->addCell(10000, ['gridSpan' => 3, 'alignment' => 'right']);
+        $signatureCell = $table->addCell(10000, ['spaceAfter' => 0,'gridSpan' => 3, 'alignment' => 'right']);
         $signatureCell->addTextBreak();
 
 
-        $signatureTable = $section->addTable([
+        $signatureTable = $section->addTable(['spaceAfter' => 0,
             'alignment' => 'right',
         ]);
 
         $signatureTable->addRow();
-        $signatureCell = $signatureTable->addCell(10000, [
+        $signatureCell = $signatureTable->addCell(10000, ['spaceAfter' => 0,
             'gridSpan' => 3,
             'alignment' => 'right',
         ]);
         $signatureCell->addText(
             'Surabaya, ' . date('d F Y', strtotime($surat['created_at'] ?? date('Y-m-d'))),
             ['size' => 12],
-            ['alignment' => 'right']
+            ['spaceAfter' => 0,'alignment' => 'right']
         );
 
         $signatureTable->addRow();
-        $positionCell = $signatureTable->addCell(10000, [
+        $positionCell = $signatureTable->addCell(10000, ['spaceAfter' => 0,
             'gridSpan' => 3,
             'alignment' => 'right',
         ]);
         $positionCell->addText(
             $penandaTangan['jabatan'] ?? '',
             ['size' => 12],
-            ['alignment' => 'right']
+            ['spaceAfter' => 0,'alignment' => 'right']
         );
 
         $signatureTable->addRow();
-        $emptyCell = $signatureTable->addCell(10000, [
+        $emptyCell = $signatureTable->addCell(10000, ['spaceAfter' => 0,
             'gridSpan' => 3,
             'alignment' => 'right',
         ]);
         $emptyCell->addTextBreak(3);
 
         $signatureTable->addRow();
-        $nameCell = $signatureTable->addCell(10000, [
+        $nameCell = $signatureTable->addCell(10000, ['spaceAfter' => 0,
             'gridSpan' => 3,
             'alignment' => 'right',
         ]);
         $nameCell->addText(
             $penandaTangan['nama'] ?? '',
             ['size' => 12],
-            ['alignment' => 'right']
+            ['spaceAfter' => 0,'alignment' => 'right']
         );
 
 
@@ -700,9 +700,9 @@ class DokumenController extends BaseController
         } elseif ($userRole === 'pegawai') {
             return view('pages/user/dokumen/create_rbpd', [
                 'surat' => $surat,
-            'penerima' => $penerima,
-            'bendahara' => $bendahara,
-            'penanda_tangan' => $penandaTangan,
+                'penerima' => $penerima,
+                'bendahara' => $bendahara,
+                'penanda_tangan' => $penandaTangan,
             ]);
         } else {
             return redirect()->back()->with('error', 'Role tidak dikenali.');
@@ -834,11 +834,11 @@ class DokumenController extends BaseController
                     throw new \Exception('Gagal menyimpan rincian biaya.');
                 }
             }
-          
+
             if ($userRole === 'admin') {
-                return redirect()->to("admin/dokumen/detailRBPD/$suratId")->with('message', 'RBPD berhasil disimpan.');
+                return redirect()->back()->with('message', 'RBPD berhasil disimpan.');
             } else if ($userRole === 'pegawai') {
-                return redirect()->to("user/dokumen/detailRBPD/$suratId")->with('message', 'RBPD berhasil disimpan.');
+                return redirect()->back()->with('message', 'RBPD berhasil disimpan.');
             } else {
                 return redirect()->back()->with('error', 'Role tidak dikenali.');
             }
@@ -848,7 +848,6 @@ class DokumenController extends BaseController
     }
 
 
-
     public function generateRBPD($suratId, $penerimaId)
     {
         $suratModel = new Surat();
@@ -856,14 +855,12 @@ class DokumenController extends BaseController
         $userModel = new User();
         $suratUserModel = new SuratUser();
 
-        // Fetch surat data
         $surat = $suratModel->find($suratId);
         if (!$surat) {
             log_message('error', "Surat with ID $suratId not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
         }
 
-        // Fetch penerima data
         $penerima = $userModel->find($penerimaId);
         if (!$penerima) {
             log_message('error', "Penerima with ID $penerimaId not found.");
@@ -923,6 +920,104 @@ class DokumenController extends BaseController
     }
 
 
+    public function editRBPD($suratId, $userId)
+    {
+        $rbpdModel = new RincianBiayaModel();
+        $suratModel = new Surat();
+        $userModel = new User();
+        $suratUserModel = new SuratUser();
+    
+        // Cari surat_user_id yang terkait dengan user_id
+        $suratUser = $suratUserModel->where('surat_id', $suratId)
+            ->where('user_id', $userId)
+            ->first();
+    
+        if (!$suratUser) {
+            return redirect()->back()->with('error', 'Data surat_user tidak ditemukan.');
+        }
+    
+        $suratUserId = $suratUser['id'];
+ 
+        $rbpd = $rbpdModel->where('surat_id', $suratId)
+            ->where('surat_user_id', $suratUserId)
+            ->findAll();
+    
+        if (empty($rbpd)) {
+            return redirect()->back()->with('error', 'Data RBPD tidak ditemukan.');
+        }
+
+        $surat = $suratModel->find($suratId);
+    
+        if (!$surat) {
+            return redirect()->back()->with('error', 'Data surat tidak ditemukan.');
+        }
+    
+        $penerima = $userModel->find($userId);
+    
+        if (!$penerima) {
+            return redirect()->back()->with('error', 'Data penerima tidak ditemukan.');
+        }
+   
+        $bendaharaId = $rbpd[0]['bendahara_id'] ?? null;
+        $bendahara = $bendaharaId ? $userModel->find($bendaharaId) : null;
+
+        $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
+    
+        return view('pages/user/dokumen/edit_rbpd', [
+            'rbpd' => $rbpd,
+            'surat' => $surat,
+            'penerima' => $penerima,
+            'bendahara' => $bendahara,
+            'penandaTangan'=>$penandaTangan
+        ]);
+    }
+    
+
+    public function updateRBPD()
+    {
+        $request = service('request');
+        $rbpdModel = new RincianBiayaModel();
+    
+        $data = $request->getPost();
+
+        // print_r($data);
+        // die();
+    
+        // Validasi input wajib
+        if (
+            empty($data['perincian_biaya']) || empty($data['jumlah']) ||
+            empty($data['bendahara_id']) || empty($data['id_penanda_tangan'])
+        ) {
+            return redirect()->back()->with('error', 'Harap isi semua data yang diperlukan.');
+        }
+    
+        // Validasi jumlah data
+        if (count($data['perincian_biaya']) !== count($data['jumlah'])) {
+            return redirect()->back()->with('error', 'Jumlah rincian biaya tidak sesuai.');
+        }
+    
+        $rbpdModel->where('surat_id', $data['surat_id'])
+            ->where('surat_user_id', $data['surat_user_id'])
+            ->delete();
+    
+        // Simpan data baru
+        foreach ($data['perincian_biaya'] as $index => $perincian) {
+            $rbpdModel->insert([
+                'surat_id' => $data['surat_id'],
+                'surat_user_id' => $data['surat_user_id'],
+                'tanggal' => date('Y-m-d'),
+                'perincian_biaya' => $perincian,
+                'jumlah' => $data['jumlah'][$index],
+                'keterangan' => $data['keterangan'][$index] ?? null,
+                'bendahara_id' => $data['bendahara_id'],
+                'id_penanda_tangan' => $data['id_penanda_tangan'],
+            ]);
+        }
+    
+        return redirect()->to('/dokumen/detailRBPD/' . $data['surat_id'])->with('message', 'RBPD berhasil diperbarui.');
+    }
+    
+    
 
 
     private function convertImageToBase64($imagePath)

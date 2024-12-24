@@ -45,12 +45,15 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('/dokumen', 'DokumenController::index');
         $routes->get('/dokumen/generate/(:num)', 'DokumenController::generate/$1');
         $routes->get('/dokumen/generateSPD/(:num)', 'DokumenController::generateSPD/$1');
+        $routes->get('/dokumen/generate-word/(:num)', 'DokumenController::generateDocx/$1');
         $routes->get('/dokumen/create', 'DokumenController::create');
         $routes->post('/dokumen/store', 'DokumenController::store');
         $routes->get('/dokumen/detailRBPD/(:num)', 'DokumenController::detailRBPD/$1');
         $routes->get('/dokumen/createRBPD/(:num)/(:num)', 'DokumenController::createRBPD/$1/$2');
         $routes->post('/dokumen/generateRBPD/(:num)/(:num)', 'DokumenController::generateRBPD/$1/$2');
         $routes->post('/dokumen/storeRBPD', 'DokumenController::storeRBPD');
+        $routes->get('/dokumen/editRBPD/(:num)/(:num)', 'DokumenController::editRBPD/$1/$2');
+        $routes->post('/dokumen/updateRBPD', 'DokumenController::updateRBPD');
         $routes->get('/dokumen/archive', 'DokumenController::arsip_index');
         $routes->post('/dokumen/delete', 'DokumenController::delete');
         $routes->post('/dokumen/bulkArsip', 'DokumenController::bulkArsip');
