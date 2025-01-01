@@ -313,23 +313,29 @@ class DokumenController extends BaseController
     {
         helper('url');
         $userId = session()->get('user_id');
-
-
+        $role = session()->get('role');
+    
         $suratModel = new Surat();
+        $suratUser = new SuratUser();
         $pembebananAnggaranModel = new PembabananAnggaranModel();
         $userModel = new User();
-        $suratUser = new SuratUser();
+  
+        if ($role === 'admin') {
 
-        $selected = $suratUser->select('id')->where('user_id', $userId)->first();
-        // Mengatur header untuk respons JSON
-        // header('Content-Type: application/json');
-        // echo json_encode($selected);
-        // exit;
+            $selected = $suratUser->select('id')->where('surat_id', $suratId)->findAll();
+        } else {
 
-        $data = ['is_read' => 1];
-
-        $suratUser->update($selected, $data);
-
+            $selected = $suratUser->select('id')->where('user_id', $userId)->where('surat_id', $suratId)->first();
+    
+            if (!$selected) {
+                log_message('error', "No matching data found for user_id: $userId with role: $role and surat_id: $suratId");
+                throw new \CodeIgniter\Exceptions\PageNotFoundException("No data found.");
+            }
+    
+            $data = ['is_read' => 1];
+            $suratUser->update($selected['id'], $data);
+        }
+    
         $surat = $suratModel->find($suratId);
         if (!$surat) {
             log_message('error', "Surat with ID $suratId not found.");
@@ -620,16 +626,25 @@ class DokumenController extends BaseController
             ['spaceAfter' => 0,'alignment' => 'right']
         );
 
-
-        $section->addText(
-            'Petugas tidak diperkenankan menerima gratifikasi dalam bentuk apapun.',
+        $section->addTextBox(
             [
-                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::LEFT,
-                'borderSize' => 1
-
+                'borderSize' => 1,
+                'borderColor' => '000000',
+                'width' => 452,
+                'height' => 40,
+                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 
+                'valign' => 'center',
+            ]
+        )->addText(
+            'Petugas tidak diperkenankan menerima gratifikasi dalam bentuk apapun.',
+     
+            [
+                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 
+                'spaceAfter' => 0, 
+                'line-height' => 1, 
             ]
         );
-
+        
 
 
         $footer = $section->addFooter();

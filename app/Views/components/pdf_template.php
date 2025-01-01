@@ -93,7 +93,7 @@ function formatTanggalRentang($mulai, $berakhir)
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .numbered-list {
@@ -106,6 +106,7 @@ function formatTanggalRentang($mulai, $berakhir)
             display: flex; 
             align-items: center;
             margin-bottom: 8px;
+            margin-left:-5px ;
         }
 
 
@@ -118,12 +119,13 @@ function formatTanggalRentang($mulai, $berakhir)
         .numbered-list li .list-text {
             text-indent: 1px;
             padding-left: 20px;
-            margin-top: -19px;
+            margin-top: -23px;
         }
         .list-number {
             min-width: 20px; 
             text-align: right; 
-            margin-right: 10px; 
+            margin-right: 10px;
+             
         }
 
         .list-text {
@@ -143,7 +145,7 @@ function formatTanggalRentang($mulai, $berakhir)
         }
 
         .content {
-            padding: 0 70px;
+            padding: 0 85px;
         }
 
         .section-title {
@@ -193,7 +195,7 @@ function formatTanggalRentang($mulai, $berakhir)
 
         .colon {
             display: table-cell;
-            width: 30px;
+            width: 20px;
             text-align: center;
             vertical-align: top;
         }
@@ -202,6 +204,7 @@ function formatTanggalRentang($mulai, $berakhir)
             list-style: none; 
             padding: 0;
             margin: 0;
+            
         }
 
         .user-info li {
@@ -212,12 +215,12 @@ function formatTanggalRentang($mulai, $berakhir)
         .list-user {
             min-width: 20px;
             text-align: right; 
-            margin-right: 10px; 
+            margin-left:-5px ; 
         }
         .list-details {
             flex-grow: 1; 
-            padding-left: 19px;
-            margin-top: -19px;
+            padding-left: 15px;
+            margin-top: -23px;
         }
 
         .list-untuk {
@@ -356,11 +359,11 @@ function formatTanggalRentang($mulai, $berakhir)
 
 
         <p>Agar yang bersangkutan melaksanakan tugas dengan baik dan penuh tanggung jawab.</p>
-        <div class="signature" style="margin-right: 60px;margin-top:20px;">
-            <p style="text-align:right;margin-right:70px">Surabaya, <?= formatTGL($surat['created_at'], 'tanggal') ?>,</p>
+        <div class="signature" style="margin-right: 40px;margin-top:20px;">
+            <p style="text-align:right;margin-right:60px">Surabaya, <?= formatTGL($surat['created_at'], 'tanggal') ?>,</p>
             <p style="text-align:right;"><?= esc($penanda_tangan['jabatan']) ?>,</p>
             <br><br><br><br>
-            <p style="text-align:right;margin-right:70px"><?= esc($penanda_tangan['nama']) ?></p>
+            <p style="text-align:right;margin-right:60px"><?= esc($penanda_tangan['nama']) ?></p>
         </div>
 
 
