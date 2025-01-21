@@ -60,7 +60,7 @@ Detail RBPD
                     </td>
                     <td class="border border-gray-300 p-3 text-center">
                         <?php if ($user['rbpd_created']): ?>
-                            <form action="<?= base_url("dokumen/generateRBPD/{$surat['id']}/{$user['user_id']}") ?>" method="post" style="display:inline;">
+                            <form action="<?= base_url("admin/dokumen/generateRBPD/{$surat['id']}/{$user['user_id']}") ?>" method="post" style="display:inline;">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="inline-block px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">Lihat PDF</button>
                             </form>

@@ -40,7 +40,7 @@ Pembuatan Dokumen
         <?php endif; ?>
 
         <!-- Form -->
-        <form method="POST" action="<?= base_url('dokumen/storeRBPD') ?>">
+        <form method="POST" action="<?= base_url('admin/dokumen/storeRBPD') ?>">
             <?= csrf_field(); ?>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -130,6 +130,8 @@ Pembuatan Dokumen
     </div>
 </div>
 <script>
+
+    // fungsi untuk menambahkan bagian rincian biaya perjalanan
     function addRow() {
         const tbody = document.getElementById('rincian-biaya-body');
         const row = document.createElement('tr');

@@ -13,9 +13,9 @@ class UserController extends BaseController
     public function index()
     {
         $session = session();
-        $characters = 'abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Hindari karakter yang mirip seperti O dan 0, I dan 1
-        $captcha = substr(str_shuffle($characters), 0, 6); // Hasilkan captcha sederhana (angka acak)
-        $session->set('captcha', $captcha); // Simpan captcha ke session
+        $characters = 'abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'; 
+        $captcha = substr(str_shuffle($characters), 0, 6); 
+        $session->set('captcha', $captcha); 
 
         if (session()->get('logged_in')) {
             return redirect()->to('/dashboard');

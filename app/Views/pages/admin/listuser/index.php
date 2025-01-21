@@ -95,7 +95,7 @@ Semua User
     </div>
 </div>
 
-<!-- Modal HTML structure -->
+<!-- Modal Untuk Edit User -->
 <div id="editModalTemplate" class="hidden absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-lg w-[600px] mx-auto relative z-50">
         <h3 class="text-xl font-semibold mb-4">Edit User</h3>

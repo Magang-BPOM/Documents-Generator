@@ -16,10 +16,7 @@ Semua Dokumen
 
 <div class="relative max-w-full min-h-screen mx-auto p-6 sm:px-6 lg:px-6">
     <div class="bg-white dark:bg-neutral-900 shadow-lg rounded-xl p-6">
-        <!-- <div class="flex items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-neutral-100">Semua Surat</h2>
-        </div> -->
-
+     
         <div class=" py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 dark:border-neutral-700">
             <div class="sm:col-span-1">
                 <label for="search_table" class="sr-only">Search</label>
@@ -83,6 +80,7 @@ Semua Dokumen
 
         </div>
 
+        <!-- Tabel utnuk menampilkan list surat -->
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-neutral-800">
@@ -134,6 +132,7 @@ Semua Dokumen
         </div>
 
 
+        <!-- Menampilkan semua daftar petugas -->
         <div id="modal" class="absolute inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
             <div class="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-lg shadow-lg relative">
                 <div class="flex justify-between items-center">
@@ -153,6 +152,7 @@ Semua Dokumen
             </div>
         </div>
 
+        <!-- Pagination -->
         <div class="flex justify-between items-center">
             <!-- Filter for items per page -->
             <div class="flex items-center gap-2">
@@ -185,6 +185,8 @@ Semua Dokumen
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 <script>
+
+    // Fungsi untuk menampilkan modal semua petugas jika lebih dari 1 petugas
      function showUsersModal(users) {
         const modalContent = document.getElementById('modal-content');
         const modal = document.getElementById('modal');
@@ -209,6 +211,7 @@ Semua Dokumen
     }
 
 
+    // Logika untuk pagination
     document.addEventListener('DOMContentLoaded', function() {
         const itemsPerPageSelect = document.getElementById('itemsPerPage');
         const prevPageBtn = document.getElementById('prevPage');
@@ -359,6 +362,7 @@ Semua Dokumen
     });
 
 
+    // Logika untuk pencarian surat
     document.getElementById("search_table").addEventListener("keyup", function() {
         const searchValue = this.value.toLowerCase();
         const table = document.querySelector("tbody");
@@ -379,6 +383,8 @@ Semua Dokumen
             row.style.display = isMatch ? "" : "none";
         }
     });
+
+    // Chekckbox pilih semua surat
     document.getElementById('selectAll').addEventListener('click', function() {
         const checkboxes = document.querySelectorAll('.rowCheckbox');
         checkboxes.forEach(checkbox => {
@@ -386,6 +392,7 @@ Semua Dokumen
         });
     });
 
+    // Fungsi untuk meng arsipkan surat yang dipilih
     document.querySelector('.bulkArsipBtn').addEventListener('click', function() {
         const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
 
@@ -421,6 +428,7 @@ Semua Dokumen
             });
     });
 
+    // Fungsi untuk Delete surat tugas yang dipilih
     document.querySelector('.bulkDeleteBtn').addEventListener('click', function() {
         const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
 
@@ -457,6 +465,7 @@ Semua Dokumen
     });
 
 
+    // Event listener untuk menampilkan dropdown Export
     document.addEventListener('DOMContentLoaded', function() {
         const dropdownButton = document.getElementById('export_drobdown_table');
         const dropdownMenu = document.getElementById('dropdownMenu');
@@ -480,6 +489,7 @@ Semua Dokumen
     });
 
 
+    // Fungsi export surat ke word
     function exportWord() {
         const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
         if (selectedIds.length === 0) {
@@ -489,6 +499,8 @@ Semua Dokumen
         window.location.href = `/admin/dokumen/generate-word/${selectedIds}`;
     }
 
+    
+    // Fungsi export surat ke PDF
     function exportPDF() {
         const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
         if (selectedIds.length === 0) {

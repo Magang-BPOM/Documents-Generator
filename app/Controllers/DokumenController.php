@@ -851,9 +851,11 @@ class DokumenController extends BaseController
             }
 
             if ($userRole === 'admin') {
-                return redirect()->back()->with('message', 'RBPD berhasil disimpan.');
+                return redirect()->to(base_url('admin/dokumen/detailRBPD/' . $suratId))
+                    ->with('message', 'RBPD berhasil disimpan.');
             } else if ($userRole === 'pegawai') {
-                return redirect()->back()->with('message', 'RBPD berhasil disimpan.');
+                return redirect()->to(base_url('dokumen/detailRBPD/' . $suratId))
+                    ->with('message', 'RBPD berhasil disimpan.');
             } else {
                 return redirect()->back()->with('error', 'Role tidak dikenali.');
             }
@@ -995,10 +997,6 @@ class DokumenController extends BaseController
     
         $data = $request->getPost();
 
-        // print_r($data);
-        // die();
-    
-        // Validasi input wajib
         if (
             empty($data['perincian_biaya']) || empty($data['jumlah']) ||
             empty($data['bendahara_id']) || empty($data['id_penanda_tangan'])

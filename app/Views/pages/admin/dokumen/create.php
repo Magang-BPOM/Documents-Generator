@@ -162,6 +162,7 @@ Pembuatan Dokumen
                 </div>
             </div>
 
+            <!-- Bagian penambahan tempat singgah -->
             <div class="col-span-2">
                 <label class="block text-lg font-medium text-gray-700 dark:text-neutral-300">Tempat Singgah/Hotel</label>
                 <div id="tempat-singgah-container">
@@ -255,17 +256,18 @@ Pembuatan Dokumen
         const waktuBerakhirInput = document.getElementById('waktu_berakhir');
         const errorContainer = document.getElementById('error-message');
 
+        // Fungsi untuk memperbarui batas waktu input "waktu berakhir" berdasarkan "waktu mulai"
         function updateDateConstraints() {
             const waktuMulai = waktuMulaiInput.value;
 
-            // Set min attribute on waktuBerakhirInput
             if (waktuMulai) {
-                waktuBerakhirInput.setAttribute('min', waktuMulai);
+                waktuBerakhirInput.setAttribute('min', waktuMulai); // Set minimum date
             } else {
-                waktuBerakhirInput.removeAttribute('min'); // Reset if no valid date
+                waktuBerakhirInput.removeAttribute('min'); // Reset jika tidak ada tanggal valid
             }
         }
 
+         // Event listener untuk perubahan pada input "waktu mulai"
         waktuMulaiInput.addEventListener('change', () => {
             updateDateConstraints();
             validateDates();
@@ -273,10 +275,10 @@ Pembuatan Dokumen
 
         waktuBerakhirInput.addEventListener('change', validateDates);
 
-        // Initialize constraints on page load
         updateDateConstraints();
     });
 
+     // Fungsi untuk menambahkan input tempat singgah baru
     function tambahTempatSinggah() {
         const container = document.getElementById('tempat-singgah-container');
         const newInput = document.createElement('div');
@@ -309,8 +311,9 @@ Pembuatan Dokumen
         container.appendChild(newInput);
     }
 
+     // Fungsi untuk menghapus input tempat singgah
     function hapusTempatSinggah(btn) {
-        btn.closest('.flex').remove();
+        btn.closest('.flex').remove();  // Fungsi untuk menghapus input tempat singgah
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -338,6 +341,7 @@ Pembuatan Dokumen
     });
 
 
+      // Fungsi untuk menampilkan atau menyembunyikan opsi tambahan
     function toggleOpsiTambahan(isVisible) {
         const container = document.getElementById('opsi-tambahan-container');
         if (isVisible) {
@@ -347,7 +351,7 @@ Pembuatan Dokumen
         }
     }
 
-
+    // Logika dropdown untuk memilih dasar hukum
     (function() {
         const selectedDasar = new Set();
         const dropdownDasar = document.getElementById('list-dasar');
@@ -355,12 +359,12 @@ Pembuatan Dokumen
         const dasarContainer = document.getElementById('selected-dasar-container');
         const dasarHiddenInput = document.getElementById('selected_dasar_input');
 
-        let dasar = <?= json_encode($dasar); ?>;
+        let dasar = <?= json_encode($dasar); ?>; // Ambil data dasar yang dikirim dari backend
 
 
         function renderDropdown(showDasar) {
             dropdownDasar.innerHTML = showDasar.map(list => {
-                const isSelected = selectedDasar.has(list.id); // Periksa apakah dasar sudah dipilih
+                const isSelected = selectedDasar.has(list.id); 
                 return `
                 <div class="dasar-option p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 cursor-pointer ${isSelected ? 'bg-gray-200 dark:bg-neutral-800 text-gray-400' : ''}"
                     data-id="${list.id}"
@@ -402,6 +406,7 @@ Pembuatan Dokumen
             dropdownDasar.classList.remove('hidden');
         });
 
+        // Fungsi untuk menambahkan dasar ke daftar yang dipilih
         function addSelectedDasar(dasar) {
             selectedDasar.add(dasar.id);
 
@@ -419,6 +424,8 @@ Pembuatan Dokumen
             dasarContainer.appendChild(dasarElement);
             updateSelectedDasarInput();
         }
+
+         // Fungsi untuk menghapus dasar dari daftar yang dipilih
 
         window.removeDasar = function(dasarId, button) {
             selectedDasar.delete(dasarId);
@@ -439,6 +446,7 @@ Pembuatan Dokumen
     })();
 
 
+      // Logika dropdown untuk memilih pengguna
     (function() {
         const selectedUsers = new Set();
         const dropdownList = document.getElementById('dropdown-list');
@@ -502,6 +510,8 @@ Pembuatan Dokumen
             dropdownList.classList.remove('hidden');
         });
 
+
+        // Fungsi untuk menambahkan pengguna ke daftar yang dipilih
         function addSelectedUser(user) {
             selectedUsers.add(user.id);
 
@@ -523,6 +533,8 @@ Pembuatan Dokumen
             updateSelectedUsersInput();
         }
 
+
+        // Fungsi untuk menghapus pengguna dari daftar yang dipilih
         window.removeUser = function(userId, button) {
             selectedUsers.delete(userId);
             button.closest('div').remove();
@@ -541,7 +553,7 @@ Pembuatan Dokumen
         });
     })();
 
-
+    // mengubah format tanggal ke indonesia
     moment.locale('id');
     const dateInput = document.getElementById('waktu');
 

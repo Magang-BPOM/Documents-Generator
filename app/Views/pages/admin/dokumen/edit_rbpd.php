@@ -143,6 +143,8 @@ Edit RBPD
 </div>
 
 <script>
+
+    // fungsi untuk menambahkan bagian rincian biaya perjalanan
     function addRow() {
         const tbody = document.getElementById('rincian-biaya-body');
         const row = document.createElement('tr');
@@ -163,6 +165,7 @@ Edit RBPD
         tbody.appendChild(row);
     }
 
+    // fungsi untuk menghapus item rincian biaya yang dipilih
     function removeRow(button) {
         button.closest('tr').remove();
     }
