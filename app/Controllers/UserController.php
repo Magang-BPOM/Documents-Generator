@@ -59,6 +59,7 @@ class UserController extends BaseController
             'foto_profil' => 'uploaded[foto_profil]|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]',
             'password'    => 'required|min_length[6]|max_length[255]',
             'is_penanda_tangan' =>'required',
+            'is_bendahara' =>'required',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);
 
@@ -93,6 +94,7 @@ class UserController extends BaseController
             'password'    => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
             'role'        => $this->request->getPost('role'),
             'is_penanda_tangan' => $this->request->getPost('is_penanda_tangan'),
+            'is_bendahara' => $this->request->getPost('is_bendahara'),
             'created_at'  => date('Y-m-d H:i:s'),
         ];
 
@@ -125,6 +127,7 @@ class UserController extends BaseController
             'jabatan'     => 'required',
             'pangkat'     => 'permit_empty|max_length[100]',
             'is_penanda_tangan' =>'required',
+            'is_bendahara' =>'required',
             'foto_profil' => 'permit_empty|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);

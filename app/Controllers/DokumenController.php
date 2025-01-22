@@ -237,94 +237,105 @@ class DokumenController extends BaseController
     public function generate($suratId)
     {
         helper('url');
+    
+        // Model untuk surat dan user
         $suratModel = new Surat();
-        $surat = $suratModel->find($suratId);
         $userModel = new User();
-
+    
+        // Ambil data surat berdasarkan ID
+        $surat = $suratModel->find($suratId);
         if (!$surat) {
             log_message('error', "Surat with ID $suratId not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
         }
-
+    
+        // Ambil data pengguna terkait surat dari model SuratUser
         $suratUserModel = new SuratUser();
         $users = $suratUserModel
             ->select('user.*')
             ->join('user', 'user.id = surat_user.user_id')
             ->where('surat_user.surat_id', $suratId)
             ->findAll();
-
-        log_message('debug', 'Users count: ' . count($users));
+    
+        log_message('debug', 'Users count: ' . count($users)); // Log jumlah pengguna yang ditemukan
         if (!empty($users)) {
-            log_message('debug', 'First user data: ' . print_r($users[0], true));
+            log_message('debug', 'First user data: ' . print_r($users[0], true)); // Log data pengguna pertama jika ada
         } else {
             log_message('error', "No users found for surat ID $suratId.");
         }
-
+    
+        // Ambil dasar-dasar surat terkait
         $DasarSuratModel = new DasarSurat();
         $listdasar = $DasarSuratModel
             ->select('dasar.*')
             ->join('dasar', 'dasar.id = dasarsurat.id_dasar')
             ->where('dasarsurat.id_surat', $suratId)
             ->findAll();
-
-
+    
+        // Ambil data penanda tangan surat
         $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
         if (!$penandaTangan) {
             log_message('error', "Penanda tangan for ID {$surat['id_penanda_tangan']} not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Penanda tangan not found.");
         }
+    
+        // Data yang akan diberikan ke template PDF
         $data = [
-            'surat' => $surat,
-            'users' => $users,
-            'dasar' => $listdasar,
-            'penanda_tangan' => $penandaTangan,
-            'header_image' => $this->convertImageToBase64('header.jpg'),
-            'footer_image' => $this->convertImageToBase64('end.jpg'),
+            'surat' => $surat, // Data surat
+            'users' => $users, // Data pengguna terkait surat
+            'dasar' => $listdasar, // Dasar-dasar surat
+            'penanda_tangan' => $penandaTangan, // Data penanda tangan surat
+            'header_image' => $this->convertImageToBase64('header.jpg'), // Gambar header dalam format base64
+            'footer_image' => $this->convertImageToBase64('end.jpg'), // Gambar footer dalam format base64
         ];
-
-
+    
+        // Render template ke format HTML
         $html = view('components/pdf_template', $data);
-
-
+    
+        // Konfigurasi Dompdf
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
-
+    
         $dompdf = new Dompdf($options);
-
-
+    
+        // Muat HTML ke Dompdf
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->setPaper('A4', 'portrait'); // Set ukuran dan orientasi kertas
         $dompdf->render();
-
+    
+        // Tentukan folder output untuk menyimpan PDF sementara
         $outputDir = WRITEPATH . "pdfs";
         if (!is_dir($outputDir)) {
-            mkdir($outputDir, 0777, true);
+            mkdir($outputDir, 0777, true); // Buat folder jika belum ada
         }
-
+    
+        // Simpan PDF ke lokasi sementara
         $outputPath = $outputDir . "/Surat-Tugas-$suratId.pdf";
         file_put_contents($outputPath, $dompdf->output());
-
+    
+        // Tampilkan PDF di browser tanpa mengunduh
         $dompdf->stream("Surat-Tugas-$suratId.pdf", ["Attachment" => false]);
     }
 
 
     public function generateSPD($suratId)
     {
-        helper('url');
-        $userId = session()->get('user_id');
-        $role = session()->get('role');
+        helper('url'); 
+        $userId = session()->get('user_id'); // Ambil user ID dari sesi
+        $role = session()->get('role'); // Ambil peran (role) user dari sesi
     
         $suratModel = new Surat();
         $suratUser = new SuratUser();
         $pembebananAnggaranModel = new PembabananAnggaranModel();
         $userModel = new User();
-  
+    
+        // Periksa apakah user adalah admin atau pegawai
         if ($role === 'admin') {
-
+            // Admin dapat mengambil semua data terkait surat
             $selected = $suratUser->select('id')->where('surat_id', $suratId)->findAll();
         } else {
-
+            // Pegawai hanya bisa mengakses data terkait dengan user_id mereka
             $selected = $suratUser->select('id')->where('user_id', $userId)->where('surat_id', $suratId)->first();
     
             if (!$selected) {
@@ -332,62 +343,71 @@ class DokumenController extends BaseController
                 throw new \CodeIgniter\Exceptions\PageNotFoundException("No data found.");
             }
     
+            // Tandai surat sebagai sudah dibaca
             $data = ['is_read' => 1];
             $suratUser->update($selected['id'], $data);
         }
     
+        // Ambil data surat berdasarkan ID
         $surat = $suratModel->find($suratId);
         if (!$surat) {
             log_message('error', "Surat with ID $suratId not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
         }
-
+    
+        // Ambil semua pengguna terkait surat
         $suratUserModel = new SuratUser();
         $users = $suratUserModel
             ->select('user.*')
             ->join('user', 'user.id = surat_user.user_id')
             ->where('surat_user.surat_id', $suratId)
             ->findAll();
-
+    
         if (empty($users)) {
             log_message('error', "No users found for surat ID $suratId.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("No users found for this surat.");
         }
-
+    
+        // Ambil data pembebanan anggaran
         $pembebananAnggaran = $pembebananAnggaranModel->getById($surat['id_pembebanan_anggaran']);
         if (!$pembebananAnggaran) {
             log_message('error', "Pembebanan anggaran for ID {$surat['id_pembebanan_anggaran']} not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Pembebanan anggaran not found.");
         }
-
+    
+        // Ambil data penanda tangan
         $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
         if (!$penandaTangan) {
             log_message('error', "Penanda tangan for ID {$surat['id_penanda_tangan']} not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Penanda tangan not found.");
         }
-
+    
+        // Ambil data tempat singgah terkait surat
         $suratSinggahModel = new SuratSinggah();
         $tempatSinggah = $suratSinggahModel->where('surat_id', $surat['id'])->findAll();
-
+    
+        // Konfigurasi Dompdf untuk PDF generation
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
-
+    
         $dompdf = new Dompdf($options);
-        $outputDir = WRITEPATH . "pdfs";
+        $outputDir = WRITEPATH . "pdfs"; // Lokasi penyimpanan file sementara
         if (!is_dir($outputDir)) {
-            mkdir($outputDir, 0777, true);
+            mkdir($outputDir, 0777, true); // Buat folder jika belum ada
         }
-
-        $outputPath = $outputDir . "/Surat-Perjalanan-Tugas-$suratId.pdf";
-
-        $combinedHtml = '';
-        $totalUsers = count($users);
-        $currentUserIndex = 0;
-
+    
+        $outputPath = $outputDir . "/Surat-Perjalanan-Tugas-$suratId.pdf"; // Path file output
+    
+        $combinedHtml = ''; // Variabel untuk menggabungkan semua halaman
+        $totalUsers = count($users); // Total user terkait surat
+        $currentUserIndex = 0; // Indeks user saat ini
+    
+        // Loop untuk setiap pengguna
         foreach ($users as $user) {
             $currentUserIndex++;
-
+    
+            // Data yang akan dikirim ke template
             $data = [
                 'surat' => $surat,
                 'user' => $user,
@@ -395,29 +415,33 @@ class DokumenController extends BaseController
                 'penanda_tangan' => $penandaTangan,
                 'tempatSinggah' => $tempatSinggah
             ];
-
+    
+            // Render template HTML
             $html = view('components/template_SPD', $data);
-
+    
+            // Tambahkan page-break jika bukan halaman terakhir
             if ($currentUserIndex < $totalUsers) {
                 $combinedHtml .= '<div style="page-break-after: always;">' . $html . '</div>';
             } else {
                 $combinedHtml .= $html;
             }
         }
-
-        $dompdf->loadHtml($combinedHtml);
-        $dompdf->setPaper('F4', 'landscape');
-        $dompdf->render();
-
-        file_put_contents($outputPath, $dompdf->output());
-        $dompdf->stream("Surat-Perjalanan-Tugas-$suratId.pdf", ["Attachment" => false]);
+    
+        $dompdf->loadHtml($combinedHtml); // Load konten HTML
+        $dompdf->setPaper('F4', 'landscape'); // Atur ukuran dan orientasi kertas
+        $dompdf->render(); // Generate PDF
+    
+        file_put_contents($outputPath, $dompdf->output()); // Simpan file PDF
+        $dompdf->stream("Surat-Perjalanan-Tugas-$suratId.pdf", ["Attachment" => false]); // Tampilkan PDF ke browser
     }
-
+    
 
 
     public function generateDocx($suratId)
     {
         helper('url');
+
+        // Ambil data surat berdasarkan $suratId
         $suratModel = new Surat();
         $surat = $suratModel->find($suratId);
         if (!$surat) {
@@ -425,6 +449,7 @@ class DokumenController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
         }
 
+         // Ambil pengguna terkait surat dari tabel surat_user
         $suratUserModel = new SuratUser();
 
         $users = $suratUserModel
@@ -433,6 +458,7 @@ class DokumenController extends BaseController
             ->where('surat_user.surat_id', $suratId)
             ->findAll();
 
+        // Ambil daftar dasar hukum surat
         $DasarSuratModel = new DasarSurat();
         $listdasar = $DasarSuratModel
             ->select('dasar.*')
@@ -440,6 +466,7 @@ class DokumenController extends BaseController
             ->where('dasarsurat.id_surat', $suratId)
             ->findAll();
 
+        // Ambil data penanda tangan
         $userModel = new User();
         $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
         if (!$penandaTangan) {
@@ -448,11 +475,12 @@ class DokumenController extends BaseController
         }
 
 
+         // Inisialisasi PhpWord dan set konfigurasi default dokumen
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
-
         $phpWord->setDefaultFontName('Bookman Old Style');
         $phpWord->setDefaultFontSize(12);
 
+        // Tambahkan halaman dokumen dengan pengaturan margin dan ukuran
         $section = $phpWord->addSection([
             'marginLeft' => 1440,
             'marginRight' => 1440,
@@ -464,7 +492,7 @@ class DokumenController extends BaseController
 
         ]);
 
-        // Header
+        // Tambahkan header dokumen dengan gambar
         $header = $section->addHeader();
         $header->firstPage();
         $header->addImage(FCPATH . 'header.jpg', [
@@ -476,18 +504,19 @@ class DokumenController extends BaseController
             'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER
         ]);
 
+        // Membuat tabel untuk konten utama surat
         $table = $section->addTable([
             'alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
             'cellMargin' => 20,
             'width' => 1000,
         ]);
 
-
+        // Tambahkan baris untuk judul surat
         $table->addRow();
         $titleCell = $table->addCell(10000, ['gridSpan' => 3]);
         $titleCell->addText('SURAT TUGAS', ['size' => 12], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
 
-
+        // Tambahkan nomor surat
         $table->addRow();
         $numberCell = $table->addCell(10000, ['gridSpan' => 3]);
         $numberCell->addText('NOMOR: ' . ($surat['nomor_surat'] ?? ''), [], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
@@ -495,11 +524,13 @@ class DokumenController extends BaseController
         $table->addRow();
         $table->addCell(10000, ['gridSpan' => 3])->addTextBreak();
 
+        // Tambahkan bagian menimbang
         $table->addRow();
         $table->addCell(2000)->addText('Menimbang');
         $table->addCell(200)->addText(':', []);
         $table->addCell(7800)->addText(($surat['menimbang'] ?? ''), [], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]); // Column 3
 
+        // Tambahkan daftar dasar surat
         $table->addRow();
         $table->addCell(2000)->addText('Dasar');
         $table->addCell(200)->addText(':', []);
@@ -514,6 +545,7 @@ class DokumenController extends BaseController
             $dasarCell->addText('Tidak ada dasar yang ditemukan.', [], ['spaceAfter' => 0,'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH]);
         }
 
+         // Tambahkan daftar penerima tugas
         $table->addRow();
         $memberiTugasCell = $table->addCell(10000, ['gridSpan' => 3]);
         $memberiTugasCell->addText('Memberi Tugas', ['size' => 12], ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
@@ -531,6 +563,7 @@ class DokumenController extends BaseController
             $i++;
         }
 
+        // Format rentang tanggal tugas
         function formatTanggalRentang($mulai, $berakhir)
         {
             $formatterHari = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN, 'EEEE');
@@ -559,12 +592,13 @@ class DokumenController extends BaseController
             return "{$hariMulai} - {$hariBerakhir}, {$tanggalMulai} {$bulanMulai} {$tahunMulai} - {$tanggalBerakhir} {$bulanBerakhir} {$tahunBerakhir}";
         }
 
-
+        
         $waktuMulai = $surat['waktu_mulai'] ?? '';
         $waktuBerakhir = $surat['waktu_berakhir'] ?? '';
 
         $waktuRentang = formatTanggalRentang($waktuMulai, $waktuBerakhir);
 
+        // Tambahkan bagian waktu, tujuan, dan rincian lainnya
         $table->addRow();
         $table->addCell(2000)->addText('Untuk');
         $table->addCell(200)->addText(':', []);
@@ -582,6 +616,7 @@ class DokumenController extends BaseController
         $signatureCell->addTextBreak();
 
 
+         // Tambahkan tanda tangan dan footer
         $signatureTable = $section->addTable(['spaceAfter' => 0,
             'alignment' => 'right',
         ]);
@@ -659,7 +694,7 @@ class DokumenController extends BaseController
             'wrappingStyle' => 'behind'
         ]);
 
-        // Save the document
+       // Simpan file Word
         $fileName = "Surat-Tugas-$suratId.docx";
         $tempFile = WRITEPATH . $fileName;
 
@@ -695,7 +730,7 @@ class DokumenController extends BaseController
             return redirect()->back()->with('error', 'Penerima tidak valid.');
         }
 
-        $bendahara = $userModel->where('role', 'admin')->findAll();
+        $bendahara = $userModel->where('is_bendahara', '1')->findAll();
 
         $penandaTangan = $userModel->select('id, nama, nip,jabatan')
             ->where('id', $surat['id_penanda_tangan'])
@@ -867,24 +902,27 @@ class DokumenController extends BaseController
 
     public function generateRBPD($suratId, $penerimaId)
     {
+        // Inisialisasi model yang diperlukan
         $suratModel = new Surat();
         $rincianBiayaModel = new RincianBiayaModel();
         $userModel = new User();
         $suratUserModel = new SuratUser();
 
+        // Ambil data surat berdasarkan $suratId
         $surat = $suratModel->find($suratId);
         if (!$surat) {
             log_message('error', "Surat with ID $suratId not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Surat with ID $suratId not found.");
         }
 
+        // Ambil data penerima berdasarkan $penerimaId
         $penerima = $userModel->find($penerimaId);
         if (!$penerima) {
             log_message('error', "Penerima with ID $penerimaId not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Penerima with ID $penerimaId not found.");
         }
 
-        // Fetch surat_user_id
+        // Ambil data surat_user berdasarkan $suratId dan $penerimaId
         $suratUser = $suratUserModel
             ->where('surat_id', $suratId)
             ->where('user_id', $penerimaId)
@@ -897,6 +935,7 @@ class DokumenController extends BaseController
 
         $suratUserId = $suratUser['id'];
 
+        // Ambil rincian biaya berdasarkan $suratId dan $suratUserId
         $rincianBiaya = $rincianBiayaModel
             ->where('surat_id', $suratId)
             ->where('surat_user_id', $suratUserId)
@@ -907,33 +946,47 @@ class DokumenController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException("No rincian biaya found for this RBPD.");
         }
 
-        // Fetch penanda tangan data
+        // Ambil data penanda tangan berdasarkan ID yang tersimpan di surat
         $penandaTangan = $userModel->find($surat['id_penanda_tangan']);
         if (!$penandaTangan) {
             log_message('error', "Penanda tangan for ID {$surat['id_penanda_tangan']} not found.");
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Penanda tangan not found.");
         }
 
+        // Ambil data bendahara berdasarkan ID dari rincian biaya pertama
+        $bendahara = $userModel->find($rincianBiaya[0]['bendahara_id']);
+        if (!$bendahara) {
+            log_message('error', "Bendahara for ID {$rincianBiaya[0]['bendahara_id']} not found.");
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Bendahara not found.");
+        }
+
+        // Menyiapkan data untuk diteruskan ke template PDF
         $data = [
-            'surat' => $surat,
-            'penerima' => $penerima,
-            'rincian_biaya' => $rincianBiaya,
-            'penanda_tangan' => $penandaTangan,
-            'header_image' => $this->convertImageToBase64('header.jpg'),
-            'footer_image' => $this->convertImageToBase64('end.jpg'),
+            'surat' => $surat, // Data surat
+            'penerima' => $penerima, // Data penerima
+            'rincian_biaya' => $rincianBiaya, // Daftar rincian biaya
+            'penanda_tangan' => $penandaTangan, // Data penanda tangan
+            'bendahara' => $bendahara, // Data bendahara
+            'header_image' => $this->convertImageToBase64('header.jpg'), // Header gambar dalam base64
+            'footer_image' => $this->convertImageToBase64('end.jpg'), // Footer gambar dalam base64
         ];
-
+        
+        // Generate HTML untuk PDF dari template
         $html = view('components/pdf_template_rbpd', $data);
+
+        // Konfigurasi Dompdf
         $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
+        $options->set('isHtml5ParserEnabled', true); 
+        $options->set('isRemoteEnabled', true); 
 
+        // Inisialisasi Dompdf
         $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('F4', 'portrait');
-        $dompdf->render();
+        $dompdf->loadHtml($html); // Muat konten HTML ke Dompdf
+        $dompdf->setPaper('F4', 'portrait'); // Atur ukuran kertas dan orientasi
+        $dompdf->render(); // Render PDF
 
-        $dompdf->stream("RBPD-$suratId-$penerimaId.pdf", ["Attachment" => false]);
+        // Stream hasil PDF ke browser
+        $dompdf->stream("RBPD-$suratId-$penerimaId.pdf", ["Attachment" => false]); // Tampilkan PDF tanpa mengunduh
     }
 
 

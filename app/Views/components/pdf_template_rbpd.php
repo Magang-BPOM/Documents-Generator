@@ -343,8 +343,8 @@ function terbilang($angka)
                             <p class="amount"><span>Rp</span> <span><?= number_format($total, 2, ',', '.') ?></span></p>
                             <p>Bendahara</p>
                             <br><br> <br>
-                            <p><?= esc($penanda_tangan['nama']) ?></p>
-                            <p>NIP: <?= esc($penanda_tangan['nip']) ?></p>
+                            <p><?= esc($bendahara['nama']) ?></p>
+                            <p>NIP: <?= esc($bendahara['nip']) ?></p>
                         </div>
                     </td>
                     <td>

@@ -52,6 +52,11 @@ class UserTable extends Migration
                 'null'       => false,
                 'default'    => 0, 
             ],
+            'is_bendahara' => [
+                'type'       => 'BOOLEAN', 
+                'null'       => false,
+                'default'    => 0, 
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,

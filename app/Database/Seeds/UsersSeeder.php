@@ -18,6 +18,7 @@ class UsersSeeder extends Seeder
                 'password' => password_hash('12', PASSWORD_BCRYPT),
                 'role' => 'admin',
                 'is_penanda_tangan' => 1,
+                'is_bendahara'=>0,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ],
@@ -31,6 +32,7 @@ class UsersSeeder extends Seeder
                 'password' => password_hash('987654321', PASSWORD_BCRYPT),
                 'role' => 'pegawai',
                 'is_penanda_tangan' => 0,
+                'is_bendahara'=>0,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ],
@@ -43,6 +45,20 @@ class UsersSeeder extends Seeder
                 'password' => password_hash('987654321', PASSWORD_BCRYPT),
                 'role' => 'pegawai',
                 'is_penanda_tangan' => 0,
+                'is_bendahara'=>0,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'nama' => 'Nia Ramadhani, S.Farm, Apt, M.Farm',
+                'nip' => '121203456121',
+                'pangkat' => 'Penata Tk.I / Gol.II-d',
+                'jabatan' => 'Pengawas Farmasi dan Makanan Ahli Muda',
+                'foto_profil' => 'https://i.pravatar.cc/150?img=2', 
+                'password' => password_hash('987654321', PASSWORD_BCRYPT),
+                'role' => 'pegawai',
+                'is_penanda_tangan' => 0,
+                'is_bendahara'=>1,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ],
