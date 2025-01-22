@@ -92,7 +92,7 @@ Tambah Pengguna Baru
                 </div>
 
                 <div class="col-span-2">
-                    <label for="is_bendahara" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Bendahara?</label>
+                    <label for="is_bendahara" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Akses Bendahara?</label>
                     <select name="is_bendahara" id="is_bendahara" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
                         <option value="0" <?= old('is_bendahara') === '0' ? 'selected' : '' ?>>Tidak</option>
                         <option value="1" <?= old('is_bendahara') === '1' ? 'selected' : '' ?>>Ya</option>
