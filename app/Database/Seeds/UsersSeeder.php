@@ -10,9 +10,22 @@ class UsersSeeder extends Seeder
     {
         $data = [
             [
-                'nama'      => 'Dra. Hesti Sila Rahayu, Apt',
+                'nama'      => 'Admin',
                 'nip'       => '121212',
                 'jabatan'   => 'Administrator',
+                'pangkat'   => 'Admin / N/A',
+                'foto_profil' => 'https://i.pravatar.cc/150?img=3', 
+                'password' => password_hash('12', PASSWORD_BCRYPT),
+                'role' => 'admin',
+                'is_penanda_tangan' => 1,
+                'is_bendahara'=>0,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ],
+            [
+                'nama'      => 'Dra. Hesti Sila Rahayu, Apt',
+                'nip'       => '12345678',
+                'jabatan'   => 'Kepala BPOM',
                 'pangkat'   => 'Admin / N/A',
                 'foto_profil' => 'https://i.pravatar.cc/150?img=3', 
                 'password' => password_hash('12', PASSWORD_BCRYPT),

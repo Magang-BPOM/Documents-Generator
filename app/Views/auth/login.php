@@ -114,7 +114,7 @@
             <!-- Captcha -->
             <div class="mb-5">
                 <label for="captcha" class="block font-medium text-sm text-gray-700">Captcha</label>
-                <div class="mt-2 text-lg font-bold text-center bg-green-600 text-white rounded-lg p-3 no-select">
+                <div class="mt-2 text-lg font-bold text-center bg-green-600 text-white rounded-lg p-3">
                     <?= session()->get('captcha') ?>
                 </div>
                 <input id="captcha"
