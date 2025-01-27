@@ -53,7 +53,9 @@ Tambah Pengguna Baru
                 <div class="col-span-1">
                     <label for="nip" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">NIP</label>
                     <input type="text" name="nip" id="nip" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" value="<?= old('nip') ?>" required>
+                    <p id="nip-error" class="text-red-600 text-sm mt-1 hidden">NIP harus terdiri dari minimal 8 karakter!</p>
                 </div>
+
 
                 <div class="col-span-1">
                     <label for="jabatan" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Jabatan</label>
@@ -73,7 +75,9 @@ Tambah Pengguna Baru
                 <div class="col-span-1">
                     <label for="password" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Password</label>
                     <input type="password" name="password" id="password" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                    <p id="password-error" class="text-red-600 text-sm mt-1 hidden">Password harus terdiri dari minimal 6 karakter!</p>
                 </div>
+
 
                 <div class="col-span-1">
                     <label for="role" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Role</label>
@@ -112,32 +116,58 @@ Tambah Pengguna Baru
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    
     document.addEventListener("DOMContentLoaded", function() {
+        const nipInput = document.getElementById("nip");
+        const passwordInput = document.getElementById("password");
+        const form = document.querySelector("form");
 
-        <?php if (session()->getFlashdata('success')): ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: '<?= session()->getFlashdata('success') ?>',
-                timer: 3000, // 3 seconds
-                showConfirmButton: false
-            }).then(() => {
-                window.location.href = "<?= base_url('admin/listuser') ?>";
-            });
-        <?php endif; ?>
+        // Validasi saat pengguna mengetik NIP
+        nipInput.addEventListener("input", function() {
+            const nipError = document.getElementById("nip-error");
+            if (nipInput.value.length < 8) {
+                nipError.textContent = "NIP harus terdiri dari minimal 8 karakter!";
+                nipError.style.display = "block";
+            } else {
+                nipError.style.display = "none";
+            }
+        });
 
-        <?php if (session()->getFlashdata('error')): ?>
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: '<?= session()->getFlashdata('error') ?>',
-                confirmButtonText: 'OK'
-            });
-        <?php endif; ?>
+        // Validasi saat pengguna mengetik password
+        passwordInput.addEventListener("input", function() {
+            const passwordError = document.getElementById("password-error");
+            if (passwordInput.value.length < 6) {
+                passwordError.textContent = "Password harus terdiri dari minimal 6 karakter!";
+                passwordError.style.display = "block";
+            } else {
+                passwordError.style.display = "none";
+            }
+        });
+
+        // Validasi saat submit form
+        form.addEventListener("submit", function(event) {
+            let errors = [];
+
+            if (nipInput.value.length < 8) {
+                errors.push('NIP harus terdiri dari minimal 8 karakter!');
+            }
+
+            if (passwordInput.value.length < 6) {
+                errors.push('Password harus terdiri dari minimal 6 karakter!');
+            }
+
+            if (errors.length > 0) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    html: errors.join('<br>'),
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
     });
-
 </script>
 
 <?= $this->endSection(); ?>

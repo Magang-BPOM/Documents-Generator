@@ -46,6 +46,7 @@ class UserController extends BaseController
         $validation = \Config\Services::validation();
         $session = session();
 
+        // Validasi input
         $validation->setRules([
             'nama'        => 'required',
             'nip' => [
@@ -67,27 +68,31 @@ class UserController extends BaseController
         ]);
 
         if (!$validation->run($this->request->getPost())) {
-            return redirect()->back()->withInput()
+            // Hanya menyimpan data POST, tidak menyimpan objek file
+            return redirect()->back()->withInput($this->request->getPost())
                 ->with('validation', $validation)
                 ->with('error', $validation->getError('nip'));
         }
 
         $file = $this->request->getFile('foto_profil');
-        $fotoProfilPath = 'https://i.pravatar.cc/150?img=1';
+        $fotoProfilPath = 'https://i.pravatar.cc/150?img=1'; // Default gambar
 
+        // Proses upload file jika file valid
         if ($file->isValid() && !$file->hasMoved()) {
-            $uploadDir = FCPATH . 'uploads/user_profiles';
-            // $uploadDir = WRITEPATH . 'uploads/user_profiles';
+            $uploadDir = WRITEPATH . 'uploads/user_profiles'; // Gunakan WRITEPATH
             if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+                mkdir($uploadDir, 0777, true); // Buat folder jika tidak ada
             }
-            $newName = $file->getRandomName();
-            $file->move($uploadDir, $newName);
-            $fotoProfilPath = base_url('uploads/user_profiles/' . $newName);
+
+            $newName = $file->getRandomName(); // Generate nama acak
+            $file->move($uploadDir, $newName); // Pindahkan file ke folder
+            $fotoProfilPath = base_url('writable/uploads/user_profiles/' . $newName); // Path URL file
         } else {
+            // Jika upload gagal, kembalikan dengan pesan error
             return redirect()->back()->with('error', 'Gagal mengunggah file.');
         }
 
+        // Data yang akan disimpan ke database
         $data = [
             'nama'        => $this->request->getPost('nama'),
             'nip'         => $this->request->getPost('nip'),
@@ -101,11 +106,11 @@ class UserController extends BaseController
             'created_at'  => date('Y-m-d H:i:s'),
         ];
 
-
+        // Simpan data ke database
         $userModel = new \App\Models\User();
         if ($userModel->insert($data)) {
             $session->setFlashdata('success', 'User berhasil ditambahkan!');
-            return redirect()->to('/user/create');
+            return redirect()->to('/admin/listuser');
         } else {
             $session->setFlashdata('error', 'Gagal menambahkan user.');
             return redirect()->back()->withInput();
@@ -194,7 +199,7 @@ class UserController extends BaseController
 
         $userModel->whereIn('id', $selectedIds)->delete();
 
-        return view('pages/admin/listuser/create');
+        return redirect()->to('/admin/listuser')->with('success', 'Data berhasil dihapus');
     }
 
 
