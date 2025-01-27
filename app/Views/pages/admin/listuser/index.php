@@ -83,7 +83,9 @@ Semua User
                                     data-jabatan="<?= esc($item['jabatan']) ?>"
                                     data-pangkat="<?= esc($item['pangkat']) ?>"
                                     data-role="<?= esc($item['role']) ?>"
-                                    data-foto="<?= esc($item['foto_profil']) ?>">
+                                    data-foto="<?= esc($item['foto_profil']) ?>"
+                                    data-is_bendahara="<?= esc($item['is_bendahara']) ?>"
+                                    data-is_penanda_tangan= "<?= esc($item['is_penanda_tangan']) ?>">
                                     Edit
                                 </button>
                             </td>
@@ -96,7 +98,7 @@ Semua User
 </div>
 
 <!-- Modal Untuk Edit User -->
-<div id="editModalTemplate" class="hidden absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+<div id="editModalTemplate" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-lg w-[600px] mx-auto relative z-50">
         <h3 class="text-xl font-semibold mb-4">Edit User</h3>
         <form id="editForm" action="" method="POST" enctype="multipart/form-data">
@@ -136,11 +138,21 @@ Semua User
                 </select>
             </div>
 
+            <!-- Penanda Tangan -->
             <div class="mb-4">
-                <label for="is_penanda_tangan" class="required block text-sm font-medium text-gray-700 dark:text-neutral-300">Accses Tanda Tangan Surat</label>
-                <select name="is_penanda_tangan" id="is_penanda_tangan" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
-                    <option value="0" <?= old('is_penanda_tangan') === '0' ? 'selected' : '' ?>>Tidak</option>
-                    <option value="1" <?= old('is_penanda_tangan') === '1' ? 'selected' : '' ?>>Ya</option>
+                <label for="is_penanda_tangan" class="block text-sm font-medium text-gray-700">Penanda Tangan</label>
+                <select id="is_penanda_tangan" name="is_penanda_tangan" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:focus:ring-blue-500" required>
+                    <option value="1">Ya</option>
+                    <option value="0">Tidak</option>
+                </select>
+            </div>
+
+            <!-- Bendahara -->
+            <div class="mb-4">
+                <label for="is_bendahara" class="block text-sm font-medium text-gray-700">Bendahara</label>
+                <select id="is_bendahara" name="is_bendahara" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:focus:ring-blue-500" required>
+                    <option value="1">Ya</option>
+                    <option value="0">Tidak</option>
                 </select>
             </div>
 
@@ -151,15 +163,15 @@ Semua User
                 <p id="fotoPreview" class="text-sm text-gray-500 mt-2"></p>
             </div>
 
-
             <div class="flex justify-end">
-                <button type="submit" class="py-2 px-4 bg-blue-600 text-white rounded-lg">Save Changes</button>
+                <button type="submit" class="py-2 px-4 bg-blue-600 text-white rounded-lg">Simpan Perubahan</button>
             </div>
         </form>
 
         <button id="closeModal" class="absolute top-2 right-2 text-xl font-bold text-gray-500">&times;</button>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {

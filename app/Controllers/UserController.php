@@ -13,9 +13,9 @@ class UserController extends BaseController
     public function index()
     {
         $session = session();
-        $characters = 'abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'; 
-        $captcha = substr(str_shuffle($characters), 0, 6); 
-        $session->set('captcha', $captcha); 
+        $characters = 'abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        $captcha = substr(str_shuffle($characters), 0, 6);
+        $session->set('captcha', $captcha);
 
         if (session()->get('logged_in')) {
             return redirect()->to('/dashboard');
@@ -58,8 +58,8 @@ class UserController extends BaseController
             'pangkat'     => 'permit_empty|max_length[100]',
             'foto_profil' => 'uploaded[foto_profil]|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]',
             'password'    => 'required|min_length[6]|max_length[255]',
-            'is_penanda_tangan' =>'required',
-            'is_bendahara' =>'required',
+            'is_penanda_tangan' => 'required',
+            'is_bendahara' => 'required',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);
 
@@ -98,6 +98,7 @@ class UserController extends BaseController
             'created_at'  => date('Y-m-d H:i:s'),
         ];
 
+
         $userModel = new \App\Models\User();
         if ($userModel->insert($data)) {
             $session->setFlashdata('success', 'User berhasil ditambahkan!');
@@ -126,8 +127,8 @@ class UserController extends BaseController
             ],
             'jabatan'     => 'required',
             'pangkat'     => 'permit_empty|max_length[100]',
-            'is_penanda_tangan' =>'required',
-            'is_bendahara' =>'required',
+            'is_penanda_tangan' => 'required',
+            'is_bendahara' => 'required',
             'foto_profil' => 'permit_empty|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);
@@ -150,7 +151,8 @@ class UserController extends BaseController
             'nip'         => $this->request->getPost('nip'),
             'jabatan'     => $this->request->getPost('jabatan'),
             'pangkat'     => $this->request->getPost('pangkat'),
-            'is_penanda_tangan' =>$this->request->getPost('is_penanda_tangan'),
+            'is_penanda_tangan' => $this->request->getPost('is_penanda_tangan'),
+            'is_bendahara' => $this->request->getPost('is_penanda_tangan'),
             'role'        => $this->request->getPost('role'),
         ];
 

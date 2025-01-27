@@ -31,6 +31,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('/admin/dokumen/bulkArsip', 'DokumenController::bulkArsip');
         $routes->post('/admin/dokumen/delete', 'DokumenController::delete');
 
+        $routes->get('/dasar', 'DasarController::index');
+        $routes->post('/dasar/store', 'DasarController::store');
+        $routes->post('/dasar/update/(:num)', 'DasarController::update/$1');
+        $routes->delete('/dasar/delete/(:num)', 'DasarController::delete/$1');
+
         $routes->get('/admin/listuser', 'UserController::listuser');
         $routes->get('/user/create', 'UserController::create');
         $routes->post('/user/store', 'UserController::store');
