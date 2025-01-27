@@ -29,6 +29,9 @@ class UserController extends BaseController
 
         $suratUser = new ModelsUser();
         $data['user'] = $suratUser->user();
+        // header('Content-Type: application/json');
+        // echo json_encode($data);
+        // exit;
 
         return view('pages/admin/listuser/index', $data);
     }
@@ -152,7 +155,7 @@ class UserController extends BaseController
             'jabatan'     => $this->request->getPost('jabatan'),
             'pangkat'     => $this->request->getPost('pangkat'),
             'is_penanda_tangan' => $this->request->getPost('is_penanda_tangan'),
-            'is_bendahara' => $this->request->getPost('is_penanda_tangan'),
+            'is_bendahara' => $this->request->getPost('is_bendahara'),
             'role'        => $this->request->getPost('role'),
         ];
 

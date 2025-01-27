@@ -215,12 +215,19 @@ Semua User
                 const pangkat = button.getAttribute('data-pangkat');
                 const role = button.getAttribute('data-role');
                 const foto = button.getAttribute('data-foto');
+                const bendahara = button.getAttribute('data-is_bendahara');
+                const penandatangan = button.getAttribute('data-is_penanda_tangan');
+                console.log(bendahara);
+                
 
                 document.getElementById('user_id').value = userId;
                 document.getElementById('nip').value = nip;
                 document.getElementById('nama').value = nama;
                 document.getElementById('jabatan').value = jabatan;
                 document.getElementById('pangkat').value = pangkat;
+                document.getElementById('is_bendahara').value = bendahara;
+                document.getElementById('is_penanda_tangan').value = penandatangan;
+
 
 
                 const roleSelect = document.getElementById('role');
