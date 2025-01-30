@@ -64,6 +64,7 @@ class UserController extends BaseController
             'password'    => 'required|min_length[6]|max_length[255]',
             'is_penanda_tangan' => 'required',
             'is_bendahara' => 'required',
+            'kepala_balai' => 'required',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);
 
@@ -103,6 +104,7 @@ class UserController extends BaseController
             'role'        => $this->request->getPost('role'),
             'is_penanda_tangan' => $this->request->getPost('is_penanda_tangan'),
             'is_bendahara' => $this->request->getPost('is_bendahara'),
+            'kepala_balai' => $this->request->getPost('kepala_balai'),
             'created_at'  => date('Y-m-d H:i:s'),
         ];
 
@@ -137,6 +139,7 @@ class UserController extends BaseController
             'pangkat'     => 'permit_empty|max_length[100]',
             'is_penanda_tangan' => 'required',
             'is_bendahara' => 'required',
+            'kepala_balai' => 'required',
             'foto_profil' => 'permit_empty|is_image[foto_profil]|mime_in[foto_profil,image/jpg,image/jpeg,image/png]|max_size[foto_profil,1024]',
             'role'        => 'required|in_list[admin,pegawai]',
         ]);
@@ -161,6 +164,7 @@ class UserController extends BaseController
             'pangkat'     => $this->request->getPost('pangkat'),
             'is_penanda_tangan' => $this->request->getPost('is_penanda_tangan'),
             'is_bendahara' => $this->request->getPost('is_bendahara'),
+            'kepala_balai' => $this->request->getPost('kepala_balai'),
             'role'        => $this->request->getPost('role'),
         ];
 

@@ -38,17 +38,17 @@ function terbilang($angka)
     } elseif ($angka < 20) {
         $hasil = terbilang($angka - 10) . ' belas';
     } elseif ($angka < 100) {
-        $hasil = terbilang($angka / 10) . ' puluh' . terbilang($angka % 10);
+        $hasil = terbilang(floor($angka / 10)) . ' puluh' . terbilang($angka % 10);
     } elseif ($angka < 200) {
-        $hasil = 'seratus' . terbilang($angka - 100);
+        $hasil = ' seratus ' . terbilang($angka - 100);
     } elseif ($angka < 1000) {
-        $hasil = terbilang($angka / 100) . ' ratus' . terbilang($angka % 100);
+        $hasil = terbilang(floor($angka / 100)) . ' ratus' . terbilang($angka % 100);
     } elseif ($angka < 2000) {
-        $hasil = 'seribu' . terbilang($angka - 1000);
+        $hasil = ' seribu' . terbilang($angka - 1000);
     } elseif ($angka < 1000000) {
-        $hasil = terbilang($angka / 1000) . ' ribu' . terbilang($angka % 1000);
+        $hasil = terbilang(floor($angka / 1000)) . ' ribu' . terbilang($angka % 1000);
     } elseif ($angka < 1000000000) {
-        $hasil = terbilang($angka / 1000000) . ' juta' . terbilang($angka % 1000000);
+        $hasil = terbilang(floor($angka / 1000000)) . ' juta ' . terbilang($angka % 1000000);
     } else {
         $hasil = 'Angka terlalu besar';
     }
@@ -159,12 +159,12 @@ function terbilang($angka)
         }
 
         .signature-section {
-            margin-top: 30px;
+            margin-top: 10px;
         }
 
         .divider {
             border-top: 2px solid black;
-            margin-top: 10px;
+            /* margin-top: 1px; */
             margin-bottom: 10px;
             margin-left: 20px;
             margin-right: 20px;
@@ -215,7 +215,7 @@ function terbilang($angka)
         .two-column-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 8px;
         }
 
         .two-column-table td {
@@ -237,14 +237,14 @@ function terbilang($angka)
             justify-content: space-between;
             align-items: center;
             margin-top: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
             width: 100%;
         }
 
         .two-column-table .section .amount span:first-child {
             flex: 0 0 auto;
             text-align: left;
-            width: 30%;
+            width: 10%;
         }
 
         .two-column-table .section .amount span:last-child {
@@ -252,6 +252,7 @@ function terbilang($angka)
             text-align: right;
             width: 70%;
         }
+
         .final-signature {
             width: 50%;
             margin-top: 10px;
@@ -334,7 +335,7 @@ function terbilang($angka)
         </table>
 
         <div class="signature-section">
-            <p class="text-right">Surabaya, <?= formatTGL($surat['created_at'], 'tanggal') ?></p>
+            <p style="text-align:right;margin-right:92px">Surabaya, <?= formatTGL($surat['created_at'], 'tanggal') ?>,</p>
             <table class="two-column-table">
                 <tr>
                     <td>
@@ -359,7 +360,7 @@ function terbilang($angka)
                     </td>
                 </tr>
             </table>
-                
+
             <div class="divider"></div>
             <div class="center">PERHITUNGAN SPD RAMPUNG</div>
 
@@ -380,7 +381,7 @@ function terbilang($angka)
                     <td>Rp 0,00</td>
                 </tr>
             </table>
-            
+
             <table class="final-signature">
                 <tr>
                     <td>

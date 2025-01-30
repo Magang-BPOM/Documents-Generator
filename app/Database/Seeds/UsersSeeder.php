@@ -19,6 +19,7 @@ class UsersSeeder extends Seeder
                 'role' => 'admin',
                 'is_penanda_tangan' => 1,
                 'is_bendahara'=>0,
+                'kepala_balai'=>0,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ],
@@ -32,6 +33,7 @@ class UsersSeeder extends Seeder
                 'role' => 'admin',
                 'is_penanda_tangan' => 1,
                 'is_bendahara'=>0,
+                'kepala_balai'=>0,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ],
@@ -46,6 +48,7 @@ class UsersSeeder extends Seeder
                 'role' => 'pegawai',
                 'is_penanda_tangan' => 0,
                 'is_bendahara'=>0,
+                'kepala_balai'=>0,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ],
@@ -59,6 +62,7 @@ class UsersSeeder extends Seeder
                 'role' => 'pegawai',
                 'is_penanda_tangan' => 0,
                 'is_bendahara'=>0,
+                'kepala_balai'=>1,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ],
@@ -72,6 +76,7 @@ class UsersSeeder extends Seeder
                 'role' => 'pegawai',
                 'is_penanda_tangan' => 0,
                 'is_bendahara'=>1,
+                'kepala_balai'=>0,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ],

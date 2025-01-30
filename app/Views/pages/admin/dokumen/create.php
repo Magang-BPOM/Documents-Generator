@@ -168,21 +168,25 @@ Pembuatan Dokumen
                 <div id="tempat-singgah-container">
                     <div class="flex items-center mb-4 mt-4">
                         <input type="text"
+                            value="<?= old('tempat_singgah.berangkat_dari.0') ?>"
                             name="tempat_singgah[berangkat_dari][]"
                             placeholder="Berangkat Dari"
                             class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
                             required>
                         <input type="text"
+                            value="<?= old('tempat_singgah.ke.0') ?>"
                             name="tempat_singgah[ke][]"
                             placeholder="Ke"
                             class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
                             required>
                         <input type="text"
+                            value="<?= old('tempat_singgah.nama_tempat.0') ?>"
                             name="tempat_singgah[nama_tempat][]"
                             placeholder="Nama Hotel/Tempat Singgah"
                             class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
                             required>
                         <input type="date"
+                            value="<?= old('tempat_singgah.tanggal.0') ?>"
                             name="tempat_singgah[tanggal][]"
                             class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
                             required>
@@ -218,7 +222,7 @@ Pembuatan Dokumen
 
 
             <div class="col-span-1">
-                <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">Penanda Tangan</label>
+                <label for="penanda_tangan" class="required block font-medium text-gray-700 dark:text-neutral-300">PPK Penanda Tangan</label>
                 <select name="penanda_tangan" id="penanda_tangan"
                     class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
                     <?php foreach ($penanda_tangan as $item): ?>
@@ -227,10 +231,20 @@ Pembuatan Dokumen
                 </select>
             </div>
 
+            <div class="col-span-1">
+                <label for="kepala_balai" class="required block font-medium text-gray-700 dark:text-neutral-300">Kepala Balai</label>
+                <select name="kepala_balai" id="kepala_balai"
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 p-3 h-12" required>
+                    <?php foreach ($kepala_balai as $item): ?>
+                        <option value="<?= $item['id'] ?>"><?= $item['nama'] ?> - <?= $item['jabatan'] ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
 
             <div class="col-span-1">
                 <label for="ttd_tanggal" class="required block text-gray-700 dark:text-neutral-300">Tanggal Tanda Tangan</label>
-                <input type="date" name="ttd_tanggal" id="ttd_tanggal" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
+                <input value="<?= old('ttd_tanggal') ?>" type="date" name="ttd_tanggal" id="ttd_tanggal" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12" required>
                 <span id="error-message-end" class="text-red-500 mt-2 hidden"></span>
             </div>
 
@@ -254,20 +268,61 @@ Pembuatan Dokumen
     document.addEventListener('DOMContentLoaded', () => {
         const waktuMulaiInput = document.getElementById('waktu_mulai');
         const waktuBerakhirInput = document.getElementById('waktu_berakhir');
-        const errorContainer = document.getElementById('error-message');
+        const tglSinggahInputs = document.querySelectorAll('input[name="tempat_singgah[tanggal][]"]');
+        const ttdPKK = document.getElementById('ttd_tanggal');
 
-        // Fungsi untuk memperbarui batas waktu input "waktu berakhir" berdasarkan "waktu mulai"
+        function getTodayDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Tambahkan nol di depan jika perlu
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         function updateDateConstraints() {
+            const today = getTodayDate();
             const waktuMulai = waktuMulaiInput.value;
 
+            // Set min pada input waktu mulai agar tidak bisa memilih hari kemarin
+            waktuMulaiInput.setAttribute('min', today);
+
             if (waktuMulai) {
-                waktuBerakhirInput.setAttribute('min', waktuMulai); // Set minimum date
+                waktuBerakhirInput.setAttribute('min', waktuMulai);
+                tglSinggahInputs.forEach(input => input.setAttribute('min', waktuMulai));
+                ttdPKK.setAttribute('min', waktuMulai);
             } else {
-                waktuBerakhirInput.removeAttribute('min'); // Reset jika tidak ada tanggal valid
+                waktuBerakhirInput.removeAttribute('min');
+                tglSinggahInputs.forEach(input => input.removeAttribute('min'));
+                ttdPKK.removeAttribute('min');
             }
         }
 
-         // Event listener untuk perubahan pada input "waktu mulai"
+        function validateDates() {
+            const waktuMulai = waktuMulaiInput.value;
+            const waktuBerakhir = waktuBerakhirInput.value;
+
+            if (waktuMulai && waktuBerakhir && waktuBerakhir < waktuMulai) {
+                alert("Waktu Berakhir tidak boleh lebih awal dari Waktu Mulai!");
+                waktuBerakhirInput.value = "";
+            }
+
+            tglSinggahInputs.forEach(input => {
+                if (waktuMulai && input.value && input.value < waktuMulai) {
+                    alert("Tanggal Singgah tidak boleh sebelum Waktu Mulai!");
+                    input.value = "";
+                }
+            });
+
+            if (waktuMulai && ttdPKK.value && ttdPKK.value < waktuMulai) {
+                alert("Tanggal PKK tidak boleh sebelum Waktu Mulai!");
+                ttdPKK.value = "";
+            }
+        }
+
+        // Set batas tanggal saat halaman dimuat
+        updateDateConstraints();
+
+        // Event listener untuk setiap perubahan tanggal
         waktuMulaiInput.addEventListener('change', () => {
             updateDateConstraints();
             validateDates();
@@ -275,10 +330,15 @@ Pembuatan Dokumen
 
         waktuBerakhirInput.addEventListener('change', validateDates);
 
-        updateDateConstraints();
+        tglSinggahInputs.forEach(input => {
+            input.addEventListener('change', validateDates);
+        });
+
+        ttdPKK.addEventListener('change', validateDates);
     });
 
-     // Fungsi untuk menambahkan input tempat singgah baru
+
+    // Fungsi untuk menambahkan input tempat singgah baru
     function tambahTempatSinggah() {
         const container = document.getElementById('tempat-singgah-container');
         const newInput = document.createElement('div');
@@ -311,9 +371,9 @@ Pembuatan Dokumen
         container.appendChild(newInput);
     }
 
-     // Fungsi untuk menghapus input tempat singgah
+    // Fungsi untuk menghapus input tempat singgah
     function hapusTempatSinggah(btn) {
-        btn.closest('.flex').remove();  // Fungsi untuk menghapus input tempat singgah
+        btn.closest('.flex').remove(); // Fungsi untuk menghapus input tempat singgah
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -341,7 +401,7 @@ Pembuatan Dokumen
     });
 
 
-      // Fungsi untuk menampilkan atau menyembunyikan opsi tambahan
+    // Fungsi untuk menampilkan atau menyembunyikan opsi tambahan
     function toggleOpsiTambahan(isVisible) {
         const container = document.getElementById('opsi-tambahan-container');
         if (isVisible) {
@@ -364,7 +424,7 @@ Pembuatan Dokumen
 
         function renderDropdown(showDasar) {
             dropdownDasar.innerHTML = showDasar.map(list => {
-                const isSelected = selectedDasar.has(list.id); 
+                const isSelected = selectedDasar.has(list.id);
                 return `
                 <div class="dasar-option p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 cursor-pointer ${isSelected ? 'bg-gray-200 dark:bg-neutral-800 text-gray-400' : ''}"
                     data-id="${list.id}"
@@ -425,7 +485,7 @@ Pembuatan Dokumen
             updateSelectedDasarInput();
         }
 
-         // Fungsi untuk menghapus dasar dari daftar yang dipilih
+        // Fungsi untuk menghapus dasar dari daftar yang dipilih
 
         window.removeDasar = function(dasarId, button) {
             selectedDasar.delete(dasarId);
@@ -446,7 +506,7 @@ Pembuatan Dokumen
     })();
 
 
-      // Logika dropdown untuk memilih pengguna
+    // Logika dropdown untuk memilih pengguna
     (function() {
         const selectedUsers = new Set();
         const dropdownList = document.getElementById('dropdown-list');

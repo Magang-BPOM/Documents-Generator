@@ -57,6 +57,11 @@ class UserTable extends Migration
                 'null'       => false,
                 'default'    => 0, 
             ],
+            'kepala_balai' => [
+                'type'       => 'BOOLEAN', 
+                'null'       => false,
+                'default'    => 0, 
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
