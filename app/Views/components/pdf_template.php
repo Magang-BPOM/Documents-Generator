@@ -271,9 +271,9 @@ function formatTanggalRentang($mulai, $berakhir)
         }
 
         .section-lampiran p {
-            margin-left: calc(58% - 100px);
+            margin-left: calc(16% - 100px);
             width: 100%;
-            text-align: left;
+            text-align: right;
         }
     </style>
 </head>
@@ -389,11 +389,11 @@ function formatTanggalRentang($mulai, $berakhir)
     <?php if (count($users) > 2): ?>
         <div class="page-break">
             <div class="wrap">
-                <p class="text-md" style="text-align: center; font-size: 18px; margin-bottom: 8px;">LAMPIRAN</p>
-                <div class="section-lampiran mt-6" style="text-align: center;">
+                <p class="text-md" style=" font-size: 18px; margin-bottom: 8px;">LAMPIRAN</p>
+                <div class="section-lampiran mt-6" style="">
                     <p class="text-md" style="text-align: left;margin-bottom: 8px;">SURAT TUGAS KEPALA BBPOM DI SURABAYA</p>
                     <p class="text-md" style="text-align: left;margin-bottom: 8px;">NOMOR: <?= esc($surat['nomor_surat']) ?></p>
-                    <p class="text-md" style="text-align: left;">TANGGAL: <?= formatTGL($surat['created_at']) ?></p>
+                    <p class="text-md" style="text-align: left;">TANGGAL: <?= formatTGL($surat['waktu_mulai']) ?></p>
                 </div>
 
                 <table class="table">

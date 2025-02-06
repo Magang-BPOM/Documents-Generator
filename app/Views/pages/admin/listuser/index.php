@@ -85,7 +85,8 @@ Semua User
                                     data-role="<?= esc($item['role']) ?>"
                                     data-foto="<?= esc($item['foto_profil']) ?>"
                                     data-is_bendahara="<?= esc($item['is_bendahara']) ?>"
-                                    data-is_penanda_tangan= "<?= esc($item['is_penanda_tangan']) ?>">
+                                    data-is_penanda_tangan= "<?= esc($item['is_penanda_tangan']) ?>"
+                                    data-kepala_balai= "<?= esc($item['kepala_balai']) ?>">
                                     Edit
                                 </button>
                             </td>
@@ -156,6 +157,15 @@ Semua User
                 </select>
             </div>
 
+            <!-- Kepala Balai -->
+            <div class="mb-4">
+                <label for="kepala_balai" class="block text-sm font-medium text-gray-700">Apakah Kepala Balai?</label>
+                <select id="kepala_balai" name="kepala_balai" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:focus:ring-blue-500" required>
+                    <option value="1">Ya</option>
+                    <option value="0">Tidak</option>
+                </select>
+            </div>
+
             <!-- Profile Picture -->
             <div class="mb-4">
                 <label for="foto" class="block text-sm font-medium text-gray-700">Profile Picture</label>
@@ -217,7 +227,9 @@ Semua User
                 const foto = button.getAttribute('data-foto');
                 const bendahara = button.getAttribute('data-is_bendahara');
                 const penandatangan = button.getAttribute('data-is_penanda_tangan');
-                console.log(bendahara);
+                const kepala = button.getAttribute('data-kepala_balai');
+                console.log(kepala);
+                
                 
 
                 document.getElementById('user_id').value = userId;
@@ -227,6 +239,7 @@ Semua User
                 document.getElementById('pangkat').value = pangkat;
                 document.getElementById('is_bendahara').value = bendahara;
                 document.getElementById('is_penanda_tangan').value = penandatangan;
+                document.getElementById('kepala_balai').value = kepala;
 
 
 

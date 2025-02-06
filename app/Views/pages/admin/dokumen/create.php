@@ -190,7 +190,6 @@ Pembuatan Dokumen
                             name="tempat_singgah[tanggal][]"
                             class="flex-grow mr-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-800 dark:border-gray-600 dark:text-neutral-300 p-3 h-12"
                             required>
-                        <button type="button" onclick="hapusTempatSinggah(this)" class="bg-red-500 text-white px-3 py-2 rounded">-</button>
                     </div>
                 </div>
                 <button type="button" onclick="tambahTempatSinggah()" class="w-full bg-neutral-50 border border-blue-500 px-3 py-2 rounded text-blue-500">Tambah Tempat Singgah</button>
@@ -248,10 +247,9 @@ Pembuatan Dokumen
                 <span id="error-message-end" class="text-red-500 mt-2 hidden"></span>
             </div>
 
-
             <!-- Button -->
             <div class="col-span-2 flex justify-start space-x-2">
-                <a href="/surat" class="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
+                <a href="/admin/dokumen" class="inline-flex items-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-neutral-900">
                     Kembali
                 </a>
 

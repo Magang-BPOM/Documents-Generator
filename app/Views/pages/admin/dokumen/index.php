@@ -16,7 +16,7 @@ Semua Dokumen
 
 <div class="relative max-w-full min-h-screen mx-auto p-6 sm:px-6 lg:px-6">
     <div class="bg-white dark:bg-neutral-900 shadow-lg rounded-xl p-6">
-     
+
         <div class=" py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 dark:border-neutral-700">
             <div class="sm:col-span-1">
                 <label for="search_table" class="sr-only">Search</label>
@@ -33,13 +33,18 @@ Semua Dokumen
             <div class="sm:col-span-2 md:grow">
                 <div class="flex justify-end gap-x-2">
                     <div class="sm:col-span-2 md:grow">
-                    <div class="flex justify-end gap-x-2">
-                            <a href="/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                        <div class="flex justify-end gap-x-2">
+
+                            <button data-trashed="false" onclick="buatsurat()" type="button" class=" py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Buat Surat
-                            </a>
+                            </button>
 
                             <button data-trashed="true" data-url="<?= base_url('admin/dokumen/bulkArsip') ?>" type="button" class="bulkArsipBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Arsip
+                            </button>
+
+                            <button data-trashed="false" onclick="editsurat()" type="button" class=" py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                                Edit
                             </button>
 
                             <button data-trashed="false" data-url="<?= base_url('admin/dokumen/delete') ?>" type="button" class="bulkDeleteBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
@@ -95,7 +100,7 @@ Semua Dokumen
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Tugas</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penanda Tangan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan TTD</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">List Surat</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200 dark:bg-neutral-900 dark:divide-neutral-800">
@@ -185,9 +190,8 @@ Semua Dokumen
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 <script>
-
     // Fungsi untuk menampilkan modal semua petugas jika lebih dari 1 petugas
-     function showUsersModal(users) {
+    function showUsersModal(users) {
         const modalContent = document.getElementById('modal-content');
         const modal = document.getElementById('modal');
 
@@ -232,9 +236,10 @@ Semua Dokumen
                 },
             <?php endforeach; ?>
         ];
+
         function updateTable() {
             const userId = <?= json_encode(session()->get('user_id')); ?>;
-            console.log("User ID:", userId);
+            console.log("User ID:", data);
 
             if (!userId) {
                 console.error("User ID is not defined or null.");
@@ -257,14 +262,14 @@ Semua Dokumen
 
                 const statusCell = document.createElement('td');
                 statusCell.className = "px-6 py-4 whitespace-nowrap";
-                const userId = <?= json_encode(session()->get('user_id')); ?>; 
+                const userId = <?= json_encode(session()->get('user_id')); ?>;
 
                 const currentUser = item.kepada.find(user => parseInt(user.user_id) === parseInt(userId));
                 const isUnreadForCurrentUser = currentUser && parseInt(currentUser.is_read || 0) === 0;
 
-                statusCell.innerHTML = isUnreadForCurrentUser
-                    ? `<span class="text-xs font-semibold text-white bg-green-500 px-2 py-1 rounded-full">New</span>`
-                    : `<span class="text-xs font-semibold text-gray-500 bg-gray-200 px-2 py-1 rounded-full">Old</span>`;
+                statusCell.innerHTML = isUnreadForCurrentUser ?
+                    `<span class="text-xs font-semibold text-white bg-green-500 px-2 py-1 rounded-full">New</span>` :
+                    `<span class="text-xs font-semibold text-gray-500 bg-gray-200 px-2 py-1 rounded-full">Old</span>`;
                 row.appendChild(statusCell);
 
 
@@ -488,6 +493,19 @@ Semua Dokumen
         });
     });
 
+    function buatsurat() {
+        window.location.href = `/admin/dokumen/create`;
+    }
+
+    function editsurat() {
+        const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
+        if (selectedIds.length === 0) {
+            alert('Silakan pilih 1 Surat yang ingin diedit');
+            return;
+        }
+        // alert('Silakan diedit');
+        window.location.href = `/admin/dokumen/edit/${selectedIds}`;
+    }
 
     // Fungsi export surat ke word
     function exportWord() {
@@ -499,7 +517,7 @@ Semua Dokumen
         window.location.href = `/admin/dokumen/generate-word/${selectedIds}`;
     }
 
-    
+
     // Fungsi export surat ke PDF
     function exportPDF() {
         const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);

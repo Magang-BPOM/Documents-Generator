@@ -14,7 +14,7 @@ class SuratSinggahTable extends Migration
             'berangkat_dari' => ['type' => 'VARCHAR', 'constraint' => 255],
             'ke' => ['type' => 'VARCHAR', 'constraint' => 255],
             'tanggal' => [
-                'type' => 'DATETIME',
+                'type' => 'DATE',
                 'null' => true,
             ],
             'nama_tempat' => ['type' => 'VARCHAR', 'constraint' => 255],

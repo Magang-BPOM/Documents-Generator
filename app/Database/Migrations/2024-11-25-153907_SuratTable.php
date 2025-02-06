@@ -62,7 +62,7 @@ class SuratTable extends Migration
                 'null' => false,
             ],
             'ttd_tanggal' => [
-                'type' => 'DATETIME',
+                'type' => 'DATE',
                 'null' => true,
             ],
             'status'       => [

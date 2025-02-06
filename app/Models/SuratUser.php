@@ -93,6 +93,10 @@ class SuratUser extends Model
         return $result;
     }
 
+    public function suratDetail($id)
+    {
+        
+    }
 
 
     public function suratbyUser()

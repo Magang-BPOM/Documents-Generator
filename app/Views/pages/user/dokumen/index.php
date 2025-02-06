@@ -36,13 +36,17 @@ Semua Dokumen
             <div class="sm:col-span-2 md:grow">
                 <div class="flex justify-end gap-x-2">
                     <div class="sm:col-span-2 md:grow">
-                    <div class="flex justify-end gap-x-2">
-                            <a href="/dokumen/create" id="btnModalAddData" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                        <div class="flex justify-end gap-x-2">
+                            <button data-trashed="false" onclick="buatsurat()" type="button" class=" py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Buat Surat
-                            </a>
+                            </button>
 
                             <button data-trashed="true" data-url="<?= base_url('dokumen/bulkArsip') ?>" type="button" class="bulkArsipBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
                                 Arsip
+                            </button>
+
+                            <button data-trashed="false" onclick="editsurat()" type="button" class=" py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                                Edit
                             </button>
 
                             <button data-trashed="false" data-url="<?= base_url('dokumen/delete') ?>" type="button" class="bulkDeleteBtn py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
@@ -185,7 +189,7 @@ Semua Dokumen
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 <script>
-     function showUsersModal(users) {
+    function showUsersModal(users) {
         const modalContent = document.getElementById('modal-content');
         const modal = document.getElementById('modal');
 
@@ -229,6 +233,7 @@ Semua Dokumen
                 },
             <?php endforeach; ?>
         ];
+
         function updateTable() {
             const userId = <?= json_encode(session()->get('user_id')); ?>;
             console.log("User ID:", userId);
@@ -254,14 +259,14 @@ Semua Dokumen
 
                 const statusCell = document.createElement('td');
                 statusCell.className = "px-6 py-4 whitespace-nowrap";
-                const userId = <?= json_encode(session()->get('user_id')); ?>; 
+                const userId = <?= json_encode(session()->get('user_id')); ?>;
 
                 const currentUser = item.kepada.find(user => parseInt(user.user_id) === parseInt(userId));
                 const isUnreadForCurrentUser = currentUser && parseInt(currentUser.is_read || 0) === 0;
 
-                statusCell.innerHTML = isUnreadForCurrentUser
-                    ? `<span class="text-xs font-semibold text-white bg-green-500 px-2 py-1 rounded-full">New</span>`
-                    : `<span class="text-xs font-semibold text-gray-500 bg-gray-200 px-2 py-1 rounded-full">Old</span>`;
+                statusCell.innerHTML = isUnreadForCurrentUser ?
+                    `<span class="text-xs font-semibold text-white bg-green-500 px-2 py-1 rounded-full">New</span>` :
+                    `<span class="text-xs font-semibold text-gray-500 bg-gray-200 px-2 py-1 rounded-full">Old</span>`;
                 row.appendChild(statusCell);
 
 
@@ -479,6 +484,19 @@ Semua Dokumen
         });
     });
 
+    function buatsurat() {
+        window.location.href = `/dokumen/create`;
+    }
+
+    function editsurat() {
+        const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
+        if (selectedIds.length === 0) {
+            alert('Silakan pilih 1 Surat yang ingin diedit');
+            return;
+        }
+        // alert('Silakan diedit');
+        window.location.href = `/dokumen/edit/${selectedIds}`;
+    }
 
     function exportWord() {
         const selectedIds = Array.from(document.querySelectorAll('.rowCheckbox:checked')).map(checkbox => checkbox.value);
